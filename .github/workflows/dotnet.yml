@@ -7,25 +7,27 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  build:
+  build-and-test:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        configuration: [Debug, Release]
-
-    runs-on: ubuntu-latest
+        configuration: [ Debug, Release ]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Install .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 8.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Execute unit tests
-      run: dotnet test
+      - name: Restore dependencies
+        run: dotnet restore --configuration ${{ matrix.configuration }}
+
+      - name: Build
+        run: dotnet build --no-restore --configuration ${{ matrix.configuration }}
+
+      - name: Test
+        run: dotnet test --no-restore --no-build --configuration ${{ matrix.configuration }}
