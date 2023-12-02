@@ -7,8 +7,6 @@ public static class Extensions
 {
     public static IServiceCollection AddAdventOfCode(this IServiceCollection services)
     {
-        services.AddHttpClient();
-
         services.TryAddSingleton<IInputService, InputService>();
 
         services.TryAddSingleton<IDayFactory, DayFactory>();

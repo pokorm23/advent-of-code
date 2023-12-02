@@ -10,9 +10,7 @@ public class Day1 : IDay
 
     public async Task<string> SolveAsync()
     {
-        var input = await this.inputService.GetOrDownloadInputAsync(this.Day);
-
-        var lines = input.Split(new []{ '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+        var lines = await this.inputService.GetInputLinesAsync(this.Day);
 
         var sum = 0;
 
@@ -20,7 +18,7 @@ public class Day1 : IDay
         {
             int? firstDigit = null;
             int? secondDigit = null;
-            
+
             foreach (var c in line)
             {
                 if (!char.IsDigit(c))
@@ -31,6 +29,7 @@ public class Day1 : IDay
                 if (firstDigit is null)
                 {
                     firstDigit = int.Parse(c.ToString());
+
                     continue;
                 }
 
@@ -59,11 +58,9 @@ public class Day1 : IDay
 
     public async Task<string> SolveBonusAsync()
     {
-        var input = await this.inputService.GetOrDownloadInputAsync(this.Day);
+        var lines = await this.inputService.GetInputLinesAsync(this.Day);
 
-        var lines = input.Split(new []{ '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-
-        var digitTexts = new Dictionary<string, int>()
+        var digitTexts = new Dictionary<string, int>
         {
             ["one"] = 1,
             ["two"] = 2,
@@ -73,26 +70,26 @@ public class Day1 : IDay
             ["six"] = 6,
             ["seven"] = 7,
             ["eight"] = 8,
-            ["nine"] = 9,
+            ["nine"] = 9
         };
 
         foreach (var c in "123456789")
         {
             digitTexts.Add(c.ToString(), int.Parse(c.ToString()));
         }
-        
+
         var sum = 0;
-        
+
         foreach (var line in lines)
         {
-            var firstDigit = digitTexts.Select(x => (Value: (int?)x.Value, line.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
+            var firstDigit = digitTexts.Select(x => (Value: (int?) x.Value, line.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
                                        .Where(x => x.Item2 >= 0)
                                        .MinBy(x => x.Item2).Value;
-            
-            var secondDigit =  digitTexts.Select(x => (Value: (int?)x.Value, line.LastIndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
+
+            var secondDigit = digitTexts.Select(x => (Value: (int?) x.Value, line.LastIndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
                                         .Where(x => x.Item2 >= 0)
-                                         .MaxBy(x => x.Item2).Value;
-            
+                                        .MaxBy(x => x.Item2).Value;
+
             secondDigit ??= firstDigit;
 
             var lineSum = 0;
