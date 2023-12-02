@@ -5,7 +5,7 @@ namespace AdventOfCode2023.Tests;
 public class Day1Tests : DayTestBase
 {
     [Fact]
-    public async Task Day1_Sample1()
+    public async Task SampleOne()
     {
         var day = new Day1(InputFromSample(
             """
@@ -21,7 +21,7 @@ public class Day1Tests : DayTestBase
     }
 
     [Fact]
-    public async Task Day1()
+    public async Task PartOne()
     {
         var day = new Day1(this.InputService);
 
@@ -31,7 +31,7 @@ public class Day1Tests : DayTestBase
     }
 
     [Fact]
-    public async Task Day1_Sample2()
+    public async Task Sample2()
     {
         var day = new Day1(InputFromSample(
             """
@@ -50,7 +50,7 @@ public class Day1Tests : DayTestBase
     }
 
     [Fact]
-    public async Task Day1_Bonus()
+    public async Task PartTwo()
     {
         var day = new Day1(this.InputService);
 

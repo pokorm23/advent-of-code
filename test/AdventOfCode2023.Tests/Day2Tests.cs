@@ -51,6 +51,10 @@ public class Day2Tests : DayTestBase
     [Fact]
     public async Task PartTwo()
     {
-        throw new NotImplementedException();
+        var day = new Day2(this.InputService);
+
+        var result = await day.SolveBonusAsync();
+
+        Assert.Equal("62241", result);
     }
 }

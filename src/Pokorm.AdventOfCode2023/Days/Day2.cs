@@ -44,14 +44,18 @@ public class Day2 : IDay
 
         Debug.WriteLine($"Solving game: {game} ...");
 
-        var criteria = new List<IGamePlayCriteria>()
-        {
-            new BagCapacityCriteria(12, 13, 14)
-        };
+        var criteria = new BagCapacityCriteria(12, 13, 14);
 
-        var possible = criteria.All(x => game.Plays.All(x.IsPossible));
+        var possible = game.Plays.All(criteria.IsPossible);
 
         Debug.WriteLine($" - possible: {possible}");
+
+        if (bonus)
+        {
+            var min = criteria.MinToBePossible(game);
+
+            return min.Power();
+        }
         
         return possible ? game.Id : 0;
     }
@@ -77,7 +81,7 @@ public class Day2 : IDay
 
             foreach (var play in plays)
             {
-                var throwDict = new Dictionary<CubeType, int>();
+                var throwDict = new CubeSet();
 
                 var throws = play.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
@@ -101,7 +105,7 @@ public class Day2 : IDay
         }
     }
 
-    private record GamePlay(Dictionary<CubeType, int> Cubes)
+    private record GamePlay(CubeSet Cubes)
     {
         public override string ToString() => string.Join(", ", Cubes.Select(x => $"{x.Value} {x.Key.ToString().ToLower()}"));
 
@@ -116,9 +120,28 @@ public class Day2 : IDay
     private interface IGamePlayCriteria
     {
         bool IsPossible(GamePlay gamePlay);
-    }
 
-    // only 12 red cubes, 13 green cubes, and 14 blue cubes
+        CubeSet MinToBePossible(Game game);
+    }
+    
+    class CubeSet : Dictionary<CubeType, int>
+    {
+        public CubeSet()
+        {
+            
+        }
+
+        public CubeSet(Dictionary<CubeType, int> dict) : base(dict)
+        {
+            
+        }
+        
+        public int Power()
+        {
+            return this.Aggregate(1, (acc, x) => acc * x.Value);
+        }
+    }
+    
     private class BagCapacityCriteria : IGamePlayCriteria
     {
         private readonly int redCount;
@@ -133,5 +156,14 @@ public class Day2 : IDay
         }
         
         public bool IsPossible(GamePlay gamePlay) => gamePlay.Count(CubeType.Red) <= redCount && gamePlay.Count(CubeType.Green) <= greenCount && gamePlay.Count(CubeType.Blue) <= blueCount;
+
+        public CubeSet MinToBePossible(Game game)
+        {
+            var maxes = game.Plays.SelectMany(x => x.Cubes)
+                            .GroupBy(x => x.Key)
+                            .Select(x => (x.Key, x.Select(y => y.Value).Max()));
+
+            return new CubeSet(maxes.ToDictionary(x => x.Key, x => x.Item2));
+        }
     }
 }
