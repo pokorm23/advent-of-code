@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode2023.Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode2023", "src\Pokorm.AdventOfCode2023\Pokorm.AdventOfCode2023.csproj", "{11333E10-8CDD-4975-ADBF-898DE889ED2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode2023.Tests", "test\AdventOfCode2023.Tests\AdventOfCode2023.Tests.csproj", "{752BF73A-E694-43B8-8B62-911192FE87A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{11333E10-8CDD-4975-ADBF-898DE889ED2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11333E10-8CDD-4975-ADBF-898DE889ED2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11333E10-8CDD-4975-ADBF-898DE889ED2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{752BF73A-E694-43B8-8B62-911192FE87A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{752BF73A-E694-43B8-8B62-911192FE87A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{752BF73A-E694-43B8-8B62-911192FE87A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{752BF73A-E694-43B8-8B62-911192FE87A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

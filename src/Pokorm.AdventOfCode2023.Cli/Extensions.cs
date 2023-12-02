@@ -8,9 +8,9 @@ public static class Extensions
     public static IServiceCollection AddAdventOfCodeApp(this IServiceCollection services)
     {
         services.AddAdventOfCode();
-        
+
         services.TryAddTransient<RunCommandHandler>();
-        
+
         return services;
     }
 }

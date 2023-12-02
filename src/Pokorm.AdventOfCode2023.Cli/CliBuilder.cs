@@ -28,13 +28,17 @@ public class CliBuilder
             {
                 Arity = ArgumentArity.ExactlyOne
             },
-            new Option<bool>(new [] {"-b", "--bonus"}, "Bonusová část")
+            new Option<bool>(new[]
+            {
+                "-b",
+                "--bonus"
+            }, "Bonusová část")
             {
                 Arity = ArgumentArity.ZeroOrOne
             }
         };
-        
-        var rootCommand = new RootCommand()
+
+        var rootCommand = new RootCommand
         {
             runCommand
         };

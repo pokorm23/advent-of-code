@@ -15,11 +15,9 @@ public class Day1 : IDay
         var lines = input.Split(new []{ '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
 
         var sum = 0;
-        var i = 0;
-        
+
         foreach (var line in lines)
         {
-            i++;
             int? firstDigit = null;
             int? secondDigit = null;
             
@@ -59,5 +57,59 @@ public class Day1 : IDay
         return sum.ToString();
     }
 
-    public Task<string> SolveBonusAsync() => throw new NotImplementedException();
+    public async Task<string> SolveBonusAsync()
+    {
+        var input = await this.inputService.GetOrDownloadInputAsync(this.Day);
+
+        var lines = input.Split(new []{ '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+
+        var digitTexts = new Dictionary<string, int>()
+        {
+            ["one"] = 1,
+            ["two"] = 2,
+            ["three"] = 3,
+            ["four"] = 4,
+            ["five"] = 5,
+            ["six"] = 6,
+            ["seven"] = 7,
+            ["eight"] = 8,
+            ["nine"] = 9,
+        };
+
+        foreach (var c in "123456789")
+        {
+            digitTexts.Add(c.ToString(), int.Parse(c.ToString()));
+        }
+        
+        var sum = 0;
+        
+        foreach (var line in lines)
+        {
+            var firstDigit = digitTexts.Select(x => (Value: (int?)x.Value, line.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
+                                       .Where(x => x.Item2 >= 0)
+                                       .MinBy(x => x.Item2).Value;
+            
+            var secondDigit =  digitTexts.Select(x => (Value: (int?)x.Value, line.LastIndexOf(x.Key, StringComparison.OrdinalIgnoreCase)))
+                                        .Where(x => x.Item2 >= 0)
+                                         .MaxBy(x => x.Item2).Value;
+            
+            secondDigit ??= firstDigit;
+
+            var lineSum = 0;
+
+            if (firstDigit is not null)
+            {
+                lineSum = firstDigit.Value * 10;
+            }
+
+            if (secondDigit is not null)
+            {
+                lineSum += secondDigit.Value;
+            }
+
+            sum += lineSum;
+        }
+
+        return sum.ToString();
+    }
 }

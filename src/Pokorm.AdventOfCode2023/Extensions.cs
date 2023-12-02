@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Pokorm.AdventOfCode2023;

@@ -20,7 +20,7 @@ public class RunCommandHandler
 
         string? result;
 
-        if (command.IsBonus)
+        if (command.Bonus)
         {
             result = await day.SolveBonusAsync();
         }
@@ -29,7 +29,7 @@ public class RunCommandHandler
             result = await day.SolveAsync();
         }
 
-        this.console.WriteLine($"Result for day {command.Day}{(command.IsBonus ? " (bonus)" : "")}:");
+        this.console.WriteLine($"Result for day {command.Day}{(command.Bonus ? " (bonus)" : "")}:");
 
         this.console.WriteLine(result);
     }
