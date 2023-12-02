@@ -24,7 +24,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore dependencies
-        run: dotnet restore --configuration ${{ matrix.configuration }}
+        run: dotnet restore /p:Configuration=${{ matrix.configuration }}
 
       - name: Build
         run: dotnet build --no-restore --configuration ${{ matrix.configuration }}
