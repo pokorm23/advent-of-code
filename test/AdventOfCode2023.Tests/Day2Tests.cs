@@ -28,7 +28,7 @@ public class Day2Tests : DayTestBase
 
         var result = await day.SolveAsync();
 
-        Assert.Equal("2207", result);
+        Assert.Equal("2551", result);
     }
 
     [Fact]
@@ -55,6 +55,6 @@ public class Day2Tests : DayTestBase
 
         var result = await day.SolveBonusAsync();
 
-        Assert.Equal("62241", result);
+        Assert.Equal("62811", result);
     }
 }
