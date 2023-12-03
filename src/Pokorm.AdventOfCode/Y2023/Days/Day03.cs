@@ -1,34 +1,12 @@
 ﻿using System.Text;
 
-namespace Pokorm.AdventOfCode2023;
+namespace Pokorm.AdventOfCode.Y2023.Days;
 
-public class Day3 : IDay
+public class Day03 : IDay
 {
     private readonly IInputService inputService;
 
-    public Day3(IInputService inputService) => this.inputService = inputService;
-
-    public int Day => 3;
-
-    private EngineSchematic ParseEngine()
-    {
-        var lines = this.inputService.GetInputLines(this.Day);
-
-        var top = 0;
-        var parser = new Parser();
-        var spans = new List<EngineSpan>();
-
-        foreach (var line in lines)
-        {
-            spans.AddRange(parser.ParseLine(line, top).ToList());
-
-            top++;
-        }
-
-        var engine = new EngineSchematic(top + 1, spans.Select(x => x.GetMaxLeftCoord()).Max() + 1, spans);
-
-        return engine;
-    }
+    public Day03(IInputService inputService) => this.inputService = inputService;
 
     public int SolveAsync()
     {
@@ -45,7 +23,27 @@ public class Day3 : IDay
 
         var partNumbers = engine.GetGears();
 
-        return partNumbers.Aggregate(0, (acc, pn) => acc + (pn.Number1.Number * pn.Number2.Number));
+        return partNumbers.Aggregate(0, (acc, pn) => acc + pn.Number1.Number * pn.Number2.Number);
+    }
+
+    private EngineSchematic ParseEngine()
+    {
+        var lines = this.inputService.GetInputLines(2023, 3);
+
+        var top = 0;
+        var parser = new Parser();
+        var spans = new List<EngineSpan>();
+
+        foreach (var line in lines)
+        {
+            spans.AddRange(parser.ParseLine(line, top).ToList());
+
+            top++;
+        }
+
+        var engine = new EngineSchematic(top + 1, spans.Select(x => x.GetMaxLeftCoord()).Max() + 1, spans);
+
+        return engine;
     }
 
     private class Parser
@@ -112,8 +110,8 @@ public class Day3 : IDay
 
         public IEnumerable<Gear> GetGears()
         {
-            var potentialGears = Spans.OfType<SymbolEngineSpan>().Where(x => x.Symbol == '*').ToList();
-            
+            var potentialGears = this.Spans.OfType<SymbolEngineSpan>().Where(x => x.Symbol == '*').ToList();
+
             foreach (var g in potentialGears)
             {
                 var surroundingNumbers = this.Spans.OfType<NumberEngineSpan>()
@@ -125,7 +123,7 @@ public class Day3 : IDay
                     yield return new Gear(g, surroundingNumbers[0], surroundingNumbers[1]);
                 }
             }
-            
+
             foreach (var n in this.Spans.OfType<NumberEngineSpan>())
             {
                 var frame = n.GetSurrounding();
@@ -135,16 +133,13 @@ public class Day3 : IDay
                     continue;
                 }
 
-                foreach (var n2 in this.Spans.OfType<NumberEngineSpan>().Where(x => x != n))
-                {
-                    
-                }
+                foreach (var n2 in this.Spans.OfType<NumberEngineSpan>().Where(x => x != n)) { }
             }
         }
     }
 
-    record Gear(SymbolEngineSpan Source, NumberEngineSpan Number1, NumberEngineSpan Number2);
-    
+    private record Gear(SymbolEngineSpan Source, NumberEngineSpan Number1, NumberEngineSpan Number2);
+
     private record Frame(Coord TopLeft, Coord BottomRight)
     {
         public bool IsIn(Coord c) => c.Left >= this.TopLeft.Left

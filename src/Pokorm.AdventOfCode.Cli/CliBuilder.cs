@@ -5,7 +5,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Pokorm.AdventOfCode2023.Cli;
+namespace Pokorm.AdventOfCode.Cli;
 
 public class CliBuilder
 {
@@ -22,6 +22,8 @@ public class CliBuilder
 
     public RootCommand CreateRootCommand()
     {
+        var currentYear = DateTime.UtcNow.AddHours(-5).AddMonths(1).Year - 1;
+
         var rootCommand = new RootCommand
         {
             new Argument<int>("day", "Den adventu")
@@ -35,10 +37,18 @@ public class CliBuilder
             }, "Bonusová část")
             {
                 Arity = ArgumentArity.ZeroOrOne
+            },
+            new Option<int>(new[]
+            {
+                "-y",
+                "--year"
+            }, () => currentYear, "Rok adventu")
+            {
+                Arity = ArgumentArity.ZeroOrOne
             }
         };
 
-        rootCommand.Name = "[Pokorm.AdventOfCode2023.Cli]";
+        rootCommand.Name = "[Pokorm.AdventOfCode.Cli]";
 
         rootCommand.Handler = CommandHandler.Create((RunCliCommand command, InvocationContext context, IHost host, CancellationToken cancellationToken) =>
         {

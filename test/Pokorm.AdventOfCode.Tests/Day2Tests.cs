@@ -1,13 +1,13 @@
-using Pokorm.AdventOfCode2023;
+using Pokorm.AdventOfCode.Y2023.Days;
 
-namespace AdventOfCode2023.Tests;
+namespace Pokorm.AdventOfCode.Tests;
 
 public class Day2Tests : DayTestBase
 {
     [Fact]
     public void SampleOne()
     {
-        var day = new Day2(InputFromSample(
+        var day = new Day02(InputFromSample(
             """
             Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
             Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -16,7 +16,7 @@ public class Day2Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result =  day.SolveAsync();
+        var result = day.SolveAsync();
 
         Assert.Equal(8, result);
     }
@@ -24,9 +24,9 @@ public class Day2Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new Day2(this.InputService);
+        var day = new Day02(this.InputService);
 
-        var result =  day.SolveAsync();
+        var result = day.SolveAsync();
 
         Assert.Equal(2551, result);
     }
@@ -34,7 +34,7 @@ public class Day2Tests : DayTestBase
     [Fact]
     public void Sample2()
     {
-        var day = new Day2(InputFromSample(
+        var day = new Day02(InputFromSample(
             """
             Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
             Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -43,7 +43,7 @@ public class Day2Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result =  day.SolveBonusAsync();
+        var result = day.SolveBonusAsync();
 
         Assert.Equal(2286, result);
     }
@@ -51,9 +51,9 @@ public class Day2Tests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = new Day2(this.InputService);
+        var day = new Day02(this.InputService);
 
-        var result =  day.SolveBonusAsync();
+        var result = day.SolveBonusAsync();
 
         Assert.Equal(62811, result);
     }

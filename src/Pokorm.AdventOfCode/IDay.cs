@@ -1,9 +1,7 @@
-﻿namespace Pokorm.AdventOfCode2023;
+﻿namespace Pokorm.AdventOfCode;
 
 public interface IDay
 {
-    int Day { get; }
-
     int SolveAsync();
 
     int SolveBonusAsync();

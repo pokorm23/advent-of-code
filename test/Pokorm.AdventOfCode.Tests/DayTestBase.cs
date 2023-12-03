@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Moq;
-using Pokorm.AdventOfCode2023;
 
-namespace AdventOfCode2023.Tests;
+namespace Pokorm.AdventOfCode.Tests;
 
 public abstract class DayTestBase
 {
@@ -10,6 +9,6 @@ public abstract class DayTestBase
 
     protected IInputService InputFromSample(string sample)
     {
-        return Mock.Of<IInputService>(x => x.GetInput(It.IsAny<int>()) == sample);
+        return Mock.Of<IInputService>(x => x.GetInput(It.IsAny<int>(), It.IsAny<int>()) == sample);
     }
 }

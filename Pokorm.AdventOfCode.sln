@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode2023.Cli", "src\Pokorm.AdventOfCode2023.Cli\Pokorm.AdventOfCode2023.Cli.csproj", "{E2D611C3-6B56-4ECE-8897-AC56E5BA66BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode.Cli", "src\Pokorm.AdventOfCode.Cli\Pokorm.AdventOfCode.Cli.csproj", "{E2D611C3-6B56-4ECE-8897-AC56E5BA66BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode2023", "src\Pokorm.AdventOfCode2023\Pokorm.AdventOfCode2023.csproj", "{11333E10-8CDD-4975-ADBF-898DE889ED2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode", "src\Pokorm.AdventOfCode\Pokorm.AdventOfCode.csproj", "{11333E10-8CDD-4975-ADBF-898DE889ED2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode2023.Tests", "test\AdventOfCode2023.Tests\AdventOfCode2023.Tests.csproj", "{752BF73A-E694-43B8-8B62-911192FE87A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokorm.AdventOfCode.Tests", "test\Pokorm.AdventOfCode.Tests\Pokorm.AdventOfCode.Tests.csproj", "{752BF73A-E694-43B8-8B62-911192FE87A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

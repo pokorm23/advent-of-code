@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Sharprompt;
 
-namespace Pokorm.AdventOfCode2023.Cli;
+namespace Pokorm.AdventOfCode.Cli;
 
 public static class CommandLineBuilderExtensions
 {

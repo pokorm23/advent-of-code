@@ -1,16 +1,14 @@
-﻿namespace Pokorm.AdventOfCode2023;
+﻿namespace Pokorm.AdventOfCode.Y2023.Days;
 
-public class Day1 : IDay
+public class Day01 : IDay
 {
     private readonly IInputService inputService;
 
-    public Day1(IInputService inputService) => this.inputService = inputService;
-
-    public int Day => 1;
+    public Day01(IInputService inputService) => this.inputService = inputService;
 
     public int SolveAsync()
     {
-        var lines = this.inputService.GetInputLines(this.Day);
+        var lines = this.inputService.GetInputLines(2023, 1);
 
         var sum = 0;
 
@@ -58,7 +56,7 @@ public class Day1 : IDay
 
     public int SolveBonusAsync()
     {
-        var lines = this.inputService.GetInputLines(this.Day);
+        var lines = this.inputService.GetInputLines(2023, 1);
 
         var digitTexts = new Dictionary<string, int>
         {

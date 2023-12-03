@@ -1,4 +1,4 @@
-﻿namespace Pokorm.AdventOfCode2023;
+﻿namespace Pokorm.AdventOfCode;
 
 public class AdventOfCodeOptions
 {

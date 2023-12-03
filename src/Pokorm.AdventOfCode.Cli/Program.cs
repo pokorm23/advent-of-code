@@ -4,7 +4,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.CommandLine.Rendering;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Pokorm.AdventOfCode2023.Cli;
+using Pokorm.AdventOfCode.Cli;
 
 var cliBuilder = CliBuilder.Create();
 

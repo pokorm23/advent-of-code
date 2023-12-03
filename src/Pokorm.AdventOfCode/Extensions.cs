@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Pokorm.AdventOfCode2023;
+namespace Pokorm.AdventOfCode;
 
 public static class Extensions
 {

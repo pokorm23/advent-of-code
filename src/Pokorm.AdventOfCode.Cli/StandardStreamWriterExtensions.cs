@@ -1,6 +1,6 @@
 ﻿using System.CommandLine.IO;
 
-namespace Pokorm.AdventOfCode2023.Cli;
+namespace Pokorm.AdventOfCode.Cli;
 
 public static class StandardStreamWriterExtensions
 {

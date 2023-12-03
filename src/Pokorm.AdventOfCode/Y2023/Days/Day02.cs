@@ -1,18 +1,16 @@
 ﻿using System.Diagnostics;
 
-namespace Pokorm.AdventOfCode2023;
+namespace Pokorm.AdventOfCode.Y2023.Days;
 
-public class Day2 : IDay
+public class Day02 : IDay
 {
     private readonly IInputService inputService;
 
-    public Day2(IInputService inputService) => this.inputService = inputService;
-
-    public int Day => 2;
+    public Day02(IInputService inputService) => this.inputService = inputService;
 
     public int SolveAsync()
     {
-        var lines = this.inputService.GetInputLines(this.Day);
+        var lines = this.inputService.GetInputLines(2023, 2);
 
         var sum = 0;
 
@@ -26,7 +24,7 @@ public class Day2 : IDay
 
     public int SolveBonusAsync()
     {
-        var lines = this.inputService.GetInputLines(this.Day);
+        var lines = this.inputService.GetInputLines(2023, 2);
 
         var sum = 0;
 
@@ -56,13 +54,13 @@ public class Day2 : IDay
 
             return min.Power();
         }
-        
+
         return possible ? game.Id : 0;
     }
 
     private record Game(int Id, List<GamePlay> Plays)
     {
-        public override string ToString() => $"Game {Id}: {string.Join("; ", Plays)}";
+        public override string ToString() => $"Game {this.Id}: {string.Join("; ", this.Plays)}";
 
         public static Game Parse(string input)
         {
@@ -107,7 +105,7 @@ public class Day2 : IDay
 
     private record GamePlay(CubeSet Cubes)
     {
-        public override string ToString() => string.Join(", ", Cubes.Select(x => $"{x.Value} {x.Key.ToString().ToLower()}"));
+        public override string ToString() => string.Join(", ", this.Cubes.Select(x => $"{x.Value} {x.Key.ToString().ToLower()}"));
 
         public int Count(CubeType type)
         {
@@ -123,30 +121,24 @@ public class Day2 : IDay
 
         CubeSet MinToBePossible(Game game);
     }
-    
-    class CubeSet : Dictionary<CubeType, int>
-    {
-        public CubeSet()
-        {
-            
-        }
 
-        public CubeSet(Dictionary<CubeType, int> dict) : base(dict)
-        {
-            
-        }
-        
+    private class CubeSet : Dictionary<CubeType, int>
+    {
+        public CubeSet() { }
+
+        public CubeSet(Dictionary<CubeType, int> dict) : base(dict) { }
+
         public int Power()
         {
             return this.Aggregate(1, (acc, x) => acc * x.Value);
         }
     }
-    
+
     private class BagCapacityCriteria : IGamePlayCriteria
     {
-        private readonly int redCount;
-        private readonly int greenCount;
         private readonly int blueCount;
+        private readonly int greenCount;
+        private readonly int redCount;
 
         public BagCapacityCriteria(int redCount, int greenCount, int blueCount)
         {
@@ -154,8 +146,8 @@ public class Day2 : IDay
             this.greenCount = greenCount;
             this.blueCount = blueCount;
         }
-        
-        public bool IsPossible(GamePlay gamePlay) => gamePlay.Count(CubeType.Red) <= redCount && gamePlay.Count(CubeType.Green) <= greenCount && gamePlay.Count(CubeType.Blue) <= blueCount;
+
+        public bool IsPossible(GamePlay gamePlay) => gamePlay.Count(CubeType.Red) <= this.redCount && gamePlay.Count(CubeType.Green) <= this.greenCount && gamePlay.Count(CubeType.Blue) <= this.blueCount;
 
         public CubeSet MinToBePossible(Game game)
         {

@@ -1,4 +1,4 @@
-﻿namespace Pokorm.AdventOfCode2023.Cli;
+﻿namespace Pokorm.AdventOfCode.Cli;
 
 public class DeployCliException : Exception
 {

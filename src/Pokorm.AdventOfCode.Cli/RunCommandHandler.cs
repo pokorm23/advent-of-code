@@ -1,7 +1,6 @@
 ﻿using System.CommandLine;
-using System.Security.Cryptography;
 
-namespace Pokorm.AdventOfCode2023.Cli;
+namespace Pokorm.AdventOfCode.Cli;
 
 public class RunCommandHandler
 {
@@ -17,14 +16,14 @@ public class RunCommandHandler
 
     public Task HandleAsync(RunCliCommand command, CancellationToken cancellationToken)
     {
-        var day = this.dayFactory.GetDay(command.Day);
+        var day = this.dayFactory.GetDay(command.Year, command.Day);
 
         var result = command.Bonus ? day.SolveBonusAsync() : day.SolveAsync();
 
-        this.console.WriteLine($"Result for day {command.Day}{(command.Bonus ? " (bonus)" : "")}:");
+        this.console.WriteLine($"Result for {command.Year} day {command.Day}{(command.Bonus ? " (bonus)" : "")}:");
 
         this.console.WriteLine(result.ToString());
-        
+
         return Task.CompletedTask;
     }
 }
