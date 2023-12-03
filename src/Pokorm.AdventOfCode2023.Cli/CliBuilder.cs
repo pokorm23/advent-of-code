@@ -22,7 +22,7 @@ public class CliBuilder
 
     public RootCommand CreateRootCommand()
     {
-        var runCommand = new Command("run")
+        var rootCommand = new RootCommand
         {
             new Argument<int>("day", "Den adventu")
             {
@@ -38,14 +38,9 @@ public class CliBuilder
             }
         };
 
-        var rootCommand = new RootCommand
-        {
-            runCommand
-        };
-
         rootCommand.Name = "[Pokorm.AdventOfCode2023.Cli]";
 
-        runCommand.Handler = CommandHandler.Create((RunCliCommand command, InvocationContext context, IHost host, CancellationToken cancellationToken) =>
+        rootCommand.Handler = CommandHandler.Create((RunCliCommand command, InvocationContext context, IHost host, CancellationToken cancellationToken) =>
         {
             context.Console.Out.WriteLineColor(JsonSerializer.Serialize(command), ConsoleColor.DarkGray);
 

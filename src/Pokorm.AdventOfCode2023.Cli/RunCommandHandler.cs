@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.Security.Cryptography;
 
 namespace Pokorm.AdventOfCode2023.Cli;
 
@@ -18,7 +19,7 @@ public class RunCommandHandler
     {
         var day = this.dayFactory.GetDay(command.Day);
 
-        string? result;
+        int? result;
 
         if (command.Bonus)
         {
@@ -31,6 +32,6 @@ public class RunCommandHandler
 
         this.console.WriteLine($"Result for day {command.Day}{(command.Bonus ? " (bonus)" : "")}:");
 
-        this.console.WriteLine(result);
+        this.console.WriteLine(result?.ToString() ?? "");
     }
 }
