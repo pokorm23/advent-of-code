@@ -10,9 +10,9 @@ public class Day3 : IDay
 
     public int Day => 3;
 
-    public async Task<int> SolveAsync()
+    private EngineSchematic ParseEngine()
     {
-        var lines = await this.inputService.GetInputLinesAsync(this.Day);
+        var lines = this.inputService.GetInputLines(this.Day);
 
         var top = 0;
         var parser = new Parser();
@@ -27,12 +27,26 @@ public class Day3 : IDay
 
         var engine = new EngineSchematic(top + 1, spans.Select(x => x.GetMaxLeftCoord()).Max() + 1, spans);
 
+        return engine;
+    }
+
+    public int SolveAsync()
+    {
+        var engine = ParseEngine();
+
         var partNumbers = engine.GetPartNumbers();
 
         return partNumbers.Aggregate(0, (acc, pn) => acc + pn.Number);
     }
 
-    public async Task<int> SolveBonusAsync() => throw new NotImplementedException();
+    public int SolveBonusAsync()
+    {
+        var engine = ParseEngine();
+
+        var partNumbers = engine.GetGears();
+
+        return partNumbers.Aggregate(0, (acc, pn) => acc + (pn.Number1.Number * pn.Number2.Number));
+    }
 
     private class Parser
     {
@@ -95,8 +109,42 @@ public class Day3 : IDay
                 }
             }
         }
+
+        public IEnumerable<Gear> GetGears()
+        {
+            var potentialGears = Spans.OfType<SymbolEngineSpan>().Where(x => x.Symbol == '*').ToList();
+            
+            foreach (var g in potentialGears)
+            {
+                var surroundingNumbers = this.Spans.OfType<NumberEngineSpan>()
+                                             .Where(n => n.GetSurrounding().IsIn(g.Coord))
+                                             .ToList();
+
+                if (surroundingNumbers.Count == 2)
+                {
+                    yield return new Gear(g, surroundingNumbers[0], surroundingNumbers[1]);
+                }
+            }
+            
+            foreach (var n in this.Spans.OfType<NumberEngineSpan>())
+            {
+                var frame = n.GetSurrounding();
+
+                if (!potentialGears.Any(s => frame.IsIn(s.Coord)))
+                {
+                    continue;
+                }
+
+                foreach (var n2 in this.Spans.OfType<NumberEngineSpan>().Where(x => x != n))
+                {
+                    
+                }
+            }
+        }
     }
 
+    record Gear(SymbolEngineSpan Source, NumberEngineSpan Number1, NumberEngineSpan Number2);
+    
     private record Frame(Coord TopLeft, Coord BottomRight)
     {
         public bool IsIn(Coord c) => c.Left >= this.TopLeft.Left

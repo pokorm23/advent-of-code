@@ -10,9 +10,9 @@ public class Day2 : IDay
 
     public int Day => 2;
 
-    public async Task<int> SolveAsync()
+    public int SolveAsync()
     {
-        var lines = await this.inputService.GetInputLinesAsync(this.Day);
+        var lines = this.inputService.GetInputLines(this.Day);
 
         var sum = 0;
 
@@ -24,9 +24,9 @@ public class Day2 : IDay
         return sum;
     }
 
-    public async Task<int> SolveBonusAsync()
+    public int SolveBonusAsync()
     {
-        var lines = await this.inputService.GetInputLinesAsync(this.Day);
+        var lines = this.inputService.GetInputLines(this.Day);
 
         var sum = 0;
 

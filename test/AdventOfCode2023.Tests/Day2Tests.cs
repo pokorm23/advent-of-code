@@ -5,7 +5,7 @@ namespace AdventOfCode2023.Tests;
 public class Day2Tests : DayTestBase
 {
     [Fact]
-    public async Task SampleOne()
+    public void SampleOne()
     {
         var day = new Day2(InputFromSample(
             """
@@ -16,23 +16,23 @@ public class Day2Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result = await day.SolveAsync();
+        var result =  day.SolveAsync();
 
         Assert.Equal(8, result);
     }
 
     [Fact]
-    public async Task PartOne()
+    public void PartOne()
     {
         var day = new Day2(this.InputService);
 
-        var result = await day.SolveAsync();
+        var result =  day.SolveAsync();
 
         Assert.Equal(2551, result);
     }
 
     [Fact]
-    public async Task Sample2()
+    public void Sample2()
     {
         var day = new Day2(InputFromSample(
             """
@@ -43,17 +43,17 @@ public class Day2Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result = await day.SolveBonusAsync();
+        var result =  day.SolveBonusAsync();
 
         Assert.Equal(2286, result);
     }
 
     [Fact]
-    public async Task PartTwo()
+    public void PartTwo()
     {
         var day = new Day2(this.InputService);
 
-        var result = await day.SolveBonusAsync();
+        var result =  day.SolveBonusAsync();
 
         Assert.Equal(62811, result);
     }

@@ -8,13 +8,13 @@ public class InputService : IInputService
 
     public InputService(IHostEnvironment hostEnvironment) => this.hostEnvironment = hostEnvironment;
 
-    public async Task<string> GetInputAsync(int day)
+    public string GetInput(int day)
     {
         var path = GetInputPath(day);
 
         if (File.Exists(path))
         {
-            return await File.ReadAllTextAsync(path);
+            return File.ReadAllText(path);
         }
 
         throw new Exception($"{path} not found");
@@ -30,14 +30,14 @@ public class InputService : IInputService
 
 public interface IInputService
 {
-    Task<string> GetInputAsync(int day);
+    string GetInput(int day);
 }
 
 public static class InputServiceExtensions
 {
-    public static async Task<string[]> GetInputLinesAsync(this IInputService inputService, int day)
+    public static string[] GetInputLines(this IInputService inputService, int day)
     {
-        var input = await inputService.GetInputAsync(day);
+        var input = inputService.GetInput(day);
 
         return input.Split(new[]
         {

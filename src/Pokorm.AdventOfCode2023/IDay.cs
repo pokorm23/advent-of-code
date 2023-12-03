@@ -4,7 +4,7 @@ public interface IDay
 {
     int Day { get; }
 
-    Task<int> SolveAsync();
+    int SolveAsync();
 
-    Task<int> SolveBonusAsync();
+    int SolveBonusAsync();
 }

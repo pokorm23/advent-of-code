@@ -15,23 +15,16 @@ public class RunCommandHandler
         this.dayFactory = dayFactory;
     }
 
-    public async Task HandleAsync(RunCliCommand command, CancellationToken cancellationToken)
+    public Task HandleAsync(RunCliCommand command, CancellationToken cancellationToken)
     {
         var day = this.dayFactory.GetDay(command.Day);
 
-        int? result;
-
-        if (command.Bonus)
-        {
-            result = await day.SolveBonusAsync();
-        }
-        else
-        {
-            result = await day.SolveAsync();
-        }
+        var result = command.Bonus ? day.SolveBonusAsync() : day.SolveAsync();
 
         this.console.WriteLine($"Result for day {command.Day}{(command.Bonus ? " (bonus)" : "")}:");
 
-        this.console.WriteLine(result?.ToString() ?? "");
+        this.console.WriteLine(result.ToString());
+        
+        return Task.CompletedTask;
     }
 }

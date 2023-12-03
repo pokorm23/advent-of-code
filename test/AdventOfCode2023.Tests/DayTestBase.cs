@@ -10,8 +10,6 @@ public abstract class DayTestBase
 
     protected IInputService InputFromSample(string sample)
     {
-        return Mock.Of<IInputService>(
-            x => x.GetInputAsync(It.IsAny<int>()
-                 ) == Task.FromResult(sample));
+        return Mock.Of<IInputService>(x => x.GetInput(It.IsAny<int>()) == sample);
     }
 }
