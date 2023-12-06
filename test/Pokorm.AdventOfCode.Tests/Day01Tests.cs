@@ -2,7 +2,7 @@ using Pokorm.AdventOfCode.Y2023.Days;
 
 namespace Pokorm.AdventOfCode.Tests;
 
-public class Day1Tests : DayTestBase
+public class Day01Tests : DayTestBase
 {
     [Fact]
     public void SampleOne()
