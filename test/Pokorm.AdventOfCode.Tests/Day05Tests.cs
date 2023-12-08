@@ -49,15 +49,15 @@ public class Day05Tests : DayTestBase
         Assert.Equal(35, result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartOne()
     {
         var day = new Day05(this.InputService);
 
         var result = day.SolveAsync();
 
-        Assert.Equal(20829, result);
-    }*/
+        Assert.Equal(313045984, result);
+    }
 
     /*[Fact]
     public void Sample2()

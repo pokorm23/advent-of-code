@@ -1,6 +1,4 @@
-﻿using System.Collections.Frozen;
-
-namespace Pokorm.AdventOfCode.Y2023.Days;
+﻿namespace Pokorm.AdventOfCode.Y2023.Days;
 
 public class Day05 : IDay
 {
@@ -95,55 +93,34 @@ public class Day05 : IDay
 
     private record Map(string From, string To, List<MapEntry> Entries)
     {
-        private IDictionary<long, long>? lookup;
-
         public long MapSourceToDest(long input)
         {
-            this.lookup ??= CreateLookup();
-
-            return this.lookup.TryGetValue(input, out var entryResult) ? entryResult : input;
-        }
-
-        public IDictionary<long, long> CreateLookup()
-        {
-            var dict = new Dictionary<long, long>();
-
-            foreach (var entry in this.Entries.Select(x => x.CreateLookup()))
+            foreach (var entry in this.Entries)
             {
-                foreach (var (key, value) in entry)
+                if (entry.TryMap(input, out var result))
                 {
-                    dict.Add(key, value);
+                    return result;
                 }
             }
 
-            return dict.ToFrozenDictionary();
+            return input;
         }
     }
 
     private record MapEntry(long DestStart, long SourceStart, long RangeLength)
     {
-        private IDictionary<long, long>? lookup;
-
-        public IDictionary<long, long> CreateLookup()
-        {
-            var dict = new Dictionary<long, long>();
-
-            var i = 0;
-
-            for (var sourceCursor = this.SourceStart; sourceCursor < this.SourceStart + this.RangeLength; sourceCursor++)
-            {
-                dict.Add(sourceCursor, this.DestStart + i);
-                i++;
-            }
-
-            return dict.ToFrozenDictionary();
-        }
-
         public bool TryMap(long input, out long result)
         {
-            this.lookup ??= CreateLookup();
+            result = 0;
 
-            return this.lookup.TryGetValue(input, out result);
+            if (input < this.SourceStart || input >= this.SourceStart + this.RangeLength)
+            {
+                return false;
+            }
+
+            result = this.DestStart - this.SourceStart + input;
+
+            return true;
         }
     }
 }
