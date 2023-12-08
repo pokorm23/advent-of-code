@@ -19,4 +19,9 @@ public static class Extensions
 
         return services;
     }
+
+    public static string[] FullSplit(this string value, params char[] split)
+    {
+        return value.Split(split, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
 }
