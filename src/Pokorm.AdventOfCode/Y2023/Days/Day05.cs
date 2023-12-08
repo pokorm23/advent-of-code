@@ -1,4 +1,6 @@
-﻿namespace Pokorm.AdventOfCode.Y2023.Days;
+﻿using System.Collections.Frozen;
+
+namespace Pokorm.AdventOfCode.Y2023.Days;
 
 public class Day05 : IDay
 {
@@ -63,7 +65,7 @@ public class Day05 : IDay
                 }
             }
         }
-        
+
         if (to is not null && from is not null)
         {
             maps.Add(new Map(from, to, entries));
@@ -76,17 +78,12 @@ public class Day05 : IDay
     {
         public IEnumerable<long> MapSeeds(string source, string dest)
         {
-            foreach (var seed in this.Seeds)
-            {
-                var cursor = seed;
+            return this.Seeds.Select(seed => MapSeed(seed, source, dest));
+        }
 
-                foreach (var map in GetOrderedMaps(source, dest))
-                {
-                    cursor = map.MapSourceToDest(cursor);
-                }
-
-                yield return cursor;
-            }
+        public long MapSeed(long seed, string source, string dest)
+        {
+            return GetOrderedMaps(source, dest).Aggregate(seed, (current, map) => map.MapSourceToDest(current));
         }
 
         public IEnumerable<Map> GetOrderedMaps(string source, string dest)
@@ -98,40 +95,55 @@ public class Day05 : IDay
 
     private record Map(string From, string To, List<MapEntry> Entries)
     {
+        private IDictionary<long, long>? lookup;
+
         public long MapSourceToDest(long input)
         {
-            foreach (var entry in this.Entries)
+            this.lookup ??= CreateLookup();
+
+            return this.lookup.TryGetValue(input, out var entryResult) ? entryResult : input;
+        }
+
+        public IDictionary<long, long> CreateLookup()
+        {
+            var dict = new Dictionary<long, long>();
+
+            foreach (var entry in this.Entries.Select(x => x.CreateLookup()))
             {
-                if (entry.TryMap(input, out var entryResult))
+                foreach (var (key, value) in entry)
                 {
-                    return entryResult;
+                    dict.Add(key, value);
                 }
             }
 
-            return input;
+            return dict.ToFrozenDictionary();
         }
     }
 
     private record MapEntry(long DestStart, long SourceStart, long RangeLength)
     {
-        public bool TryMap(long input, out long result)
+        private IDictionary<long, long>? lookup;
+
+        public IDictionary<long, long> CreateLookup()
         {
-            result = 0;
+            var dict = new Dictionary<long, long>();
 
             var i = 0;
-            for (long sourceCursor = this.SourceStart; sourceCursor < this.SourceStart + this.RangeLength; sourceCursor++)
+
+            for (var sourceCursor = this.SourceStart; sourceCursor < this.SourceStart + this.RangeLength; sourceCursor++)
             {
-                if (input == sourceCursor)
-                {
-                    result = this.DestStart + i;
-
-                    return true;
-                }
-
+                dict.Add(sourceCursor, this.DestStart + i);
                 i++;
             }
 
-            return false;
+            return dict.ToFrozenDictionary();
+        }
+
+        public bool TryMap(long input, out long result)
+        {
+            this.lookup ??= CreateLookup();
+
+            return this.lookup.TryGetValue(input, out result);
         }
     }
 }
