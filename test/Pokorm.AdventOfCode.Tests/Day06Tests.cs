@@ -10,11 +10,11 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void SampleOne()
     {
-        var day = new Day06(InputFromSample(
+        var day = CreateDayFromSample(
             """
             Time:      7  15   30
             Distance:  9  40  200
-            """));
+            """);
 
         var result = day.Solve();
 
@@ -24,7 +24,7 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new Day06(this.InputService);
+        var day = CreateDay();
 
         var result = day.Solve();
 
@@ -34,11 +34,11 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void SampleTwo()
     {
-        var day = new Day06(InputFromSample(
+        var day = CreateDayFromSample(
             """
             Time:      7  15   30
             Distance:  9  40  200
-            """));
+            """);
 
         var result = day.SolveBonus();
 
@@ -48,7 +48,7 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = new Day06(this.InputService);
+        var day = CreateDay();
 
         var result = day.SolveBonus();
 

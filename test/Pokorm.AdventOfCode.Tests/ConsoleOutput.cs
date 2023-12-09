@@ -20,11 +20,17 @@ public class ConsoleOutput : IDisposable
 
     public void Dispose()
     {
-        var capture = this.stringWriter.ToString();
-
-        foreach (var s in capture.ReplaceLineEndings().Split(Environment.NewLine))
+        try
         {
-            this.output.WriteLine(s);
+            var capture = this.stringWriter.ToString();
+
+            foreach (var s in capture.ReplaceLineEndings().Split(Environment.NewLine))
+            {
+                this.output.WriteLine(s);
+            }
+        }
+        catch 
+        {
         }
 
         Console.SetOut(this.originalOutput);
