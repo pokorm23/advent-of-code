@@ -8,14 +8,14 @@ public class Day04 : IDay
 
     public Day04(IInputService inputService) => this.inputService = inputService;
 
-    public int Solve()
+    public long Solve()
     {
         var set = Parse();
 
         return set.Cards.Sum(x => x.GetPoints());
     }
 
-    public int SolveBonus()
+    public long SolveBonus()
     {
         var set = Parse();
 

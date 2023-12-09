@@ -2,7 +2,7 @@
 
 public interface IDay
 {
-    int Solve();
+    long Solve();
 
-    int SolveBonus();
+    long SolveBonus();
 }

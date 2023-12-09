@@ -8,7 +8,7 @@ public class Day02 : IDay
 
     public Day02(IInputService inputService) => this.inputService = inputService;
 
-    public int Solve()
+    public long Solve()
     {
         var lines = this.inputService.GetInputLines(2023, 2);
 
@@ -22,7 +22,7 @@ public class Day02 : IDay
         return sum;
     }
 
-    public int SolveBonus()
+    public long SolveBonus()
     {
         var lines = this.inputService.GetInputLines(2023, 2);
 

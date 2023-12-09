@@ -8,7 +8,7 @@ public class Day03 : IDay
 
     public Day03(IInputService inputService) => this.inputService = inputService;
 
-    public int Solve()
+    public long Solve()
     {
         var engine = ParseEngine();
 
@@ -17,7 +17,7 @@ public class Day03 : IDay
         return partNumbers.Aggregate(0, (acc, pn) => acc + pn.Number);
     }
 
-    public int SolveBonus()
+    public long SolveBonus()
     {
         var engine = ParseEngine();
 

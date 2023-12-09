@@ -52,7 +52,6 @@ public class Day06Tests : DayTestBase
 
         var result = day.SolveBonus();
 
-        //Assert.True(result < 26788781);
-        //Assert.Equal(20283860, result);
+        Assert.Equal(43663323, result);
     }
 }

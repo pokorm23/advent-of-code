@@ -8,14 +8,14 @@ public class Day06 : IDay
 
     public Day06(IInputService inputService) => this.inputService = inputService;
 
-    public int Solve()
+    public long Solve()
     {
         var data = Parse(false);
 
         return data.GetMarginOfError();
     }
 
-    public int SolveBonus()
+    public long SolveBonus()
     {
         var data = Parse(true);
 
@@ -26,19 +26,19 @@ public class Day06 : IDay
     {
         var lines = this.inputService.GetInputLines(GetType());
 
-        var times = lines[0].FullSplit(':')[1].FullSplit(' ').Select(int.Parse).ToArray();
-        var distances = lines[1].FullSplit(':')[1].FullSplit(' ').Select(int.Parse).ToArray();
+        var times = lines[0].FullSplit(':')[1].FullSplit(' ').Select(long.Parse).ToArray();
+        var distances = lines[1].FullSplit(':')[1].FullSplit(' ').Select(long.Parse).ToArray();
 
         if (ignoreKerning)
         {
-            times = [int.Parse(string.Join("", times.Select(x => x.ToString())))];
-            distances = [int.Parse(string.Join("", distances.Select(x => x.ToString())))];
+            times = [long.Parse(string.Join("", times.Select(x => x.ToString())))];
+            distances = [long.Parse(string.Join("", distances.Select(x => x.ToString())))];
         }
-        
+
         var races = times.Zip(distances).Select(x => new Race(x.First, x.Second)).ToList();
 
         var r = new Data(races);
-        
+
         Trace.WriteLine($"Parsed: {r}");
 
         return r;
@@ -46,26 +46,26 @@ public class Day06 : IDay
 
     private record Data(List<Race> Races)
     {
-        public int GetMarginOfError()
+        public long GetMarginOfError()
         {
             return this.Races.Select(x => x.GetHoldTimeToBeatRecord().Count())
-                       .Aggregate(1, (acc, x) => acc * x);
+                       .Aggregate(1L, (acc, x) => acc * x);
         }
 
-        public override string ToString() => string.Join(Environment.NewLine, Races);
+        public override string ToString() => string.Join(Environment.NewLine, this.Races);
     }
 
-    private record Race(int Time, int RecordDistance)
+    private record Race(long Time, long RecordDistance)
     {
-        public IEnumerable<int> GetAllPossibleDistances()
+        public IEnumerable<long> GetAllPossibleDistances()
         {
-            foreach (var i in Enumerable.Range(0, this.Time + 1))
+            for (var i = 0L; i < this.Time + 1; i++)
             {
                 yield return (this.Time - i) * i;
             }
         }
 
-        public IEnumerable<int> GetHoldTimeToBeatRecord()
+        public IEnumerable<long> GetHoldTimeToBeatRecord()
         {
             foreach (var i in GetAllPossibleDistances())
             {
@@ -76,6 +76,6 @@ public class Day06 : IDay
             }
         }
 
-        public override string ToString() => $"t={Time}ms / r={RecordDistance}mm";
+        public override string ToString() => $"t={this.Time}ms / r={this.RecordDistance}mm";
     }
 }

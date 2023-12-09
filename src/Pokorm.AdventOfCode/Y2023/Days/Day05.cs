@@ -8,14 +8,14 @@ public class Day05 : IDay
 
     public Day05(IInputService inputService) => this.inputService = inputService;
 
-    public int Solve()
+    public long Solve()
     {
         var data = Parse();
 
         return (int) data.MapSeeds("seed", "location").Min();
     }
 
-    public int SolveBonus()
+    public long SolveBonus()
     {
         var data = Parse();
 
