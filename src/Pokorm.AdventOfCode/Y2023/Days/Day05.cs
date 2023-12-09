@@ -114,7 +114,7 @@ public class Day05 : IDay
         {
             var runRanges = this.Seeds.ToList();
 
-            var maps = GetOrderedMaps(source, dest).ToList();
+            var maps = this.Maps.ToList();
 
             Trace.WriteLine($"Maps: {string.Join(", ", maps)}");
             Trace.WriteLine(null);
@@ -137,32 +137,7 @@ public class Day05 : IDay
 
         public long MapSeed(long seed, string source, string dest)
         {
-            return GetOrderedMaps(source, dest).Aggregate(seed, (current, map) => map.MapSourceToDest(current));
-        }
-
-        public IEnumerable<Map> GetOrderedMaps(string source, string dest)
-        {
-            var inLoop = false;
-            
-            foreach (var map in this.Maps)
-            {
-                if (map.From == source)
-                {
-                    yield return map;
-                    inLoop = true;
-                }
-
-                if (map.To == dest)
-                {
-                    yield return map;
-                    yield break;
-                }
-
-                if (inLoop)
-                {
-                    yield return map;
-                }
-            }
+            return this.Maps.Aggregate(seed, (current, map) => map.MapSourceToDest(current));
         }
     }
 
