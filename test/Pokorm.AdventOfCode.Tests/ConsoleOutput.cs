@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Diagnostics;
+using Xunit.Abstractions;
 
 namespace Pokorm.AdventOfCode.Tests;
 
@@ -13,6 +14,7 @@ public class ConsoleOutput : IDisposable
         this.output = output;
         this.stringWriter = new StringWriter();
         this.originalOutput = Console.Out;
+        Trace.Listeners.Add(new TextWriterTraceListener(this.stringWriter));
         Console.SetOut(this.stringWriter);
     }
 

@@ -1,4 +1,6 @@
-﻿namespace Pokorm.AdventOfCode.Y2023.Days;
+﻿using System.Diagnostics;
+
+namespace Pokorm.AdventOfCode.Y2023.Days;
 
 public class Day05 : IDay
 {
@@ -82,7 +84,19 @@ public class Day05 : IDay
 
     private record Range(long Start, long Length)
     {
-        public long End => this.Start + this.Length - 1;
+        public long End => this.Start + Math.Max(0, this.Length - 1);
+
+        public static Range FromStartEnd(long start, long end)
+        {
+            if (end < start)
+            {
+                throw new ArgumentException("end must be greater than start");
+            }
+
+            return new Range(start, end - start + 1);
+        }
+
+        public override string ToString() => $"{this.Start}..{this.End}({this.Length})";
     }
 
     private record Data(List<Range> Seeds, List<Map> Maps)
@@ -100,11 +114,22 @@ public class Day05 : IDay
         {
             var runRanges = this.Seeds.ToList();
 
-            foreach (var map in GetOrderedMaps(source, dest))
+            var maps = GetOrderedMaps(source, dest).ToList();
+
+            Trace.WriteLine($"Maps: {string.Join(", ", maps)}");
+            Trace.WriteLine(null);
+
+            foreach (var map in maps)
             {
+                Trace.WriteLine($"Mapping {map}, input = {runRanges.Count}");
+
                 var iterResult = map.MapSourceToDest(runRanges).ToList();
 
                 runRanges = iterResult;
+
+                Trace.WriteLine($"--- Mapped {map}, output = {runRanges.Count}");
+
+                Trace.WriteLine(null);
             }
 
             return runRanges;
@@ -117,8 +142,27 @@ public class Day05 : IDay
 
         public IEnumerable<Map> GetOrderedMaps(string source, string dest)
         {
-            return this.Maps.SkipWhile(x => x.From != source)
-                       .TakeWhile(x => x.To != dest);
+            var inLoop = false;
+            
+            foreach (var map in this.Maps)
+            {
+                if (map.From == source)
+                {
+                    yield return map;
+                    inLoop = true;
+                }
+
+                if (map.To == dest)
+                {
+                    yield return map;
+                    yield break;
+                }
+
+                if (inLoop)
+                {
+                    yield return map;
+                }
+            }
         }
     }
 
@@ -128,34 +172,57 @@ public class Day05 : IDay
         {
             foreach (var src in srcRanges)
             {
+                Trace.WriteLine($"-> input = {src}");
+
                 var sortedEntries = this.Entries.OrderBy(x => x.Source.Start).ToList();
 
                 var mappedRanges = new List<(Range Input, Range Output)>();
 
                 foreach (var entry in sortedEntries)
                 {
+                    Trace.Write($"  - trying entry = {entry}");
+
                     var (input, transformedRange) = entry.MapRange(src);
 
                     if (transformedRange is not null && input is not null)
                     {
                         mappedRanges.Add((input, transformedRange));
+                        Trace.WriteLine($" -> {input}");
+                    }
+                    else
+                    {
+                        Trace.WriteLine(" -> no match");
                     }
                 }
 
                 if (mappedRanges.Count == 0)
                 {
+                    Trace.WriteLine($" - direct = {src}");
+
                     yield return src;
+
                     continue;
                 }
-                
-                // iterate gaps betwwen input matches
+
+                // iterate gaps between input matches
                 for (var i = 0; i < mappedRanges.Count; i++)
                 {
+                    // try gap before first
+                    if (i == 0 && mappedRanges[i].Input.Start > src.Start)
+                    {
+                        var preGapStart = src.Start;
+                        var preGapEnd = mappedRanges[i].Input.Start - 1;
+
+                        var preGap = Range.FromStartEnd(preGapStart, preGapEnd);
+
+                        Trace.WriteLine($" - direct (pre-gap) = {preGap}");
+
+                        yield return preGap;
+                    }
+
                     var (input, output) = mappedRanges[i];
-                    // i = 0; 17-17
-                    // i = 1; 20-20
-                    // i = 2; 27-31
-                    // i = 3; 48-50
+
+                    Trace.WriteLine($" - transform = {input} -> {output}");
 
                     yield return output; // yield transformed
 
@@ -168,14 +235,19 @@ public class Day05 : IDay
                         continue;
                     }
 
-                    var gapStart = input.End + 1; // 18
-                    var gapEnd = startOfNext - 1; // 19
+                    var gapStart = input.End + 1;
+                    var gapEnd = startOfNext - 1;
 
-                    // i = 0; (20 - 1) - (17 + 1) + 1 = 2
-                    var gapLength = gapEnd - gapStart + 1;
-                    
-                    // yield gap
-                    yield return new Range(input.End + 1, gapLength);
+                    if (gapStart >= gapEnd)
+                    {
+                        continue;
+                    }
+
+                    var gap = Range.FromStartEnd(gapStart, gapEnd);
+
+                    Trace.WriteLine($" - direct (gap) = {gap}");
+
+                    yield return gap;
                 }
             }
         }
@@ -192,6 +264,8 @@ public class Day05 : IDay
 
             return input;
         }
+
+        public override string ToString() => $"{this.From} -> {this.To} ({this.Entries.Count})";
     }
 
     private record MapEntry(Range Source, long Diff)
@@ -215,10 +289,9 @@ public class Day05 : IDay
 
             var shiftedStart = this.Diff + start;
             var shiftedEnd = this.Diff + end;
-            var length = shiftedEnd - shiftedStart + 1;
 
-            var inputRange = new Range(start, length);
-            var transformedRange = new Range(shiftedStart, length);
+            var inputRange = Range.FromStartEnd(start, end);
+            var transformedRange = Range.FromStartEnd(shiftedStart, shiftedEnd);
 
             return (inputRange, transformedRange);
         }
@@ -236,5 +309,7 @@ public class Day05 : IDay
 
             return true;
         }
+
+        public override string ToString() => $"{this.Source}{(this.Diff >= 0 ? "+" : "")}{this.Diff}";
     }
 }
