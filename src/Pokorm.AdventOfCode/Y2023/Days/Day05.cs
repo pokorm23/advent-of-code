@@ -17,14 +17,14 @@ public class Day05 : IDay
     {
         var data = Parse();
 
-        return 0;
+        return (int) data.MapSeedsAsRanges("seed", "location").Min();
     }
 
     private Data Parse()
     {
         var lines = this.inputService.GetInputLines(2023, 5);
 
-        var seeds = new List<long>();
+        var seeds = new List<Seed>();
         var maps = new List<Map>();
         string? from = null, to = null;
         var entries = new List<MapEntry>();
@@ -33,8 +33,13 @@ public class Day05 : IDay
         {
             if (line.StartsWith("seeds"))
             {
-                seeds = line.FullSplit(':')[1].FullSplit(' ').Select(long.Parse).ToList();
+                var seedsNums = line.FullSplit(':')[1].FullSplit(' ').Select(long.Parse).ToList();
 
+                foreach (var longs in seedsNums.Chunk(2))
+                {
+                    seeds.Add(new Seed(longs[0], longs[1]));
+                }
+                
                 continue;
             }
 
@@ -72,11 +77,24 @@ public class Day05 : IDay
         return new Data(seeds, maps);
     }
 
-    private record Data(List<long> Seeds, List<Map> Maps)
+    record Seed(long Start, long Lenght);
+
+    private record Data(List<Seed> Seeds, List<Map> Maps)
     {
         public IEnumerable<long> MapSeeds(string source, string dest)
         {
-            return this.Seeds.Select(seed => MapSeed(seed, source, dest));
+            return this.Seeds.SelectMany(x => new [] {x.Start, x.Lenght}).Select(seed => MapSeed(seed, source, dest));
+        }
+
+        public IEnumerable<long> MapSeedsAsRanges(string source, string dest)
+        {
+            foreach (var (start, lenght) in this.Seeds)
+            {
+                for (var i = start; i < start + lenght; i++)
+                {
+                    yield return MapSeed(i, source, dest);
+                }
+            }
         }
 
         public long MapSeed(long seed, string source, string dest)
