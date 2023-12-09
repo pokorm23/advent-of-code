@@ -60,11 +60,12 @@ public class Day05Tests : DayTestBase
     }
 
     [Fact]
-    public void Sample2()
+    public void SampleTwo()
     {
+        // seeds: 79 14 55 13
         var day = new Day05(InputFromSample(
             """
-            seeds: 79 14 55 13
+            seeds: 79 14
             
             seed-to-soil map:
             50 98 2
