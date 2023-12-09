@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Sharprompt;
+using Spectre.Console;
 
 namespace Pokorm.AdventOfCode.Cli;
 
@@ -63,11 +64,17 @@ public static class CommandLineBuilderExtensions
                     throw;
                 }
             }
-            catch (DeployCliException e)
+            catch (CliException e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                context.Console.Error.WriteLine($"Chyba: {e.Message}");
-                Console.ResetColor();
+                AnsiConsole.WriteLine();
+                AnsiConsole.Console.WriteLine("Chyba", new Style(foreground: Color.Red));
+                AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything);
+            }
+            catch (Exception e)
+            {
+                AnsiConsole.WriteLine();
+                AnsiConsole.Console.WriteLine("Neočekávaná chyba", new Style(foreground: Color.Red));
+                AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything);
             }
         });
     }

@@ -35,6 +35,10 @@ public class RunCommandHandler
         {
             cancellationToken.ThrowIfCancellationRequested();
         }
+        else if (workTask.IsFaulted)
+        {
+            throw workTask.Exception!;
+        }
 
         var result = await workTask;
 
