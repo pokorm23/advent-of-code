@@ -1,4 +1,5 @@
 using Pokorm.AdventOfCode.Y2023.Days;
+using Xunit.Abstractions;
 
 namespace Pokorm.AdventOfCode.Tests;
 
@@ -58,4 +59,6 @@ public class Day01Tests : DayTestBase
 
         Assert.Equal(54249, result);
     }
+
+    public Day01Tests(ITestOutputHelper output) : base(output) { }
 }

@@ -1,4 +1,5 @@
 using Pokorm.AdventOfCode.Y2023.Days;
+using Xunit.Abstractions;
 
 namespace Pokorm.AdventOfCode.Tests;
 
@@ -105,13 +106,15 @@ public class Day05Tests : DayTestBase
         Assert.Equal(46, result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartTwo()
     {
         var day = new Day05(this.InputService);
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
-        Assert.Equal(12648035, result);
-    }*/
+        Assert.True(result < 26788781);
+    }
+
+    public Day05Tests(ITestOutputHelper output) : base(output) { }
 }
