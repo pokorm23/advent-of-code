@@ -71,4 +71,22 @@ public static class CommandLineBuilderExtensions
             }
         });
     }
+
+    public static CommandLineBuilder UseTimeout(this CommandLineBuilder builder,
+        TimeSpan timeout)
+    {
+        return builder.AddMiddleware(async (context, next) =>
+        {
+            var expirationTimeTask = Task.Delay(timeout);
+            var pipelineTask = next(context);
+            var finishedTask = await Task.WhenAny(expirationTimeTask, pipelineTask);
+
+            if (finishedTask == expirationTimeTask)
+            {
+                context.Console.Error.WriteLine($"Operation timed out after {timeout.TotalSeconds} seconds");
+
+                throw new OperationCanceledException();
+            }
+        });
+    }
 }

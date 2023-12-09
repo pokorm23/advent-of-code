@@ -16,7 +16,7 @@ public class Day02Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(8, result);
     }
@@ -26,7 +26,7 @@ public class Day02Tests : DayTestBase
     {
         var day = new Day02(this.InputService);
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(2551, result);
     }
@@ -43,7 +43,7 @@ public class Day02Tests : DayTestBase
             Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
             """));
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(2286, result);
     }
@@ -53,7 +53,7 @@ public class Day02Tests : DayTestBase
     {
         var day = new Day02(this.InputService);
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(62811, result);
     }

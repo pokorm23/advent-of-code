@@ -21,7 +21,7 @@ public class Day03Tests : DayTestBase
             .664...598
             """));
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(4361, result);
     }
@@ -31,7 +31,7 @@ public class Day03Tests : DayTestBase
     {
         var day = new Day03(this.InputService);
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.True(result > 550053);
         Assert.True(result <= 601575);
@@ -56,7 +56,7 @@ public class Day03Tests : DayTestBase
             .664.598..
             """));
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(467835, result);
     }
@@ -66,7 +66,7 @@ public class Day03Tests : DayTestBase
     {
         var day = new Day03(this.InputService);
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(80179647, result);
     }

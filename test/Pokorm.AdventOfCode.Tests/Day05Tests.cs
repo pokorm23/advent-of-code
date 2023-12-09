@@ -44,7 +44,7 @@ public class Day05Tests : DayTestBase
             56 93 4
             """));
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(35, result);
     }
@@ -54,7 +54,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05(this.InputService);
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(313045984, result);
     }
@@ -99,7 +99,7 @@ public class Day05Tests : DayTestBase
             56 93 4
             """));
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(46, result);
     }

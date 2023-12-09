@@ -2,7 +2,7 @@
 
 public interface IDay
 {
-    int SolveAsync();
+    int Solve();
 
-    int SolveBonusAsync();
+    int SolveBonus();
 }

@@ -15,7 +15,7 @@ public class Day01Tests : DayTestBase
             treb7uchet
             """));
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(142, result);
     }
@@ -25,7 +25,7 @@ public class Day01Tests : DayTestBase
     {
         var day = new Day01(this.InputService);
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(53194, result);
     }
@@ -44,7 +44,7 @@ public class Day01Tests : DayTestBase
             7pqrstsixteen
             """));
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(281, result);
     }
@@ -54,7 +54,7 @@ public class Day01Tests : DayTestBase
     {
         var day = new Day01(this.InputService);
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(54249, result);
     }

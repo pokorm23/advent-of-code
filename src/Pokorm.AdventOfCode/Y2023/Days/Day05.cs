@@ -6,14 +6,14 @@ public class Day05 : IDay
 
     public Day05(IInputService inputService) => this.inputService = inputService;
 
-    public int SolveAsync()
+    public int Solve()
     {
         var data = Parse();
 
         return (int) data.MapSeeds("seed", "location").Min();
     }
 
-    public int SolveBonusAsync()
+    public int SolveBonus()
     {
         var data = Parse();
 

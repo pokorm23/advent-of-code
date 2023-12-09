@@ -6,7 +6,7 @@ public class Day01 : IDay
 
     public Day01(IInputService inputService) => this.inputService = inputService;
 
-    public int SolveAsync()
+    public int Solve()
     {
         var lines = this.inputService.GetInputLines(2023, 1);
 
@@ -54,7 +54,7 @@ public class Day01 : IDay
         return sum;
     }
 
-    public int SolveBonusAsync()
+    public int SolveBonus()
     {
         var lines = this.inputService.GetInputLines(2023, 1);
 

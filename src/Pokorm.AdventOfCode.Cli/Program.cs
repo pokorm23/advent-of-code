@@ -11,6 +11,7 @@ var cliBuilder = CliBuilder.Create();
 var builder = new CommandLineBuilder(cliBuilder.CreateRootCommand())
               .UseDefaults()
               .UseCancelReporting()
+              .UseTimeout(TimeSpan.FromSeconds(10))
               .UseHost(hostBuilder =>
               {
                   var cliContext = hostBuilder.Properties[typeof(InvocationContext)] as InvocationContext;

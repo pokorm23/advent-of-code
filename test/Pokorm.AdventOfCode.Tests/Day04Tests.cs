@@ -17,7 +17,7 @@ public class Day04Tests : DayTestBase
             Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
             """));
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(13, result);
     }
@@ -27,7 +27,7 @@ public class Day04Tests : DayTestBase
     {
         var day = new Day04(this.InputService);
 
-        var result = day.SolveAsync();
+        var result = day.Solve();
 
         Assert.Equal(20829, result);
     }
@@ -45,7 +45,7 @@ public class Day04Tests : DayTestBase
             Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
             """));
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(30, result);
     }
@@ -55,7 +55,7 @@ public class Day04Tests : DayTestBase
     {
         var day = new Day04(this.InputService);
 
-        var result = day.SolveBonusAsync();
+        var result = day.SolveBonus();
 
         Assert.Equal(12648035, result);
     }
