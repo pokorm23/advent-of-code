@@ -1,22 +1,15 @@
-using Pokorm.AdventOfCode.Y2023.Days;
-using Xunit.Abstractions;
+namespace Pokorm.AdventOfCode.Tests.Y2023;
 
-namespace Pokorm.AdventOfCode.Tests;
-
-public class Day07Tests : DayTestBase
+public class Day16Tests : DayTestBase
 {
-    public Day07Tests(ITestOutputHelper output) : base(output) { }
+    public Day16Tests(ITestOutputHelper output) : base(output) { }
 
-    [Fact]
+    //[Fact]
     public void SampleOne()
     {
         var day = CreateDayFromSample(
             """
-            32T3K 765
-            T55J5 684
-            KK677 28
-            KTJJT 220
-            QQQJA 483
+
             """);
 
         var result = day.Solve();
@@ -24,7 +17,7 @@ public class Day07Tests : DayTestBase
         Assert.Equal(6440, result);
     }
 
-    [Fact]
+    //[Fact]
     public void PartOne()
     {
         var day = CreateDay();
@@ -34,13 +27,12 @@ public class Day07Tests : DayTestBase
         Assert.Equal(249748283, result);
     }
 
-    /*[Fact]
+    //[Fact]
     public void SampleTwo()
     {
         var day = CreateDayFromSample(
             """
-            Time:      7  15   30
-            Distance:  9  40  200
+
             """);
 
         var result = day.SolveBonus();
@@ -48,7 +40,7 @@ public class Day07Tests : DayTestBase
         Assert.Equal(71503, result);
     }
 
-    [Fact]
+    //[Fact]
     public void PartTwo()
     {
         var day = CreateDay();
@@ -56,5 +48,5 @@ public class Day07Tests : DayTestBase
         var result = day.SolveBonus();
 
         Assert.Equal(43663323, result);
-    }*/
+    }
 }

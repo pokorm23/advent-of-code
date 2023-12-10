@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using Xunit.Abstractions;
 
 namespace Pokorm.AdventOfCode.Tests;
 
@@ -29,9 +28,7 @@ public class ConsoleOutput : IDisposable
                 this.output.WriteLine(s);
             }
         }
-        catch 
-        {
-        }
+        catch { }
 
         Console.SetOut(this.originalOutput);
         this.stringWriter.Dispose();

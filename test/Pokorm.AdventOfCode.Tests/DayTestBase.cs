@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Xunit.Abstractions;
 
 namespace Pokorm.AdventOfCode.Tests;
 

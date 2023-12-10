@@ -67,13 +67,13 @@ public static class CommandLineBuilderExtensions
             catch (CliException e)
             {
                 AnsiConsole.WriteLine();
-                AnsiConsole.Console.WriteLine("Chyba", new Style(foreground: Color.Red));
+                AnsiConsole.Console.WriteLine("Chyba", new Style(Color.Red));
                 AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything);
             }
             catch (Exception e)
             {
                 AnsiConsole.WriteLine();
-                AnsiConsole.Console.WriteLine("Neočekávaná chyba", new Style(foreground: Color.Red));
+                AnsiConsole.Console.WriteLine("Neočekávaná chyba", new Style(Color.Red));
                 AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything);
             }
         });

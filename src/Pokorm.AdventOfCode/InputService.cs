@@ -22,7 +22,8 @@ public class InputService : IInputService
 
     private string GetInputPath(int year, int day)
     {
-        var path = Path.Combine(this.hostEnvironment.ContentRootPath, $"Y{year}/Inputs/{day}.txt");
+        var dayPrefix = day < 10 ? $"0{day}" : $"{day}";
+        var path = Path.Combine(this.hostEnvironment.ContentRootPath, $"Y{year}/Inputs/{dayPrefix}.txt");
 
         return path;
     }

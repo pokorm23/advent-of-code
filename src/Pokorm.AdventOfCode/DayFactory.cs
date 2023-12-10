@@ -18,7 +18,7 @@ internal class DayFactory : IDayFactory
             {
                 return false;
             }
-            
+
             return Regex.IsMatch(type.Name, $"^Day{day.ToString().PadLeft(2, '0')}$");
         }).ToList();
 
