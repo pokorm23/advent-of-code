@@ -50,19 +50,30 @@ public class CliBuilder
 
         rootCommand.Name = "[Pokorm.AdventOfCode.Cli]";
 
-        rootCommand.Handler = CommandHandler.Create((RunCliCommand command, InvocationContext context, IHost host, CancellationToken cancellationToken) =>
-        {
-            context.Console.Out.WriteLineColor(JsonSerializer.Serialize(command), ConsoleColor.DarkGray);
-
-            var di = host.Services;
-
-            using var scope = di.CreateAsyncScope();
-
-            var handler = scope.ServiceProvider.GetRequiredService<RunCommandHandler>();
-
-            return handler.HandleAsync(command, cancellationToken);
-        });
+        rootCommand.Handler = CommandHandler.Create(CreateHandler<RunCliCommand, RunCommandHandler>);
 
         return rootCommand;
+    }
+    
+    public static ICommandHandler CreateCliCommandHandler<TCommand, THandler>()
+        where TCommand : class
+        where THandler : ICliCommandHandler<TCommand>
+    {
+        return CommandHandler.Create(CreateHandler<TCommand, THandler>);
+    }
+
+    public static async Task CreateHandler<TCommand, THandler>(TCommand command, InvocationContext context, IHost host, CancellationToken cancellationToken)
+        where TCommand : class
+        where THandler : ICliCommandHandler<TCommand>
+    {
+        context.Console.Out.WriteLineColor(JsonSerializer.Serialize(command), ConsoleColor.DarkGray);
+
+        var di = host.Services;
+
+        await using var scope = di.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider.GetRequiredService<THandler>();
+
+        await handler.HandleAsync(command, cancellationToken);
     }
 }

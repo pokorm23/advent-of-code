@@ -4,17 +4,42 @@ public class Day08Tests : DayTestBase
 {
     public Day08Tests(ITestOutputHelper output) : base(output) { }
 
-    //[Fact]
+    [Fact]
     public void SampleOne()
     {
         var day = CreateDayFromSample(
             """
+            RL
 
+            AAA = (BBB, CCC)
+            BBB = (DDD, EEE)
+            CCC = (ZZZ, GGG)
+            DDD = (DDD, DDD)
+            EEE = (EEE, EEE)
+            GGG = (GGG, GGG)
+            ZZZ = (ZZZ, ZZZ)
             """);
 
         var result = day.Solve();
 
-        Assert.Equal(6440, result);
+        Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public void SampleTwo()
+    {
+        var day = CreateDayFromSample(
+            """
+            LLR
+            
+            AAA = (BBB, BBB)
+            BBB = (AAA, ZZZ)
+            ZZZ = (ZZZ, ZZZ)
+            """);
+
+        var result = day.Solve();
+
+        Assert.Equal(6, result);
     }
 
     //[Fact]
@@ -28,7 +53,7 @@ public class Day08Tests : DayTestBase
     }
 
     //[Fact]
-    public void SampleTwo()
+    public void SampleThree()
     {
         var day = CreateDayFromSample(
             """

@@ -2,7 +2,7 @@
 
 namespace Pokorm.AdventOfCode.Cli;
 
-public class RunCommandHandler
+public class RunCommandHandler : ICliCommandHandler<RunCliCommand>
 {
     private readonly IConsole console;
     private readonly IDayFactory dayFactory;
