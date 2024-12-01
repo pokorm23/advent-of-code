@@ -1,3 +1,5 @@
+using Pokorm.AdventOfCode.Y2023.Days;
+
 namespace Pokorm.AdventOfCode.Tests.Y2023;
 
 public class Day04Tests : DayTestBase

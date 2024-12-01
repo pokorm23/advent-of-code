@@ -22,6 +22,16 @@ public abstract class DayTestBase : IDisposable
         return Mock.Of<IInputService>(x => x.GetInput(It.IsAny<int>(), It.IsAny<int>()) == sample);
     }
 
+    protected string[] LinesFromSample(string sample)
+    {
+        return sample.ReplaceLineEndings().Split(Environment.NewLine, StringSplitOptions.TrimEntries);
+    }
+
+    protected string[] LinesForDay(IDay day)
+    {
+        return this.InputService.GetInputLines(day.GetType());
+    }
+
     protected IDay CreateDay() => CreateDay(this.InputService);
 
     protected IDay CreateDayFromSample(string sample) => CreateDay(InputFromSample(sample));
