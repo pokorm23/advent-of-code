@@ -1,7 +1,7 @@
 ﻿namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/2
-public class Day02 : IDayParsed
+public class Day02
 {
     public long Solve(string[] lines)
     {

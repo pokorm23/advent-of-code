@@ -13,8 +13,8 @@ public static class Extensions
 
         services.Scan(scan => scan
                               .FromAssemblyOf<IDay>()
-                              .AddClasses(classes => classes.AssignableTo<IDay>())
-                              .AsImplementedInterfaces()
+                              .AddClasses(classes => classes.Where(t => t.Name.StartsWith("Day")))
+                              .AsSelf()
                               .WithSingletonLifetime());
 
         return services;

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/3
-public partial class Day03 : IDayParsed
+public partial class Day03
 {
     [StringSyntax(StringSyntaxAttribute.Regex)]
     public const string MulOperationOperandRegexPattern = @"\d{1,3}";

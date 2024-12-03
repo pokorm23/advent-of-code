@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/1
-public class Day01 : IDayParsed
+public class Day01
 {
     public long Solve(string[] lines)
     {

@@ -2,5 +2,5 @@
 
 public interface IDayFactory
 {
-    IDay GetDay(int year, int day);
+    object GetDay(int year, int day);
 }

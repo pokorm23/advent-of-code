@@ -27,7 +27,7 @@ public abstract class DayTestBase : IDisposable
         return sample.ReplaceLineEndings().Split(Environment.NewLine, StringSplitOptions.TrimEntries);
     }
 
-    protected string[] LinesForDay(IDay day)
+    protected string[] LinesForDay<T>(T day) where T : class
     {
         return this.InputService.GetInputLines(day.GetType());
     }

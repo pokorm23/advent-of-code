@@ -1,19 +1,19 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Pokorm.AdventOfCode;
 
 internal class DayFactory : IDayFactory
 {
-    private readonly IEnumerable<IDay> days;
+    private readonly IServiceProvider serviceProvider;
+    private IServiceCollection? services;
 
-    public DayFactory(IEnumerable<IDay> days) => this.days = days;
+    public DayFactory(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
 
-    public IDay GetDay(int year, int day)
+    public object GetDay(int year, int day)
     {
-        var dayInstance = this.days.Where(x =>
+        var dayInstance = GetServices().Select(x => x.ImplementationType!).Where(type =>
         {
-            var type = x.GetType();
-
             if (!(type.Namespace?.Contains(year.ToString()) ?? false))
             {
                 return false;
@@ -32,6 +32,24 @@ internal class DayFactory : IDayFactory
             throw new Exception($"Multiple days with number {day} for {year} found.");
         }
 
-        return dayInstance[0];
+        return ActivatorUtilities.GetServiceOrCreateInstance(this.serviceProvider, dayInstance[0]);
+    }
+
+    private IServiceCollection GetServices()
+    {
+        if (this.services is not null)
+        {
+            return this.services;
+        }
+
+        this.services = new ServiceCollection();
+
+        this.services.Scan(scan => scan
+                                   .FromAssemblyOf<IDay>()
+                                   .AddClasses(classes => classes.Where(t => t.Name.StartsWith("Day")))
+                                   .AsSelf()
+                                   .WithSingletonLifetime());
+
+        return this.services;
     }
 }
