@@ -38,26 +38,35 @@ public class Day04Tests : DayTestBase
         Assert.Equal(2603, result);
     }
 
-   /* [Fact]
+   [Fact]
     public void SampleBonus()
     {
         var day = new Day04();
 
         var result = day.SolveBonus(LinesFromSample(
             """
-            xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
+            MMMSXXMASM
+            MSAMXMSMSA
+            AMXSXMAAMM
+            MSAMASMSMX
+            XMASAMXAMM
+            XXAMMXXAMA
+            SMSMSASXSS
+            SAXAMASAAA
+            MAMMMXMMMM
+            MXMXAXMASX
             """));
 
-        Assert.Equal(48, result);
+        Assert.Equal(9, result);
     }
 
-    [Fact]
+     [Fact]
     public void PartTwo()
     {
         var day = new Day04();
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(76911921, result);
-    }*/
+        Assert.Equal(1965, result);
+    }
 }

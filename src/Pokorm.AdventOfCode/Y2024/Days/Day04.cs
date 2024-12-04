@@ -3,7 +3,7 @@
 // https://adventofcode.com/2024/day/4
 public class Day04
 {
-    public long Solve(string[] lines)
+    static BoardData Parse(string[] lines)
     {
         var width = 0;
         var height = lines.Length;
@@ -29,7 +29,12 @@ public class Day04
 
         var board = new Board(width, height);
 
-        var data = new BoardData(board, points);
+        return new BoardData(board, points);
+    }
+
+    public long Solve(string[] lines)
+    {
+        var data = Parse(lines);
 
         int[] possibleChangeInPos = [ -1, 0, 1 ];
 
@@ -73,6 +78,45 @@ public class Day04
                     continue;
                 }
 
+                result++;
+            }
+        }
+
+        return result;
+    }
+
+    public long SolveBonus(string[] lines)
+    {
+        var data = Parse(lines);
+
+        (int X, int Y)[] possibleChangeInPos = [ (1, 1), (1, -1), (-1, 1), (-1, -1) ];
+
+        var vectors = possibleChangeInPos.Select(y => new Vector(y.X, y.Y)).ToList();
+
+        var result = 0;
+
+        foreach (var (coord, value) in data.Data)
+        {
+            if (coord.Y == 0 || coord.X == 0 || coord.Y == (data.Board.Height-1)|| coord.X == (data.Board.Height-1)) // hrana
+            {
+                continue;
+            }
+
+            if (value != 'A') // vzdy stred
+            {
+                continue;
+            }
+
+            var br = data.GetPoint(coord + vectors[0]);
+            var tr = data.GetPoint(coord + vectors[1]);
+            var bl = data.GetPoint(coord + vectors[2]);
+            var tl = data.GetPoint(coord + vectors[3]);
+
+            if ((br.Value == 'S' && tl.Value == 'M' && tr.Value == 'S' && bl.Value == 'M')
+                || (br.Value == 'M' && tl.Value == 'S' && tr.Value == 'S' && bl.Value == 'M')
+                || (br.Value == 'S' && tl.Value == 'M' && tr.Value == 'M' && bl.Value == 'S')
+                || (br.Value == 'M' && tl.Value == 'S' && tr.Value == 'M' && bl.Value == 'S'))
+            {
                 result++;
             }
         }
