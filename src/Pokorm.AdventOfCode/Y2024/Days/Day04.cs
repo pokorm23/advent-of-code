@@ -8,7 +8,7 @@ public class Day04
         var width = 0;
         var height = lines.Length;
         var y = 0;
-        var points = new List<BoardPoint>();
+        var points = new Dictionary<Coord, char>();
 
         foreach (var line in lines)
         {
@@ -18,7 +18,7 @@ public class Day04
             {
                 var coord = new Coord(lineWidth, y);
 
-                points.Add(new (coord, c));
+                points.Add(coord, c);
 
                 lineWidth++;
             }
@@ -31,83 +31,66 @@ public class Day04
 
         var data = new BoardData(board, points);
 
-        return FindString("XMAS", data).Count();
-    }
-
-    private IEnumerable<Result> FindString(string text, BoardData data)
-    {
-        foreach (var boardPoint in data.Data)
-        {
-            foreach (var result in FindString(text, boardPoint, data))
-            {
-                Console.WriteLine($"Found on {boardPoint}: {string.Join(",", result.Points.Select(x => $"({x.Coord.X},{x.Coord.Y})"))}");
-                yield return result;
-            }
-        }
-    }
-
-    private IEnumerable<Result> FindString(string text, BoardPoint boardPoint, BoardData data)
-    {
         int[] possibleChangeInPos = [ -1, 0, 1 ];
 
-        var vectors = possibleChangeInPos.SelectMany(x => possibleChangeInPos.Select(y => (x, y))).Where(x => x!= (0,0));
+        var vectors = possibleChangeInPos.SelectMany(x => possibleChangeInPos.Select(y => new Vector(x, y))).Where(x => x!= Vector.Zero).ToList();
 
-        foreach (var v in vectors)
+        var result = 0;
+        
+        foreach (var (coord, value) in data.Data)
         {
-            var seq = text.AsSpan();
-            var stack = new Stack<BoardPoint>();
-            stack.Push(boardPoint);
-
-            foreach (var result in FindString(seq, stack, v, data))
+            if (value != 'X')
             {
-                yield return result;
+                continue;
+            }
+
+            foreach (var vector in vectors)
+            {
+                var potCoord = coord + (vector * 3);
+
+                if (!data.Board.IsCoordValid(potCoord))
+                {
+                    continue;
+                }
+
+                var mChar = data.Board.TryGetCoordInDirection(coord, vector);
+
+                if (mChar is null || data.GetPoint(mChar.Value).Value != 'M')
+                {
+                    continue;
+                }
+                
+                var aChar = data.Board.TryGetCoordInDirection(coord, vector * 2);
+
+                if (aChar is null || data.GetPoint(aChar.Value).Value != 'A')
+                {
+                    continue;
+                }
+                var sChar = data.Board.TryGetCoordInDirection(coord, vector * 3);
+
+                if (sChar is null || data.GetPoint(sChar.Value).Value != 'S')
+                {
+                    continue;
+                }
+
+                result++;
             }
         }
-    }
-
-    private IEnumerable<Result> FindString(ReadOnlySpan<char> seqToFind, Stack<BoardPoint> stack, (int X, int Y) vector, BoardData data)
-    {
-        if (seqToFind.Length == 0)
-        {
-            return [ new Result([ ..stack.Reverse() ]) ];
-        }
-
-        var matched = seqToFind[0] == stack.Peek().Value;
-
-        if (!matched)
-        {
-            return [ ];
-        }
-
-        if (seqToFind.Length == 1)
-        {
-            return [ new Result([ ..stack.Reverse() ]) ];
-        }
-
-        var sourceCoord = stack.Peek();
-
-        var potentialCoord = data.Board.TryGetCoordInDirection(sourceCoord.Coord, vector);
-
-        if (potentialCoord is null)
-        {
-            return [ ];
-        }
-
-        var result = new List<Result>();
-
-        var subSeq = seqToFind[1..];
-        stack.Push(data.GetPoint(potentialCoord.Value));
-
-        result.AddRange(FindString(subSeq, stack, vector, data));
-
-        stack.Pop();
 
         return result;
     }
 
-    private record struct Coord(int X, int Y);
+    private record struct Vector(int X, int Y)
+    {
+        public static Vector Zero = new (0,0);
+        public static Vector operator *(Vector c, int scale) => new Vector(c.X * scale, c.Y * scale);
+    }
 
-    private record struct Result(List<BoardPoint> Points);
+    private record struct Coord(int X, int Y)
+    {
+        public static Coord operator +(Coord c, Vector v) => new Coord(c.X + v.X, c.Y + v.Y);
+
+    }
 
     private record BoardPoint(Coord Coord, char Value) { }
 
@@ -115,7 +98,7 @@ public class Day04
     {
         public bool IsCoordValid(Coord source) => source.Y >= 0 && source.X >= 0 && source.Y < this.Height && source.X < this.Width;
 
-        public Coord? TryGetCoordInDirection(Coord source, (int X, int Y) vector)
+        public Coord? TryGetCoordInDirection(Coord source, Vector vector)
         {
             if (!IsCoordValid(source))
             {
@@ -160,7 +143,7 @@ public class Day04
         }
     }
 
-    private record BoardData(Board Board, List<BoardPoint> Data)
+    private record BoardData(Board Board, Dictionary<Coord, char> Data)
     {
         public BoardPoint GetPoint(Coord source)
         {
@@ -169,9 +152,9 @@ public class Day04
                 throw new ArgumentOutOfRangeException(nameof(source), $"{source} range out in {this.Board}");
             }
 
-            var point = this.Data.FirstOrDefault(x => x.Coord == source);
+            var point = this.Data.TryGetValue(source, out var v) ? v : (char) 0;
 
-            return point ?? new BoardPoint(source, (char) 0);
+            return new BoardPoint(source, point);
         }
     }
 }
