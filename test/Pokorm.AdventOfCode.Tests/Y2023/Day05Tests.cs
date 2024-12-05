@@ -54,7 +54,7 @@ public class Day05Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = CreateDay();
+        var day = new Day05(this.InputService);
 
         var result = day.Solve();
 
