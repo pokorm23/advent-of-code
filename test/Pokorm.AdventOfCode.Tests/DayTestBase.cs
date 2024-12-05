@@ -6,9 +6,15 @@ namespace Pokorm.AdventOfCode.Tests;
 
 public abstract class DayTestBase : IDisposable
 {
+    public ITestOutputHelper Output { get; }
+
     private readonly ConsoleOutput consoleOutput;
 
-    public DayTestBase(ITestOutputHelper output) => this.consoleOutput = new ConsoleOutput(output);
+    public DayTestBase(ITestOutputHelper output)
+    {
+        this.Output = output;
+        this.consoleOutput = new ConsoleOutput(output);
+    }
 
     public IInputService InputService { get; } = new InputService(Mock.Of<IHostEnvironment>(x => x.ContentRootPath == Directory.GetCurrentDirectory()));
 

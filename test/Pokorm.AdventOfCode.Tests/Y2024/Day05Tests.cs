@@ -34,7 +34,7 @@ public class Day05Tests : DayTestBase
             47|29
             75|13
             53|13
-            
+
             75,47,61,53,29
             97,61,53,29,13
             75,29,13
@@ -56,7 +56,7 @@ public class Day05Tests : DayTestBase
         Assert.Equal(4996, result);
     }
 
-   [Fact]
+    [Fact]
     public void SampleBonus()
     {
         var day = new Day05();
@@ -96,7 +96,7 @@ public class Day05Tests : DayTestBase
         Assert.Equal(123, result);
     }
 
-     [Fact]
+    [Fact]
     public void PartTwo()
     {
         var day = new Day05();
@@ -105,6 +105,7 @@ public class Day05Tests : DayTestBase
 
         Assert.True(result < 11155);
         Assert.True(result > 4905);
-        Assert.Equal(12, result);
+        Assert.True(result < 10977);
+        Assert.Equal(6311, result);
     }
 }

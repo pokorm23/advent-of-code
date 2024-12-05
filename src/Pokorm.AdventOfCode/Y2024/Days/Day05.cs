@@ -1,11 +1,12 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/5
 public class Day05
 {
-    private static DayData Parse(string[] lines)
+    public static DayData Parse(string[] lines)
     {
         var rules = new HashSet<Rule>();
         var data = new List<IReadOnlyCollection<int>>();
@@ -94,16 +95,26 @@ public class Day05
         {
             var seenTails = new HashSet<Rule>();
             var correct = true;
+            var ruleApplied = new HashSet<RulePos>();
 
-            foreach (var num in line)
+            foreach (var nn in line.Select((x, i) => new NumberInLine(i, x)))
             {
-                var heads = headLookup[num];
+                var (_, num) = nn;
 
-                if (heads.Any(h => seenTails.Contains(h)))
+                var heads = headLookup[num].ToList();
+
+                var matchedRules = heads.Where(h => seenTails.Contains(h)).ToList();
+
+                if (matchedRules.Count > 0)
                 {
+                    foreach (var r in matchedRules)
+                    {
+                        ruleApplied.Add(new RulePos(r, nn));
+                    }
+
                     correct = false;
 
-                    break;
+                    //break;
                 }
 
                 var tails = tailLookup[num];
@@ -114,32 +125,40 @@ public class Day05
                 }
             }
 
-            /*Console.WriteLine($"{string.Join(",", line)}");
-            Console.WriteLine($" - applied: {string.Join("; ", ruleApplied)}");
-            var touched = data.Rules.Where(x => line.Contains(x.Head) && line.Contains(x.Tail) ).ToHashSet();
-            Console.WriteLine($" - all touched: {string.Join("; ", touched)}");
-            Console.WriteLine($" - nums in rules: {string.Join("; ", touched.SelectMany(x => new int[] {x.Tail, x.Head}).ToHashSet())}");
-            Console.WriteLine($" - ordered: {string.Join("; ", touched.SelectMany(x => new int[] {x.Tail, x.Head}).ToHashSet().Order(data.CreateComparer()))}");
-            Console.WriteLine($" - ordered: {string.Join("; ", data.GetOrderedHeads().Where(x => line.Contains(x)))}");
-            Console.WriteLine();*/
+            if (correct)
+            {
+                Console.WriteLine($"{string.Join(",", line)}: OK");
 
-            var ordered = line.ToImmutableSortedSet(data.CreateComparer());
+                continue;
+            }
+
+            var context = ruleApplied.Select(x => x.Rule).ToHashSet();
+
+            context.UnionWith(data.Rules.Where(x => line.Contains(x.Head)));
+
+            var comparer = data.CreateComparer(context);
+
+            foreach (var rule in context)
+            {
+                if (comparer.Compare(rule.Head, rule.Tail) != -1)
+                {
+                    throw new Exception($"Comparer not consistent");
+                }
+            }
+
+            var ordered = line.ToImmutableSortedSet(comparer);
 
             var co = ordered.SequenceEqual(line);
 
             if (co != correct)
             {
-                Console.WriteLine($"{string.Join(",", line)}: FAIL");
-                continue;
-            }
-
-            if (!correct)
-            {
-                Console.WriteLine($"{string.Join(",", line)}: OK");
-                continue;
+                throw new Exception($"Comparing not consistent");
             }
 
             Console.WriteLine($"{string.Join(",", line)}: {string.Join(",", ordered)}");
+
+            Debug.Assert(ordered.Count == line.Count);
+            Debug.Assert(ordered.Count % 2 == 1);
 
             var middle = ordered.ElementAt((int) (line.Count / 2));
 
@@ -160,16 +179,16 @@ public class Day05
     }
 
 
-    private record Rule(int Head, int Tail)
+    public record Rule(int Head, int Tail)
     {
         public override string ToString() => $"{this.Head}|{this.Tail}";
     }
 
-    private record DayData(HashSet<Rule> Rules, IReadOnlyCollection<IReadOnlyCollection<int>> Lines)
+    public record DayData(HashSet<Rule> Rules, IReadOnlyCollection<IReadOnlyCollection<int>> Lines)
     {
-        public IComparer<int> CreateComparer()
+        public IComparer<int> CreateComparer(ISet<Rule> context)
         {
-            var ordered = GetOrderedHeads();
+            var ordered = GetOrderedHeads(context);
 
             return Comparer<int>.Create((x, y) =>
             {
@@ -185,18 +204,54 @@ public class Day05
             });
         }
 
-        public List<int> GetOrderedHeads()
+        public List<int> GetOrderedHeads(ISet<Rule> context)
         {
-            var lookup = Rules
-                         .GroupBy(x => x.Head, x => Rules.Where(y => y.Head == x.Head).Select(y => y.Tail))
-                .ToDictionary(x => x.Key, x => x.SelectMany(y => y).ToHashSet());
+            var lookup = this.Rules.Where(x => context.Contains(x))
+                             .GroupBy(x => x.Head, x => x.Tail)
+                             .ToDictionary(x => x.Key, x => x.ToHashSet());
 
             foreach (var rule in this.Rules)
             {
-                if (!lookup.TryGetValue(rule.Tail, out _))
+                if (!lookup.TryGetValue(rule.Tail, out var _))
                 {
-                    lookup.Add(rule.Tail, []);
+                    lookup.Add(rule.Tail, [ ]);
                 }
+            }
+
+            var expandCache = new Dictionary<int, HashSet<int>>();
+            var conflict = new HashSet<int>();
+
+            HashSet<int> Expand(int n)
+            {
+                if (expandCache.TryGetValue(n, out var r))
+                {
+                    return r;
+                }
+
+                var newSet = new HashSet<int>();
+
+                newSet.Add(n);
+
+                foreach (var i in lookup[n].ToList())
+                {
+                    if (!conflict.Add(i))
+                    {
+                        throw new Exception();
+                    }
+
+                    newSet.UnionWith(Expand(i));
+                    conflict.Remove(i);
+                }
+
+                expandCache.Add(n, newSet);
+
+                return newSet;
+            }
+
+            // expand
+            foreach (var (key, value) in lookup)
+            {
+                value.UnionWith(Expand(key));
             }
 
             var uniqueNumbers = lookup.Keys.ToArray();
@@ -205,26 +260,30 @@ public class Day05
 
             for (var i = 0; i < uniqueNumbers.Length; i++)
             {
-                var num = uniqueNumbers[i]; // 75
+                var num = uniqueNumbers[i];
 
                 if (result.Count == 0)
                 {
                     result.Add(num);
+
                     continue;
                 }
 
                 var wasInserted = false;
 
-                for (int j = 0; j < result.Count; j++)
+                for (var j = 0; j < result.Count; j++)
                 {
                     var numToCompare = result[j];
 
-                    if (lookup[num].Contains(numToCompare))
+                    if (!lookup[num].Contains(numToCompare))
                     {
-                        result.Insert(j, num);
-                        wasInserted = true;
-                        break;
+                        continue;
                     }
+
+                    result.Insert(j, num);
+                    wasInserted = true;
+
+                    break;
                 }
 
                 if (!wasInserted)
