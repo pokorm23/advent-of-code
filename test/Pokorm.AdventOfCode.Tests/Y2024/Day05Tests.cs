@@ -103,6 +103,8 @@ public class Day05Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(1, result);
+        Assert.True(result < 11155);
+        Assert.True(result > 4905);
+        Assert.Equal(12, result);
     }
 }
