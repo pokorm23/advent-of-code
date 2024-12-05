@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json.schemastore.org/template",
+    "author": "Michal Pokorný",
+    "name": "Advent of code day",
+    "tags": {
+      "language": "C#",
+      "type": "item"
+    },
+    "identity": "Pokorm.AdventOfCode.Template.1.0",
+    "shortName": "aoc",
+    "sourceName": "PokormAdventOfCode",
+    "primaryOutputs": [
+    ],
+    "defaultName": "PokormAdventOfCode",
+    "symbols": {
+      "Year": {
+        "replaces": "YearParameter",
+        "fileRename": "YearParameter",
+        "type": "parameter",
+        "datatype": "text",
+        "defaultValue": "2024"
+      },
+      "Day": {
+        "replaces": "DayParameter",
+        "fileRename": "DayParameter",
+        "type": "parameter",
+        "datatype": "text"
+      }
+    }
+  }

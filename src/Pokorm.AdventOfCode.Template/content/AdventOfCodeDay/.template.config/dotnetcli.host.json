@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "https://json.schemastore.org/dotnetcli.host",
+  "symbolInfo": {
+    "Year": {
+      "longName": "year",
+      "shortName": "y"
+    },
+    "Day": {
+      "longName": "day",
+      "shortName": "q"
+    }
+  }
+}
