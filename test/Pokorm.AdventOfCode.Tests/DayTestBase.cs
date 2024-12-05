@@ -38,6 +38,11 @@ public abstract class DayTestBase : IDisposable
         return this.InputService.GetInputLines(day.GetType());
     }
 
+    protected string TextForDay<T>(T day) where T : class
+    {
+        return this.InputService.GetInput(day.GetType());
+    }
+
     protected IDay CreateDay() => CreateDay(this.InputService);
 
     protected IDay CreateDayFromSample(string sample) => CreateDay(InputFromSample(sample));
