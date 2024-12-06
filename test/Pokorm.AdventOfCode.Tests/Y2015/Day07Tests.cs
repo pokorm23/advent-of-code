@@ -11,12 +11,18 @@ public class Day07Tests : DayTestBase
     {
         var day = new Day07();
 
-        var result = day.Solve(LinesFromSample(
-                """
-                ...
-                """));
+        var result = day.Solve(LinesFromSample("""
+                                               123 -> x
+                                               456 -> y
+                                               x AND y -> d
+                                               x OR y -> e
+                                               x LSHIFT 2 -> f
+                                               y RSHIFT 2 -> g
+                                               NOT x -> h
+                                               NOT y -> a
+                                               """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(65079, result);
     }
 
     [Fact]
@@ -26,29 +32,6 @@ public class Day07Tests : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }
-
-    [Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day07();
-
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
-
-        Assert.Equal(-1, result);
-    }
-
-    [Fact]
-    public void PartTwo()
-    {
-        var day = new Day07();
-
-        var result = day.SolveBonus(LinesForDay(day));
-
-        Assert.Equal(-1, result);
+        Assert.Equal(3176, result);
     }
 }

@@ -21,4 +21,6 @@ public static class Extensions
     }
 
     public static string[] FullSplit(this string value, params char[] split) => value.Split(split, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    public static string[] FullSplit(this string value, string split) => value.Split(split, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }
