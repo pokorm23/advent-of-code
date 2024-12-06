@@ -7,16 +7,53 @@ public class Day05Tests : DayTestBase
     public Day05Tests(ITestOutputHelper output) : base(output) { }
 
     [Fact]
-    public void PartOne_Sample()
+    public void PartOne_Sample_1()
     {
         var day = new Day05();
 
-        var result = day.Solve(LinesFromSample(
-                """
-                ...
-                """));
+        var result = day.Solve(["ugknbfddgicrmopn"]);
 
-        Assert.Equal(-1, result);
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void PartOne_Sample_2()
+    {
+        var day = new Day05();
+
+        var result = day.Solve(["aaa"]);
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void PartOne_Sample_3()
+    {
+        var day = new Day05();
+
+        var result = day.Solve(["jchzalrnumimnmhp"]);
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void PartOne_Sample_4()
+    {
+        var day = new Day05();
+
+        var result = day.Solve(["haegwjzuvuyypxyu"]);
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void PartOne_Sample_5()
+    {
+        var day = new Day05();
+
+        var result = day.Solve(["dvszwmarrgswjxmb"]);
+
+        Assert.Equal(0, result);
     }
 
     [Fact]
@@ -26,7 +63,7 @@ public class Day05Tests : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(238, result);
     }
 
     [Fact]
