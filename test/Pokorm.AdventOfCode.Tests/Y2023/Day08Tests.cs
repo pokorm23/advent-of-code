@@ -1,3 +1,5 @@
+using Pokorm.AdventOfCode.Y2023.Days;
+
 namespace Pokorm.AdventOfCode.Tests.Y2023;
 
 public class Day08Tests : DayTestBase
@@ -7,7 +9,7 @@ public class Day08Tests : DayTestBase
     [Fact]
     public void SampleOne()
     {
-        var day = CreateDayFromSample(
+        var day = new Day08(InputFromSample(
             """
             RL
 
@@ -18,7 +20,7 @@ public class Day08Tests : DayTestBase
             EEE = (EEE, EEE)
             GGG = (GGG, GGG)
             ZZZ = (ZZZ, ZZZ)
-            """);
+            """));
 
         var result = day.Solve();
 
@@ -28,14 +30,14 @@ public class Day08Tests : DayTestBase
     [Fact]
     public void SampleTwo()
     {
-        var day = CreateDayFromSample(
+        var day = new Day08(InputFromSample(
             """
             LLR
             
             AAA = (BBB, BBB)
             BBB = (AAA, ZZZ)
             ZZZ = (ZZZ, ZZZ)
-            """);
+            """));
 
         var result = day.Solve();
 
@@ -45,7 +47,7 @@ public class Day08Tests : DayTestBase
     //[Fact]
     public void PartOne()
     {
-        var day = CreateDay();
+        var day = new Day08(this.InputService);
 
         var result = day.Solve();
 
@@ -55,10 +57,10 @@ public class Day08Tests : DayTestBase
     //[Fact]
     public void SampleThree()
     {
-        var day = CreateDayFromSample(
+        var day = new Day08(InputFromSample(
             """
 
-            """);
+            """));
 
         var result = day.SolveBonus();
 
@@ -68,7 +70,7 @@ public class Day08Tests : DayTestBase
     //[Fact]
     public void PartTwo()
     {
-        var day = CreateDay();
+        var day = new Day08(this.InputService);
 
         var result = day.SolveBonus();
 

@@ -1,3 +1,5 @@
+using Pokorm.AdventOfCode.Y2023.Days;
+
 namespace Pokorm.AdventOfCode.Tests.Y2023;
 
 public class Day07Tests : DayTestBase
@@ -7,14 +9,14 @@ public class Day07Tests : DayTestBase
     [Fact]
     public void SampleOne()
     {
-        var day = CreateDayFromSample(
+        var day = new Day07(InputFromSample(
             """
             32T3K 765
             T55J5 684
             KK677 28
             KTJJT 220
             QQQJA 483
-            """);
+            """));
 
         var result = day.Solve();
 
@@ -24,7 +26,7 @@ public class Day07Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = CreateDay();
+        var day = new Day07(this.InputService);
 
         var result = day.Solve();
 

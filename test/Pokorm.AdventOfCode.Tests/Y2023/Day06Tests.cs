@@ -1,3 +1,5 @@
+using Pokorm.AdventOfCode.Y2023.Days;
+
 namespace Pokorm.AdventOfCode.Tests.Y2023;
 
 public class Day06Tests : DayTestBase
@@ -7,11 +9,11 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void SampleOne()
     {
-        var day = CreateDayFromSample(
-            """
-            Time:      7  15   30
-            Distance:  9  40  200
-            """);
+        var day = new Day06(InputFromSample(
+                                """
+                                Time:      7  15   30
+                                Distance:  9  40  200
+                                """));
 
         var result = day.Solve();
 
@@ -21,7 +23,7 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = CreateDay();
+        var day = new Day06(this.InputService);
 
         var result = day.Solve();
 
@@ -31,11 +33,11 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void SampleTwo()
     {
-        var day = CreateDayFromSample(
+        var day = new Day06(InputFromSample(
             """
             Time:      7  15   30
             Distance:  9  40  200
-            """);
+            """));
 
         var result = day.SolveBonus();
 
@@ -45,7 +47,7 @@ public class Day06Tests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = CreateDay();
+        var day = new Day06(this.InputService);
 
         var result = day.SolveBonus();
 
