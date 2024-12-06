@@ -11,7 +11,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05();
 
-        var result = day.Solve(["ugknbfddgicrmopn"]);
+        var result = day.Solve([ "ugknbfddgicrmopn" ]);
 
         Assert.Equal(1, result);
     }
@@ -21,7 +21,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05();
 
-        var result = day.Solve(["aaa"]);
+        var result = day.Solve([ "aaa" ]);
 
         Assert.Equal(1, result);
     }
@@ -31,7 +31,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05();
 
-        var result = day.Solve(["jchzalrnumimnmhp"]);
+        var result = day.Solve([ "jchzalrnumimnmhp" ]);
 
         Assert.Equal(0, result);
     }
@@ -41,7 +41,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05();
 
-        var result = day.Solve(["haegwjzuvuyypxyu"]);
+        var result = day.Solve([ "haegwjzuvuyypxyu" ]);
 
         Assert.Equal(0, result);
     }
@@ -51,7 +51,7 @@ public class Day05Tests : DayTestBase
     {
         var day = new Day05();
 
-        var result = day.Solve(["dvszwmarrgswjxmb"]);
+        var result = day.Solve([ "dvszwmarrgswjxmb" ]);
 
         Assert.Equal(0, result);
     }
@@ -67,16 +67,43 @@ public class Day05Tests : DayTestBase
     }
 
     [Fact]
-    public void PartTwo_Sample()
+    public void PartTwo_Sample_1()
     {
         var day = new Day05();
 
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+        var result = day.SolveBonus([ "qjhvhtzxzqqjkmpb" ]);
 
-        Assert.Equal(-1, result);
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_2()
+    {
+        var day = new Day05();
+
+        var result = day.SolveBonus([ "xxyxx" ]);
+
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_3()
+    {
+        var day = new Day05();
+
+        var result = day.SolveBonus([ "uurcxstgmygtbstg" ]);
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_4()
+    {
+        var day = new Day05();
+
+        var result = day.SolveBonus([ "ieodomkazucvgmuy" ]);
+
+        Assert.Equal(0, result);
     }
 
     [Fact]
@@ -86,6 +113,6 @@ public class Day05Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(69, result);
     }
 }
