@@ -79,7 +79,7 @@ public class Day08 : IDay
 
         var result = new Data(dirs, map);
 
-        Console.WriteLine($"Parsed: {result}");
+        //Console.WriteLine($"Parsed: {result}");
 
         return result;
     }

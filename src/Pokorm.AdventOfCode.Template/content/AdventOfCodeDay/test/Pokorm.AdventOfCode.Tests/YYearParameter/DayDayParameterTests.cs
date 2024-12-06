@@ -7,14 +7,21 @@ public class DayDayParameterTests : DayTestBase
     public DayDayParameterTests(ITestOutputHelper output) : base(output) { }
 
     [Fact]
-    public void SampleOne()
+    public void PartOne_Sample()
     {
         var day = new DayDayParameter();
 
+#if (NoLines)
+        var result = day.Solve(
+                """
+                ...
+                """);
+#else
         var result = day.Solve(LinesFromSample(
-            """
-            ...
-            """));
+                """
+                ...
+                """));
+#endif
 
         Assert.Equal(-1, result);
     }
@@ -24,20 +31,31 @@ public class DayDayParameterTests : DayTestBase
     {
         var day = new DayDayParameter();
 
+#if (NoLines)
+        var result = day.Solve(TextForDay(day));
+#else
         var result = day.Solve(LinesForDay(day));
+#endif
 
         Assert.Equal(-1, result);
     }
 
     [Fact]
-    public void SampleBonus()
+    public void PartTwo_Sample()
     {
         var day = new DayDayParameter();
 
+#if (NoLines)
+        var result = day.SolveBonus(
+                """
+                ...
+                """);
+#else
         var result = day.SolveBonus(LinesFromSample(
-            """
-            ...
-            """));
+                """
+                ...
+                """));
+#endif
 
         Assert.Equal(-1, result);
     }
@@ -47,7 +65,11 @@ public class DayDayParameterTests : DayTestBase
     {
         var day = new DayDayParameter();
 
+#if (NoLines)
+        var result = day.SolveBonus(TextForDay(day));
+#else
         var result = day.SolveBonus(LinesForDay(day));
+#endif
 
         Assert.Equal(-1, result);
     }

@@ -127,7 +127,7 @@ public class Day05
 
             if (correct)
             {
-                Console.WriteLine($"{string.Join(",", line)}: OK");
+                //Console.WriteLine($"{string.Join(",", line)}: OK");
 
                 continue;
             }
@@ -155,7 +155,7 @@ public class Day05
                 throw new Exception($"Comparing not consistent");
             }
 
-            Console.WriteLine($"{string.Join(",", line)}: {string.Join(",", ordered)}");
+            //Console.WriteLine($"{string.Join(",", line)}: {string.Join(",", ordered)}");
 
             Debug.Assert(ordered.Count == line.Count);
             Debug.Assert(ordered.Count % 2 == 1);

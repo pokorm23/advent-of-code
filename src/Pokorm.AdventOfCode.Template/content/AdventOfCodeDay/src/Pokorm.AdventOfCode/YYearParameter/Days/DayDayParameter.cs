@@ -3,28 +3,50 @@
 // https://adventofcode.com/YearParameter/day/DayParameter
 public class DayDayParameter
 {
-    public static DayData Parse(string[] lines)
+#if (NoLines)
+    static DayData Parse(string input)
+#else
+    static DayData Parse(string[] lines)
+#endif
     {
         return new DayData();
     }
 
+#if (NoLines)
+    public long Solve(string input)
+#else
     public long Solve(string[] lines)
+#endif
     {
+#if (NoLines)
+        var data = Parse(input);
+#else
         var data = Parse(lines);
+#endif
+
         var result = 0;
 
         return result;
     }
 
+#if (NoLines)
+    public long SolveBonus(string input)
+#else
     public long SolveBonus(string[] lines)
+#endif
     {
+#if (NoLines)
+        var data = Parse(input);
+#else
         var data = Parse(lines);
+#endif
+
         var result = 0;
 
         return result;
     }
 
-    public record DayData()
+    record DayData()
     {
 
     }

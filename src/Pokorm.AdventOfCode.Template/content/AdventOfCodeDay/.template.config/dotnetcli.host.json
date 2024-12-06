@@ -8,6 +8,10 @@
     "Day": {
       "longName": "day",
       "shortName": "q"
+    },
+    "NoLines": {
+      "longName": "no-lines",
+      "shortName": "i"
     }
   }
 }

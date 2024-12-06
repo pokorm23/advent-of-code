@@ -25,6 +25,11 @@
         "fileRename": "DayParameter",
         "type": "parameter",
         "datatype": "text"
+      },
+      "NoLines": {
+        "type": "parameter",
+        "datatype": "bool",
+        "defaultValue": "false"
       }
     }
   }
