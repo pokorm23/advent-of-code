@@ -38,14 +38,14 @@ public partial class Day06
     public long Solve(string[] lines)
     {
         var data = Parse(lines);
-        var state = State.Initial;
+        var state = new State([]);
 
         foreach (var dataInstruction in data.Instructions)
         {
             state = state.ApplyInstruction(dataInstruction);
         }
 
-        return state.Current.Count(x => x.Value);
+        return state.Current.Count;
     }
 
     public long SolveBonus(string[] lines)
@@ -87,28 +87,30 @@ public partial class Day06
 
     private record struct Ins(Operation Operation, Range Range);
 
-    private record State(IDictionary<Coord, bool> Current)
+    private record State(HashSet<Coord> Current)
     {
-        public static State Initial = new State(Enumerable.Range(0, 1000).SelectMany(x => Enumerable.Range(0, 1000).Select(y => new Coord(x, y)))
-                                                          .ToImmutableDictionary(c => c, _ => false));
-
         public State ApplyInstruction(Ins ins)
         {
-            var newCurrent = this.Current.ToDictionary();
+            var newCurrent = this.Current.ToHashSet();
 
             foreach (var coord in ins.Range.Enumerate())
             {
-                var currentState = this.Current[coord];
-
                 var newState = ins.Operation switch
                 {
                     Operation.TurnOn  => true,
                     Operation.TurnOff => false,
-                    Operation.Toggle  => !currentState,
+                    Operation.Toggle  => !(this.Current.Contains(coord)),
                     var _             => throw new Exception()
                 };
 
-                newCurrent[coord] = newState;
+                if (newState)
+                {
+                    newCurrent.Add(coord);
+                }
+                else
+                {
+                    newCurrent.Remove(coord);
+                }
             }
 
             return new State(newCurrent);
