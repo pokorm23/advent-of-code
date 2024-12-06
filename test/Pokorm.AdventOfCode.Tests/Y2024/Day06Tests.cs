@@ -45,10 +45,19 @@ public class Day06Tests : DayTestBase
 
         var result = day.SolveBonus(LinesFromSample(
             """
-            ...
+            ....#.....
+            .........#
+            ..........
+            ..#.......
+            .......#..
+            ..........
+            .#..^.....
+            ........#.
+            #.........
+            ......#...
             """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(6, result);
     }
 
     [Fact]
@@ -58,6 +67,9 @@ public class Day06Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
+        Console.WriteLine(result);
+        
+        Assert.True(result < 1618);
         Assert.Equal(-1, result);
     }
 }

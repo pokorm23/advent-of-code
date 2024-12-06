@@ -3,7 +3,7 @@
 // https://adventofcode.com/2024/day/6
 public class Day06
 {
-    private static DayData Parse(string[] lines)
+    private static BoardData Parse(string[] lines)
     {
         var width = 0;
         var height = lines.Length;
@@ -51,7 +51,7 @@ public class Day06
 
         var board = new Board(width, height);
 
-        return new DayData(board, points, boardGuardPoint!);
+        return new BoardData(board, points, boardGuardPoint!);
     }
 
     public long Solve(string[] lines)
@@ -74,7 +74,35 @@ public class Day06
     public long SolveBonus(string[] lines)
     {
         var data = Parse(lines);
+
         var result = 0;
+
+        var guard = data.Guard;
+
+        do
+        {
+            var nextCoord = data.MoveGuard(guard)?.Position;
+
+            if (nextCoord is not null && nextCoord != guard.Position)
+            {
+                var newData = data.Data.ToDictionary();
+
+                newData[nextCoord.Value] = BoardPointType.Obstacle;
+
+                var dataWithObstacle = data with
+                {
+                    Guard = guard,
+                    Data = newData
+                };
+
+                if (dataWithObstacle.IsGuardLooped(guard))
+                {
+                    result++;
+                }
+            }
+
+            guard = data.MoveGuard(guard);
+        } while (guard is not null);
 
         return result;
     }
@@ -154,12 +182,10 @@ public class Day06
         }
     }
 
-    private record DayData(Board Board, Dictionary<Coord, BoardPointType> Data, BoardGuardPoint Guard)
+    private record BoardData(Board Board, Dictionary<Coord, BoardPointType> Data, BoardGuardPoint Guard)
     {
-        public BoardGuardPoint? MoveGuard(BoardGuardPoint? initial)
+        public BoardGuardPoint? MoveGuard(BoardGuardPoint guard)
         {
-            var guard = initial ?? this.Guard;
-
             var nextCoord = this.Board.TryGetCoordInDirection(guard.Position, guard.GetVector());
 
             if (nextCoord is null)
@@ -186,6 +212,43 @@ public class Day06
             }
 
             throw new Exception();
+        }
+
+        public void Run(BoardGuardPoint initial, Func<BoardGuardPoint, bool> action)
+        {
+            var guard = initial;
+
+            do
+            {
+                var shouldContinue = action(guard);
+
+                if (!shouldContinue)
+                {
+                    return;
+                }
+
+                guard = MoveGuard(guard);
+            } while (guard is not null);
+        }
+
+        public bool IsGuardLooped(BoardGuardPoint initial)
+        {
+            var loop = false;
+            var guardPositions = new HashSet<BoardGuardPoint>();
+
+            Run(initial, currentGuard =>
+            {
+                // loop detected
+                if (!guardPositions.Add(currentGuard))
+                {
+                    loop = true;
+                    return false;
+                }
+
+                return true;
+            });
+
+            return loop;
         }
     }
 }
