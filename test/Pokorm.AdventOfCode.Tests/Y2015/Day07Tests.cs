@@ -34,4 +34,14 @@ public class Day07Tests : DayTestBase
 
         Assert.Equal(3176, result);
     }
+
+    [Fact]
+    public void PartTwo()
+    {
+        var day = new Day07();
+
+        var result = day.SolveBonus(LinesForDay(day));
+
+        Assert.Equal(14710, result);
+    }
 }
