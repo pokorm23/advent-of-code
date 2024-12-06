@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Pokorm.AdventOfCode.Y2015.Days;
 
@@ -38,23 +37,27 @@ public partial class Day06
     public long Solve(string[] lines)
     {
         var data = Parse(lines);
-        var state = new State([]);
+        var state = new State([ ]);
 
         foreach (var dataInstruction in data.Instructions)
         {
             state = state.ApplyInstruction(dataInstruction);
         }
 
-        return state.Current.Count;
+        return state.LitLights.Count;
     }
 
     public long SolveBonus(string[] lines)
     {
         var data = Parse(lines);
+        var state = new BonusState([ ]);
 
-        var result = 0;
+        foreach (var dataInstruction in data.Instructions)
+        {
+            state = state.ApplyInstruction(dataInstruction);
+        }
 
-        return result;
+        return state.BrightnessMap.Sum(x => x.Value);
     }
 
     private enum Operation
@@ -87,11 +90,11 @@ public partial class Day06
 
     private record struct Ins(Operation Operation, Range Range);
 
-    private record State(HashSet<Coord> Current)
+    private record State(HashSet<Coord> LitLights)
     {
         public State ApplyInstruction(Ins ins)
         {
-            var newCurrent = this.Current.ToHashSet();
+            var newCurrent = this.LitLights.ToHashSet();
 
             foreach (var coord in ins.Range.Enumerate())
             {
@@ -99,7 +102,7 @@ public partial class Day06
                 {
                     Operation.TurnOn  => true,
                     Operation.TurnOff => false,
-                    Operation.Toggle  => !(this.Current.Contains(coord)),
+                    Operation.Toggle  => !this.LitLights.Contains(coord),
                     var _             => throw new Exception()
                 };
 
@@ -114,6 +117,32 @@ public partial class Day06
             }
 
             return new State(newCurrent);
+        }
+    }
+
+    private record BonusState(Dictionary<Coord, int> BrightnessMap)
+    {
+        public BonusState ApplyInstruction(Ins ins)
+        {
+            var newBrightnessMap = this.BrightnessMap.ToDictionary();
+
+            foreach (var coord in ins.Range.Enumerate())
+            {
+                var brightnessChange = ins.Operation switch
+                {
+                    Operation.TurnOn  => 1,
+                    Operation.TurnOff => -1,
+                    Operation.Toggle  => 2,
+                    var _             => throw new Exception()
+                };
+
+                if (!newBrightnessMap.TryAdd(coord, Math.Max(0, brightnessChange)))
+                {
+                    newBrightnessMap[coord] = Math.Max(0, newBrightnessMap[coord] + brightnessChange);
+                }
+            }
+
+            return new BonusState(newBrightnessMap);
         }
     }
 

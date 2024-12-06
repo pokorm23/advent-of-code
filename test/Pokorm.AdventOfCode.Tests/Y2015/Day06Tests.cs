@@ -51,7 +51,7 @@ public class Day06Tests : DayTestBase
     {
         var day = new Day06();
 
-        var result = day.SolveBonus([ "qjhvhtzxzqqjkmpb" ]);
+        var result = day.SolveBonus([ "turn on 0,0 through 0,0" ]);
 
         Assert.Equal(1, result);
     }
@@ -61,29 +61,9 @@ public class Day06Tests : DayTestBase
     {
         var day = new Day06();
 
-        var result = day.SolveBonus([ "xxyxx" ]);
+        var result = day.SolveBonus([ "toggle 0,0 through 999,999" ]);
 
-        Assert.Equal(1, result);
-    }
-
-    [Fact]
-    public void PartTwo_Sample_3()
-    {
-        var day = new Day06();
-
-        var result = day.SolveBonus([ "uurcxstgmygtbstg" ]);
-
-        Assert.Equal(0, result);
-    }
-
-    [Fact]
-    public void PartTwo_Sample_4()
-    {
-        var day = new Day06();
-
-        var result = day.SolveBonus([ "ieodomkazucvgmuy" ]);
-
-        Assert.Equal(0, result);
+        Assert.Equal(2000000, result);
     }
 
     [Fact]
@@ -93,6 +73,7 @@ public class Day06Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(69, result);
+        Assert.True(result > 14747699);
+        Assert.Equal(15343601, result);
     }
 }
