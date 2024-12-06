@@ -79,11 +79,13 @@ public class Day06
 
         var guard = data.Guard;
 
+        var putObstacles = new HashSet<Coord>();
+
         do
         {
             var nextCoord = data.MoveGuard(guard)?.Position;
 
-            if (nextCoord is not null && nextCoord != guard.Position)
+            if (nextCoord is not null && nextCoord != guard.Position && putObstacles.Add(nextCoord.Value))
             {
                 var newData = data.Data.ToDictionary();
 
