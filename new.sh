@@ -10,4 +10,6 @@ PUZZLE_URL="https://adventofcode.com/$year/day/$1/input"
 PUZZLE_FILE="src/Pokorm.AdventOfCode/Y$year/Inputs/$num.txt"
 
 curl "${PUZZLE_URL}" -H "cookie: session=${AOC_SESSION_COOKIE}" -o "${PUZZLE_FILE}"
-sed -i '${/^$/d}' "${PUZZLE_FILE}"
+
+git add .
+git commit -m "$year.$1 init"
