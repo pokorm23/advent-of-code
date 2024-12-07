@@ -40,10 +40,12 @@ public class Day09Tests : DayTestBase
 
         var result = day.SolveBonus(LinesFromSample(
                 """
-                ...
+                London to Dublin = 464
+                London to Belfast = 518
+                Dublin to Belfast = 141
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(982, result);
     }
 
     [Fact]
@@ -53,6 +55,6 @@ public class Day09Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(736, result);
     }
 }

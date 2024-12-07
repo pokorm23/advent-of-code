@@ -5,7 +5,6 @@ namespace Pokorm.AdventOfCode.Y2015.Days;
 // https://adventofcode.com/2015/day/9
 public class Day09
 {
-    // AlphaCentauri to Arbre = 108
     private static Map Parse(string[] lines)
     {
         var edges = new Dictionary<HashSet<string>, int>();
@@ -30,57 +29,58 @@ public class Day09
     {
         //Console.WriteLine();
         var data = Parse(lines);
-        var result = 0;
 
+        var result = FindDistance(data);
+
+        return result;
+    }
+    
+    public long SolveBonus(string[] lines)
+    {
+        var data = Parse(lines);
+
+        var result = FindDistance(data, true);
+
+        return result;
+    }
+
+    private static int FindDistance(Map data, bool longest = false)
+    {
+        var result = 0;
         var vs = data.GetVertexes();
 
         foreach (var v in vs)
         {
-            var (subResult, stack) = Recurse(v, 0, [ ], [ ]);
+            var subResult = Recurse(v, 0, [ ], [ ]);
 
-            //Console.WriteLine($"SubResult: {subResult} in {string.Join(" -> ", stack)}");
-
-            result = result == 0 ? subResult : Math.Min(subResult, result);
+            result = result == 0 ? subResult : (longest ? Math.Max(subResult, result) : Math.Min(subResult, result));
 
             continue;
 
-            (int Result, List<string> Stack) Recurse(string cur, int l, HashSet<string> visited, Stack<string> stack)
+            int Recurse(string cur, int l, HashSet<string> visited, Stack<string> stack)
             {
                 visited.Add(cur);
                 stack.Push(cur);
-
-                var indent = new string(' ', (stack.Count - 1) * 2);
-
-                //Console.WriteLine($"{indent}[{cur}] start");
 
                 var isEnd = visited.Count == vs.Count;
 
                 if (isEnd)
                 {
-                    //Console.WriteLine($"{indent}[{cur}] end as {l}");
-                    var r = (l, stack.AsEnumerable().Reverse().ToList());
-
                     visited.Remove(cur);
                     stack.Pop();
 
-                    return r;
+                    return l;
                 }
 
-                var lenghts = new List<(int Result, List<string> Stack)>();
+                var lenghts = new List<int>();
 
                 var siblings = data.GetSiblings(cur)
                                    .Where(c => !visited.Contains(c.Key))
                                    .ToList();
 
-                //Console.WriteLine($"{indent}[{cur}] siblings: {string.Join(" ; ", siblings.Select(x => x.Key))}");
-
                 foreach (var (sv, sd) in siblings)
                 {
-                    //Console.WriteLine($"{indent}[{cur}] go to {sv}");
-
                     var sub = Recurse(sv, l + sd, visited, stack);
-
-                    //Console.WriteLine($"{indent}[{cur}] finished {sv} as {sub.Result}");
 
                     lenghts.Add(sub);
                 }
@@ -88,23 +88,9 @@ public class Day09
                 visited.Remove(cur);
                 stack.Pop();
 
-                foreach (var (i, list) in lenghts)
-                {
-                    //Console.WriteLine($"{indent}[{cur}] potential: {i} in {string.Join(" -> ", list)}");
-                }
-
-                return lenghts.MinBy(x => x.Result);
+                return longest ?  lenghts.Max() : lenghts.Min();
             }
         }
-
-        return result;
-    }
-
-    public long SolveBonus(string[] lines)
-    {
-        var data = Parse(lines);
-
-        var result = 0;
 
         return result;
     }
