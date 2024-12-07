@@ -27,22 +27,12 @@ public class Day10Tests : DayTestBase
     }
 
     [Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day10();
-
-        var result = day.SolveBonus(" ");
-
-        Assert.Equal(-1, result);
-    }
-
-    [Fact]
     public void PartTwo()
     {
         var day = new Day10();
 
         var result = day.SolveBonus(TextForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(6989950, result);
     }
 }

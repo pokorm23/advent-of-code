@@ -54,10 +54,5 @@ public class Day10
 
     public long Solve(string input) => SolveTimes(input, 40).Length;
 
-    public long SolveBonus(string input)
-    {
-        var result = 0;
-
-        return result;
-    }
+    public long SolveBonus(string input) => SolveTimes(input, 50).Length;
 }
