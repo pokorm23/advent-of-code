@@ -14,7 +14,7 @@ public class InputService : IInputService
 
         if (File.Exists(path))
         {
-            return File.ReadAllText(path);
+            return File.ReadAllText(path).TrimEnd('\r', '\n');
         }
 
         throw new Exception($"{path} not found");
