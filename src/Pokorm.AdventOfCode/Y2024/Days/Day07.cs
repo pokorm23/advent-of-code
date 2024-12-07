@@ -26,30 +26,10 @@ public class Day07
 
         foreach (var e in data.Equations)
         {
-            if (Recurse(e.Test, e.Quefs))
+            if (MatchesTest(e.Test, e.Quefs, false))
             {
                 result += e.Test;
             }
-        }
-
-        static bool Recurse(long test, List<long> coefs)
-        {
-            var plusCase = coefs[0] + coefs[1];
-            var timeCase = coefs[0] * coefs[1];
-
-            if (coefs.Count == 2)
-            {
-                return plusCase == test || timeCase == test;
-            }
-
-            var result1 = Recurse(test, [ plusCase, ..coefs[2..] ]);
-
-            if (result1)
-            {
-                return result1;
-            }
-
-            return Recurse(test, [ timeCase, ..coefs[2..] ]);
         }
 
         return result;
@@ -59,9 +39,47 @@ public class Day07
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var result = 0L;
+
+        foreach (var e in data.Equations)
+        {
+            if (MatchesTest(e.Test, e.Quefs, true))
+            {
+                result += e.Test;
+            }
+        }
 
         return result;
+    }
+
+    private static bool MatchesTest(long test, List<long> coefs, bool useConcatenation)
+    {
+        var plusCase = coefs[0] + coefs[1];
+        var timeCase = coefs[0] * coefs[1];
+        var concatCase = !useConcatenation ? (long?) null : long.Parse($"{coefs[0]}{coefs[1]}");
+
+        if (coefs.Count == 2)
+        {
+            return plusCase == test || timeCase == test || concatCase == test;
+        }
+
+        var result1 = MatchesTest(test, [ plusCase, ..coefs[2..] ], useConcatenation);
+
+        if (result1)
+        {
+            return result1;
+        }
+
+        var result2 = MatchesTest(test, [ timeCase, ..coefs[2..] ], useConcatenation);
+
+        if (result2 || concatCase is null)
+        {
+            return result2;
+        }
+
+        var result3 = MatchesTest(test, [ concatCase.Value, ..coefs[2..] ], useConcatenation);
+
+        return result3;
     }
 
     private record Eq(long Test, List<long> Quefs);
