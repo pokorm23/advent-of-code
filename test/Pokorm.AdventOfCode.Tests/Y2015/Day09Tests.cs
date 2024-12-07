@@ -27,9 +27,10 @@ public class Day09Tests : DayTestBase
         var day = new Day09();
 
         var result = day.Solve(LinesForDay(day));
-        
-        Assert.Equal(-1, result);
+
         Assert.True(result < 283);
+        Assert.True(result != 30);
+        Assert.Equal(141, result);
     }
 
     [Fact]
