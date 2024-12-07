@@ -11,12 +11,9 @@ public class Day10Tests : DayTestBase
     {
         var day = new Day10();
 
-        var result = day.Solve(LinesFromSample(
-                """
-                ...
-                """));
+        var result = day.SolveTimes("1", 5);
 
-        Assert.Equal(-1, result);
+        Assert.Equal("312211", result);
     }
 
     [Fact]
@@ -24,9 +21,9 @@ public class Day10Tests : DayTestBase
     {
         var day = new Day10();
 
-        var result = day.Solve(LinesForDay(day));
+        var result = day.Solve(TextForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(492982, result);
     }
 
     [Fact]
@@ -34,10 +31,7 @@ public class Day10Tests : DayTestBase
     {
         var day = new Day10();
 
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+        var result = day.SolveBonus(" ");
 
         Assert.Equal(-1, result);
     }
@@ -47,7 +41,7 @@ public class Day10Tests : DayTestBase
     {
         var day = new Day10();
 
-        var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus(TextForDay(day));
 
         Assert.Equal(-1, result);
     }
