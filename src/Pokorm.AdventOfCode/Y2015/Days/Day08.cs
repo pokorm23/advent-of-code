@@ -66,6 +66,26 @@ public class Day08
     {
         var result = 0;
 
+        foreach (var line in lines)
+        {
+            var codeLength = line.Length;
+            var encodedLength = 0;
+
+            foreach (var c in line)
+            {
+                if (c is '"' or '\\')
+                {
+                    encodedLength++;
+                }
+
+                encodedLength++;
+            }
+
+            encodedLength += 2; // ""
+
+            result += encodedLength - codeLength;
+        }
+
         return result;
     }
 }

@@ -36,12 +36,14 @@ public class Day08Tests : DayTestBase
     {
         var day = new Day08();
 
-        var result = day.SolveBonus(LinesFromSample(
-            """
-            ...
-            """));
+        var result = day.SolveBonus(LinesFromSample("""
+                                               ""
+                                               "abc"
+                                               "aaa\"aaa"
+                                               "\x27"
+                                               """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(19, result);
     }
 
     [Fact]
@@ -51,6 +53,6 @@ public class Day08Tests : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(2074, result);
     }
 }
