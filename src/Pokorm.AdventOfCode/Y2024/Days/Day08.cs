@@ -7,21 +7,7 @@ public class Day08
     {
         var data = Parse(lines);
 
-        var allPairs = data.PairAntennas().ToList();
-
-        var antiNodes = new HashSet<Coord>();
-
-        foreach (var pair in allPairs)
-        {
-            var an = pair.GetAntiNodes()
-                         .Where(x => data.Board.IsCoordValid(x))
-                         .ToList();
-
-            foreach (var anc in an)
-            {
-                antiNodes.Add(anc);
-            }
-        }
+        var antiNodes = data.GetAllAntiNodes(false);
 
         return antiNodes.Count;
     }
@@ -30,9 +16,9 @@ public class Day08
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var antiNodes = data.GetAllAntiNodes(true);
 
-        return result;
+        return antiNodes.Count;
     }
 
     private static DayData Parse(string[] lines)
@@ -118,11 +104,45 @@ public class Day08
     {
         public Vector Vector => this.B - this.A;
 
-        public IEnumerable<Coord> GetAntiNodes()
+        public IEnumerable<Coord> GetFirstAntiNodes(Board bounds)
         {
             var d = this.Vector;
 
-            return [ this.A - d, this.B + d ];
+            return ((Coord[]) [ this.A - d, this.B + d ]).Where(bounds.IsCoordValid);
+        }
+
+        public IEnumerable<Coord> GetAntiNodes(Board bounds)
+        {
+            var d = this.Vector;
+            var c = this.A;
+
+            yield return this.A;
+
+            while (true)
+            {
+                c += d;
+
+                if (!bounds.IsCoordValid(c))
+                {
+                    break;
+                }
+
+                yield return c;
+            }
+
+            c = this.A;
+
+            while (true)
+            {
+                c -= d;
+
+                if (!bounds.IsCoordValid(c))
+                {
+                    break;
+                }
+
+                yield return c;
+            }
         }
     }
 
@@ -149,6 +169,26 @@ public class Day08
                     }
                 }
             }
+        }
+
+        public ISet<Coord> GetAllAntiNodes(bool includeHigherHarmonics)
+        {
+            var allPairs = PairAntennas().ToList();
+
+            var antiNodes = new HashSet<Coord>();
+
+            foreach (var pair in allPairs)
+            {
+                var an = !includeHigherHarmonics ? pair.GetFirstAntiNodes(this.Board)
+                             : pair.GetAntiNodes(this.Board);
+
+                foreach (var anc in an)
+                {
+                    antiNodes.Add(anc);
+                }
+            }
+
+            return antiNodes;
         }
     }
 }
