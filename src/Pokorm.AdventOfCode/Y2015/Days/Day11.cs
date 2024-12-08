@@ -18,6 +18,8 @@ public class Day11
         return input;
     }
 
+    public string SolveBonus(string input) => Solve(Solve(input));
+
     public bool IsValid(string input)
     {
         char? lc = null;
@@ -85,6 +87,4 @@ public class Day11
 
         return result.ToString();
     }
-
-    public string SolveBonus(string input) => "";
 }

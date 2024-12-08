@@ -57,26 +57,13 @@ public class Day11Tests : DayTestBase
         Assert.Equal("cqjxxyzz", result);
     }
 
-    /*[Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day11();
-
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
-
-        Assert.Equal(-1, result);
-    }
-
     [Fact]
     public void PartTwo()
     {
         var day = new Day11();
 
-        var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus(TextForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal("cqkaabcc", result);
+    }
 }
