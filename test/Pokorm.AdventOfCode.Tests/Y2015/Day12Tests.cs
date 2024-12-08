@@ -121,17 +121,26 @@ public class Day12Tests : DayTestBase
         Assert.Equal(119433, result);
     }
 
-    /* [Fact]
+     [Fact]
      public void PartTwo_Sample()
      {
          var day = new Day12();
 
-         var result = day.SolveBonus(LinesFromSample(
-                 """
-                 ...
-                 """));
+         Assert.Equal(6, day.SolveBonus("""
+                                        [1,2,3]
+                                        """));
 
-         Assert.Equal(-1, result);
+         Assert.Equal(4, day.SolveBonus("""
+                                        [1,{"c":"red","b":2},3]
+                                        """));
+
+         Assert.Equal(0, day.SolveBonus("""
+                                        {"d":"red","e":[1,2,3,4],"f":5}
+                                        """));
+
+         Assert.Equal(6, day.SolveBonus("""
+                                        [1,"red",5]
+                                        """));
      }
 
      [Fact]
@@ -139,8 +148,8 @@ public class Day12Tests : DayTestBase
      {
          var day = new Day12();
 
-         var result = day.SolveBonus(LinesForDay(day));
+         var result = day.SolveBonus(TextForDay(day));
 
-         Assert.Equal(-1, result);
-     }*/
+         Assert.Equal(68466, result);
+     }
 }

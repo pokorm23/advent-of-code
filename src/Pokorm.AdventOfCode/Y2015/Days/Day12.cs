@@ -14,6 +14,8 @@ public class Day12
         visitor.Visit(data.Root, c =>
         {
             result += c is JInteger i ? i.Value : 0;
+
+            return c;
         });
 
         return result;
@@ -24,6 +26,35 @@ public class Day12
         var data = Parse(input);
 
         var result = 0;
+
+        var visitor = new JVisitor();
+
+        var newRoot = visitor.Visit(data.Root, c =>
+        {
+            if (c is not JObject o)
+            {
+                return c;
+            }
+
+            if (o.Properties.Any(x => x.Value is JString {Value: "red"}))
+            {
+                return null;
+            }
+
+            return c;
+        });
+
+        if (newRoot is null)
+        {
+            return 0;
+        }
+
+        visitor.Visit(newRoot, c =>
+        {
+            result += c is JInteger i ? i.Value : 0;
+
+            return c;
+        });
 
         return result;
     }
@@ -164,55 +195,59 @@ public class Day12
 
     public class JVisitor
     {
-        public void Visit(JToken token, Action<JToken> action)
+        public JToken? Visit(JToken token, Func<JToken, JToken?> action)
         {
-            if (token is JArray a)
+            return token switch
             {
-                Visit(a, action);
-            }
-            else if (token is JObject b)
-            {
-                Visit(b, action);
-            }
-            else if (token is JInteger c)
-            {
-                Visit(c, action);
-            }
-            else if (token is JString d)
-            {
-                Visit(d, action);
-            }
-            else
-            {
-                throw new Exception();
-            }
+                JArray a   => Visit(a, action),
+                JObject b  => Visit(b, action),
+                JInteger c => Visit(c, action),
+                JString d  => Visit(d, action),
+                var _      => throw new Exception()
+            };
         }
 
-        private void Visit(JArray token, Action<JToken> action)
+        private JToken? Visit(JArray token, Func<JToken, JToken?> action)
         {
-            foreach (var tokenItem in token.Items)
+            foreach (var tokenItem in token.Items.ToList())
             {
-                Visit(tokenItem, action);
+                var result = Visit(tokenItem, action);
+
+                if (result is null)
+                {
+                    token.Items.Remove(tokenItem);
+                }
+                else
+                {
+                    token.Items[token.Items.IndexOf(tokenItem)] = result;
+                }
             }
+
+            return action(token);
         }
 
-        private void Visit(JString token, Action<JToken> action)
-        {
-            action(token);
-        }
+        private JToken? Visit(JString token, Func<JToken, JToken?> action) => action(token);
 
-        private void Visit(JObject token, Action<JToken> action)
+        private JToken? Visit(JObject token, Func<JToken, JToken?> action)
         {
-            foreach (var tokenItem in token.Properties.Values)
+            foreach (var (key, tokenItem) in token.Properties.ToDictionary())
             {
-                Visit(tokenItem, action);
+                var result = Visit(tokenItem, action);
+
+                if (result is null)
+                {
+                    token.Properties.Remove(key);
+                }
+                else
+                {
+                    token.Properties[key] = result;
+                }
             }
+
+            return action(token);
         }
 
-        private void Visit(JInteger token, Action<JToken> action)
-        {
-            action(token);
-        }
+        private JToken? Visit(JInteger token, Func<JToken, JToken?> action) => action(token);
     }
 
     public record JToken;
