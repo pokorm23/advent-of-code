@@ -1,33 +1,90 @@
-﻿namespace Pokorm.AdventOfCode.Y2015.Days;
+﻿using System.Diagnostics;
+using System.Text;
+
+namespace Pokorm.AdventOfCode.Y2015.Days;
 
 // https://adventofcode.com/2015/day/11
 public class Day11
 {
-    static DayData Parse(string[] lines)
+    public string Solve(string input)
     {
-        return new DayData();
+        input = GetNextPassword(input);
+
+        while (!IsValid(input))
+        {
+            input = GetNextPassword(input);
+        }
+
+        return input;
     }
 
-    public long Solve(string[] lines)
+    public bool IsValid(string input)
     {
-        var data = Parse(lines);
+        char? lc = null;
+        char? llc = null;
+        var rule1 = false;
 
-        var result = 0;
+        var rule2 = new HashSet<char>();
 
-        return result;
+        foreach (var c in input)
+        {
+            if (c is 'i' or 'o' or 'l')
+            {
+                return false;
+            }
+
+            if (!rule1 && lc.HasValue && llc.HasValue)
+            {
+                rule1 = c - lc == 1 && lc - llc == 1;
+            }
+
+            if (rule2.Count < 2 && lc.HasValue && !rule2.Contains(c) && c == lc)
+            {
+                rule2.Add(c);
+            }
+
+            (lc, llc) = (c, lc);
+        }
+
+        return rule1 && rule2.Count >= 2;
     }
 
-    public long SolveBonus(string[] lines)
+    public string GetNextPassword(string input)
     {
-        var data = Parse(lines);
+        Debug.Assert(input.Length > 0);
 
-        var result = 0;
+        var result = new StringBuilder();
 
-        return result;
+        bool? wrap = false;
+
+        foreach (var c in input.Reverse())
+        {
+            if (wrap is null)
+            {
+                result.Insert(0, c);
+
+                continue;
+            }
+
+            var nc = c;
+
+            if (c == 'z')
+            {
+                wrap = true;
+                nc = 'a';
+                result.Insert(0, nc);
+
+                continue;
+            }
+
+            nc = (char) (nc + 1);
+            wrap = null;
+
+            result.Insert(0, nc);
+        }
+
+        return result.ToString();
     }
 
-    record DayData()
-    {
-
-    }
+    public string SolveBonus(string input) => "";
 }
