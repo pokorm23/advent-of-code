@@ -6,7 +6,7 @@ namespace Pokorm.AdventOfCore.Benchmarks;
 [MemoryDiagnoser]
 public class DayBenchmarks
 {
-    public static List<(Type x, object?, Func<long>, Func<long>)> Days { get; set; }
+    public static List<(Type x, object?, Func<object>, Func<object>)> Days { get; set; }
 
     public IEnumerable<object> SolveParams()
     {
@@ -26,9 +26,9 @@ public class DayBenchmarks
 
     [Benchmark]
     [ArgumentsSource(nameof(SolveParams))]
-    public long Solve(DayBenchmarkParam param) => param.SolveFunc();
+    public object Solve(DayBenchmarkParam param) => param.SolveFunc();
 
-    //[Benchmark]
-    //[ArgumentsSource(nameof(SolveBonusParams))]
-    public long SolveBonus(DayBenchmarkParam param) => param.SolveFunc();
+    [Benchmark]
+    [ArgumentsSource(nameof(SolveBonusParams))]
+    public object SolveBonus(DayBenchmarkParam param) => param.SolveFunc();
 }

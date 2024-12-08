@@ -5,7 +5,7 @@ namespace Pokorm.AdventOfCode;
 
 public static class DayInvoker
 {
-    public static Func<long> InvokeSolve(bool bonus, object? day, Type type, IServiceProvider serviceProvider)
+    public static Func<object> InvokeSolve(bool bonus, object? day, Type type, IServiceProvider serviceProvider)
     {
         if (day is IDay d)
         {
@@ -37,7 +37,7 @@ public static class DayInvoker
         return InvokeExecuteMethod(handleMethod, day, type, serviceProvider);
     }
 
-    private static Func<long> InvokeExecuteMethod(MethodInfo handleMethod,
+    private static Func<object> InvokeExecuteMethod(MethodInfo handleMethod,
         object? instance,
         Type type,
         IServiceProvider serviceProvider)
@@ -76,6 +76,10 @@ public static class DayInvoker
         if (handleMethod.ReturnType.IsAssignableTo(typeof(long)))
         {
             return () => (long) handleMethod.Invoke(instance, paramValues.ToArray())!;
+        }
+        else if (handleMethod.ReturnType.IsAssignableTo(typeof(string)))
+        {
+            return () => (string) handleMethod.Invoke(instance, paramValues.ToArray())!;
         }
         else
         {
