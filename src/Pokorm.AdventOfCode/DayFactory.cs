@@ -10,9 +10,24 @@ internal class DayFactory : IDayFactory
 
     public DayFactory(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
 
+    public IEnumerable<Type> GetAllDayTypes()
+    {
+        return GetServices().Select(x => x.ImplementationType!);
+    }
+
+    public object? TryCreateDay(Type type)
+    {
+        if (type.IsAbstract && type.IsSealed)
+        {
+            return null;
+        }
+
+        return ActivatorUtilities.GetServiceOrCreateInstance(this.serviceProvider, type);
+    }
+
     public object GetDay(int year, int day)
     {
-        var dayInstance = GetServices().Select(x => x.ImplementationType!).Where(type =>
+        var dayInstance = GetAllDayTypes().Where(type =>
         {
             if (!(type.Namespace?.Contains(year.ToString()) ?? false))
             {
@@ -46,7 +61,7 @@ internal class DayFactory : IDayFactory
 
         this.services.Scan(scan => scan
                                    .FromAssemblyOf<IDay>()
-                                   .AddClasses(classes => classes.Where(t => t.Name.StartsWith("Day")))
+                                   .AddClasses(classes => classes.Where(t => (t.Namespace?.EndsWith("Days") ?? false) && t.Name.StartsWith("Day") && !t.IsNested))
                                    .AsSelf()
                                    .WithSingletonLifetime());
 
