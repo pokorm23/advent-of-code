@@ -27,7 +27,6 @@ public class Day09
 
     public long Solve(string[] lines)
     {
-        //Console.WriteLine();
         var data = Parse(lines);
 
         var result = FindDistance(data);

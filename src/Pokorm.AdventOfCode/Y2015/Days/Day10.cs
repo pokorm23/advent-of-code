@@ -13,8 +13,6 @@ public class Day10
             var currentSequenceCount = 0;
             var result = new StringBuilder();
 
-            Console.Write($"{input}");
-
             foreach (var c in input)
             {
                 if (lastChar is null)
@@ -45,8 +43,6 @@ public class Day10
             }
 
             input = result.ToString();
-
-            Console.WriteLine($" becomes {input}");
         }
 
         return input;
