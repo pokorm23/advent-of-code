@@ -40,7 +40,7 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new Day09(new NullLogger<Day09>());
+        var day = new Day09(this.logger);
 
         var result = day.Solve(TextForDay(day));
 
@@ -70,7 +70,7 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = new Day09(new NullLogger<Day09>());
+        var day = new Day09(this.logger);
 
         var result = day.SolveBonus(TextForDay(day));
 

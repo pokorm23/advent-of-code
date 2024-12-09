@@ -189,10 +189,20 @@ public class Day09
             }
 
             // length -> (offset)
-            var freePos = new HashSet<(int Offset, int Length)>();
+            var freePos = new SortedSet<(int Offset, int Length)>(Comparer<(int Offset, int Length)>.Create((x, y) =>
+            {
+                return x.Offset.CompareTo(y.Offset);
+            }));
+
+            var freePos1 = new Dictionary<int, SortedSet<int>>(EqualityComparer<int>.Create((x, y) =>
+            {
+                return x >= y;
+            }));
 
             SingleFreeSpace? lastFree = null;
             Range? freeStartRange = null;
+
+            var sw = Stopwatch.GetTimestamp();
 
             // iterate for empty free space
             for (var i = 0; i < this.Items.Count; i++)
@@ -230,6 +240,10 @@ public class Day09
                 }
             }
 
+            var totalEl = new TimeSpan();
+            logger.LogInformation($"Free space: {Stopwatch.GetElapsedTime(sw)}");
+            sw = Stopwatch.GetTimestamp();
+
             if (freeStartRange is not null)
             {
                 freePos.Add(freeStartRange.Value.GetOffsetAndLength(this.Items.Count));
@@ -241,6 +255,8 @@ public class Day09
 
             for (var j = this.Items.Count - 1; j >= 0; j--)
             {
+                sw = Stopwatch.GetTimestamp();
+
                 //LogPos(logger, this, occu, fileEndRange, 0, j);
 
                 var file = this.Items[j] as SingleFile;
@@ -263,10 +279,9 @@ public class Day09
                     {
                         var fileBlock = fileEndRange.Value.GetOffsetAndLength(this.Items.Count);
 
-                        var ff = freePos.Where(x => x.Length >= fileBlock.Length
-                                                    && x.Offset <= fileBlock.Offset)
-                                        .OrderBy(x => x.Offset)
-                                        .FirstOrDefault();
+                        var ff = freePos
+                            .FirstOrDefault(x => x.Length >= fileBlock.Length
+                                                 && x.Offset <= fileBlock.Offset);
 
                         var found = ff.Length != 0;
 
@@ -310,17 +325,28 @@ public class Day09
                 {
                     lastFile = file;
                 }
+
+                var el = Stopwatch.GetElapsedTime(sw);
+                totalEl += el;
+                logger.LogInformation($"{j}: {el}");
             }
 
-            foreach (var i in Enumerable.Range(0, this.Items.Count).Where(x => !occu.Any(c => c.Key == x)))
+            logger.LogInformation($"iter: {totalEl}");
+            sw = Stopwatch.GetTimestamp();
+
+            foreach (var i in Enumerable.Range(0, this.Items.Count))
             {
-                occu.Add(i, new SingleFreeSpace());
+                if (occu.TryGetValue(i, out var r))
+                {
+                    yield return r;
+                }
+                else
+                {
+                    yield return new SingleFreeSpace();
+                }
             }
 
-            foreach (var (index, value) in occu.OrderBy(x => x.Key))
-            {
-                yield return value;
-            }
+            logger.LogInformation($"yield: {Stopwatch.GetElapsedTime(sw)}");
         }
 
         private void LogPos(ILogger l,
