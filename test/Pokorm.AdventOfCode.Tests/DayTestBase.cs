@@ -6,9 +6,14 @@ namespace Pokorm.AdventOfCode.Tests;
 
 public abstract class DayTestBase : IDisposable
 {
-    public ITestOutputHelper Output { get; }
+    public ITestOutputHelper? Output { get; }
 
-    private readonly ConsoleOutput consoleOutput;
+    private readonly ConsoleOutput? consoleOutput;
+
+    public DayTestBase()
+    {
+        
+    }
 
     public DayTestBase(ITestOutputHelper output)
     {
@@ -20,7 +25,7 @@ public abstract class DayTestBase : IDisposable
 
     public void Dispose()
     {
-        this.consoleOutput.Dispose();
+        this.consoleOutput?.Dispose();
     }
 
     protected IInputService InputFromSample(string sample)

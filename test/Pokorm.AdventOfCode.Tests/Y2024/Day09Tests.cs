@@ -1,10 +1,13 @@
+using Microsoft.Extensions.Logging;
 using Pokorm.AdventOfCode.Y2024.Days;
 
 namespace Pokorm.AdventOfCode.Tests.Y2024;
 
 public class Day09Tests : DayTestBase
 {
-    public Day09Tests(ITestOutputHelper output) : base(output) { }
+    private readonly ILogger<Day09> logger;
+
+    public Day09Tests(ILogger<Day09> logger) => this.logger = logger;
 
     [Fact]
     public void PartOne_Parse()
@@ -16,7 +19,7 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne_Sample_1()
     {
-        var day = new Day09();
+        var day = new Day09(this.logger);
 
         var result = day.Solve("12345");
 
@@ -26,7 +29,7 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne_Sample_2()
     {
-        var day = new Day09();
+        var day = new Day09(this.logger);
 
         var result = day.Solve("2333133121414131402");
 
@@ -36,33 +39,33 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new Day09();
+        var day = new Day09(this.logger);
 
         var result = day.Solve(TextForDay(day));
 
         Assert.Equal(6346871685398, result);
     }
 
-   /* [Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day09();
+    /* [Fact]
+     public void PartTwo_Sample()
+     {
+         var day = new Day09();
 
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+         var result = day.SolveBonus(LinesFromSample(
+                 """
+                 ...
+                 """));
 
-        Assert.Equal(-1, result);
-    }
+         Assert.Equal(-1, result);
+     }
 
-    [Fact]
-    public void PartTwo()
-    {
-        var day = new Day09();
+     [Fact]
+     public void PartTwo()
+     {
+         var day = new Day09();
 
-        var result = day.SolveBonus(LinesForDay(day));
+         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+         Assert.Equal(-1, result);
+     }*/
 }

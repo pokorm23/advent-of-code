@@ -1,27 +1,28 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/9
 public class Day09
 {
-    /*public readonly ILogger<Day09> logger;
+    public readonly ILogger<Day09> logger;
 
     public Day09(ILogger<Day09> logger)
     {
         this.logger = logger;
-    }*/
+    }
 
     public long Solve(string input)
     {
         var disk = Parse(input);
 
-        //Console.WriteLine(disk.ToString());
+        this.logger.LogDebug(disk.ToString());
 
         var fragDisk = new Disk(disk.ApplyAllFileChanges().ToList());
 
-        //Console.WriteLine(fragDisk.ToString());
+        this.logger.LogDebug(fragDisk.ToString());
 
         var checksum = fragDisk.ComputeChecksum();
 
