@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Pokorm.AdventOfCode.Y2024.Days;
 
 namespace Pokorm.AdventOfCode.Tests.Y2024;
@@ -39,7 +40,7 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new Day09(this.logger);
+        var day = new Day09(new NullLogger<Day09>());
 
         var result = day.Solve(TextForDay(day));
 
@@ -69,11 +70,11 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = new Day09(this.logger);
+        var day = new Day09(new NullLogger<Day09>());
 
         var result = day.SolveBonus(TextForDay(day));
 
-        Assert.Equal(6346871685398, result);
         Assert.True(result < 6373055449881);
+        Assert.Equal(6373055193464, result);
     }
 }

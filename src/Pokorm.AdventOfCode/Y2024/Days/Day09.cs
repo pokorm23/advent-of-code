@@ -31,11 +31,11 @@ public class Day09
     {
         var disk = Parse(input);
 
-        this.logger.LogDebug(disk.ToString());
+        //this.logger.LogDebug(disk.ToString());
 
         var fragDisk = new Disk(disk.ApplyAllFileChangesWithoutFragmentation(this.logger).ToList());
 
-        this.logger.LogDebug(fragDisk.ToString());
+        //this.logger.LogDebug(fragDisk.ToString());
 
         var checksum = fragDisk.ComputeChecksum();
 
@@ -188,13 +188,60 @@ public class Day09
                 throw new Exception();
             }
 
+            // length -> (offset)
+            var freePos = new HashSet<(int Offset, int Length)>();
+
+            SingleFreeSpace? lastFree = null;
+            Range? freeStartRange = null;
+
+            // iterate for empty free space
+            for (var i = 0; i < this.Items.Count; i++)
+            {
+                var free = this.Items[i] as SingleFreeSpace;
+
+                if (freeStartRange is null && free is not null)
+                {
+                    freeStartRange = new Range(i, i + 1);
+                }
+
+                if (lastFree is not null)
+                {
+                    Debug.Assert(freeStartRange.HasValue);
+
+                    if (free is not null)
+                    {
+                        freeStartRange = new Range(freeStartRange.Value.Start, i + 1);
+                    }
+                }
+
+                if (free is null)
+                {
+                    if (freeStartRange is not null)
+                    {
+                        freePos.Add(freeStartRange.Value.GetOffsetAndLength(this.Items.Count));
+                    }
+
+                    freeStartRange = null;
+                    lastFree = null;
+                }
+                else
+                {
+                    lastFree = free;
+                }
+            }
+
+            if (freeStartRange is not null)
+            {
+                freePos.Add(freeStartRange.Value.GetOffsetAndLength(this.Items.Count));
+            }
+
             SingleFile? lastFile = null;
             Range? fileEndRange = null;
             var occu = new Dictionary<int, SingleDiskItem>();
 
             for (var j = this.Items.Count - 1; j >= 0; j--)
             {
-                LogPos(logger, this, occu, fileEndRange, 0, j);
+                //LogPos(logger, this, occu, fileEndRange, 0, j);
 
                 var file = this.Items[j] as SingleFile;
 
@@ -216,85 +263,34 @@ public class Day09
                     {
                         var fileBlock = fileEndRange.Value.GetOffsetAndLength(this.Items.Count);
 
-                        SingleFreeSpace? lastFree = null;
-                        Range? freeStartRange = null;
-                        var found = false;
+                        var ff = freePos.Where(x => x.Length >= fileBlock.Length
+                                                    && x.Offset <= fileBlock.Offset)
+                                        .OrderBy(x => x.Offset)
+                                        .FirstOrDefault();
 
-                        // iterate for empty free space
-                        for (var i = 0; i < j; i++)
+                        var found = ff.Length != 0;
+
+                        if (!found)
                         {
-                            LogPos(logger, this, occu, fileEndRange, 0, j, i);
-
-                            var free = this.Items[i] as SingleFreeSpace;
-
-                            // simulation that pos is taken
-                            if (free is not null && occu.ContainsKey(i))
-                            {
-                                free = null;
-                            }
-
-                            if (freeStartRange is null && free is not null)
-                            {
-                                freeStartRange = new Range(i, i + 1);
-                            }
-
-                            if (lastFree is not null)
-                            {
-                                Debug.Assert(freeStartRange.HasValue);
-
-                                if (free is not null)
-                                {
-                                    freeStartRange = new Range(freeStartRange.Value.Start, i + 1);
-                                }
-                            }
-
-                            if (freeStartRange.HasValue)
-                            {
-                                var (offset, length) = freeStartRange.Value.GetOffsetAndLength(this.Items.Count);
-
-                                if (length == fileBlock.Length)
-                                {
-                                    found = true;
-
-                                    for (var l = offset; l < offset + length; l++)
-                                    {
-                                        occu.Add(l, lastFile);
-                                    }
-
-                                    break;
-                                }
-                            }
-
-                            if (free is null)
-                            {
-                                freeStartRange = null;
-                                lastFree = null;
-                            }
-                            else
-                            {
-                                lastFree = free;
-                            }
-                        }
-
-                        // append to front result
-                        /*for (var l = 0; l < fileBlock.Length && found; l++)
-                        {
-                            front.Add(lastFile);
-                            k++;
-                        }*/
-
-                        // append to back result
-                        for (var l = fileBlock.Offset; l < fileBlock.Offset + fileBlock.Length; l++)
-                        {
-                            if (!found) // confirmed adding
+                            for (var l = fileBlock.Offset; l < fileBlock.Offset + fileBlock.Length; l++)
                             {
                                 occu.Add(l, lastFile);
-
-                                // back.Insert(0, lastFile);
                             }
-                            else
+                        }
+                        else
+                        {
+                            freePos.Remove(ff);
+
+                            if (ff.Length > fileBlock.Length) // taken more
                             {
-                                //back.Insert(0, new SingleFreeSpace());
+                                var newLength = ff.Length - fileBlock.Length;
+                                var newOffset = ff.Offset + fileBlock.Length;
+                                freePos.Add((newOffset, newLength));
+                            }
+
+                            for (var l = ff.Offset; l < ff.Offset + fileBlock.Length; l++)
+                            {
+                                occu.Add(l, lastFile);
                             }
                         }
                     }
@@ -334,7 +330,7 @@ public class Day09
             int k,
             int j)
         {
-           /* var prependJ = new string(' ', j);
+            var prependJ = new string(' ', j);
 
             var c = new char[s.Items.Count];
 
@@ -361,64 +357,7 @@ public class Day09
 
             l.LogTrace($"{prependJ}^");
             l.LogTrace($"{prependJ}|");
-            l.LogTrace($"{prependJ}j");*/
-        }
-
-        private void LogPos(ILogger l,
-            Disk s,
-            Dictionary<int, SingleDiskItem> front,
-            Range? fileEndRange,
-            int k,
-            int j,
-            int i)
-        {
-            /*var c = new char[s.Items.Count];
-
-            for (var i1 = 0; i1 < c.Length; i1++)
-            {
-                c[i1] = ' ';
-            }
-
-            foreach (var d in front)
-            {
-                c[d.Key] = d.Value is SingleFile f ? (char) ('0' + f.Id) : '.';
-            }
-
-            var result = new string(c).TrimEnd();
-
-            l.LogTrace(result);
-
-            l.LogDebug(s.ToString());
-
-            if (fileEndRange is not null)
-            {
-                var (o, le) = fileEndRange.Value.GetOffsetAndLength(s.Items.Count);
-                l.LogTrace($"{new string(' ', o)}{string.Join("", Enumerable.Range(o, le).Select(x => s.Items[x].ToString()))}");
-            }
-
-            if (i == j)
-            {
-                var prependI = new string(' ', i);
-                l.LogTrace($"{prependI}^");
-                l.LogTrace($"{prependI}|");
-                l.LogTrace($"{prependI}i,j");
-            }
-            else if (i < j)
-            {
-                var prependI = new string(' ', i);
-                var prependJ = new string(' ', j - i - 1);
-                l.LogTrace($"{prependI}^{prependJ}^");
-                l.LogTrace($"{prependI}|{prependJ}|");
-                l.LogTrace($"{prependI}i{prependJ}j");
-            }
-            else if (j < i)
-            {
-                var prependI = new string(' ', j);
-                var prependJ = new string(' ', i - j - 1);
-                l.LogTrace($"{prependI}^{prependJ}^");
-                l.LogTrace($"{prependI}|{prependJ}|");
-                l.LogTrace($"{prependI}j{prependJ}i");
-            }*/
+            l.LogTrace($"{prependJ}j");
         }
 
         [Pure]
