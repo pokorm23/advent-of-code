@@ -15,25 +15,15 @@ public class Day09
 
     public long Solve(string input)
     {
-        var data = Parse(input);
+        var disk = Parse(input);
 
-        FileChange? change = null;
+        //Console.WriteLine(disk.ToString());
 
-        do
-        {
-            change = data.TryToMoveNextFile();
+        var fragDisk = new Disk(disk.ApplyAllFileChanges().ToList());
 
-            if (change is null)
-            {
-                break;
-            }
+        //Console.WriteLine(fragDisk.ToString());
 
-            var newItems = data.ApplyFileChange(change);
-
-            data = new Disk(newItems);
-        } while (true);
-
-        var checksum = data.ComputeChecksum();
+        var checksum = fragDisk.ComputeChecksum();
 
         return checksum;
     }
@@ -114,6 +104,60 @@ public class Day09
     public record Disk(List<SingleDiskItem> Items)
     {
         [Pure]
+        public IEnumerable<SingleDiskItem> ApplyAllFileChanges()
+        {
+            var lastFileIndex = this.Items.FindLastIndex(i => i is SingleFile);
+
+            if (lastFileIndex == -1)
+            {
+                throw new Exception();
+            }
+
+            var firstFreeSpace = this.Items.FindIndex(i => i is SingleFreeSpace);
+
+            if (firstFreeSpace == -1 || firstFreeSpace >= lastFileIndex)
+            {
+                throw new Exception();
+            }
+
+            var appliedFiles = 0;
+
+            for (var (i, j) = (0, this.Items.Count - 1); i < this.Items.Count && j >= 0 && i <= j;)
+            {
+                var originalI = i;
+                var oi = this.Items[i] as SingleFreeSpace;
+                var oj = this.Items[j] as SingleFile;
+
+                if (oi is not null && oj is null) // both are free
+                {
+                    j--;
+
+                    continue;
+                }
+
+                i++;
+
+                if (oi is null)
+                {
+                    oj = (SingleFile) this.Items[originalI];
+                }
+                else
+                {
+                    j--;
+                }
+
+                appliedFiles++;
+
+                yield return new SingleFile(oj.Id);
+            }
+
+            for (var i = 0; i < this.Items.Count - appliedFiles; i++)
+            {
+                yield return new SingleFreeSpace();
+            }
+        }
+
+        [Pure]
         public List<SingleDiskItem> ApplyFileChange(FileChange change)
         {
             var newItems = this.Items.ToList();
@@ -146,7 +190,7 @@ public class Day09
             return new FileChange(fileId, lastFileIndex, firstFreeSpace);
         }
 
-        public string ToBlockString()
+        public override string ToString()
         {
             var result = new StringBuilder();
 

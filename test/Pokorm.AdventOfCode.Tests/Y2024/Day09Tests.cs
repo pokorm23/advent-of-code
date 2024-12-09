@@ -9,8 +9,8 @@ public class Day09Tests : DayTestBase
     [Fact]
     public void PartOne_Parse()
     {
-        Assert.Equal("0..111....22222", Day09.Parse("12345").ToBlockString());
-        Assert.Equal("00...111...2...333.44.5555.6666.777.888899", Day09.Parse("2333133121414131402").ToBlockString());
+        Assert.Equal("0..111....22222", Day09.Parse("12345").ToString());
+        Assert.Equal("00...111...2...333.44.5555.6666.777.888899", Day09.Parse("2333133121414131402").ToString());
     }
 
     [Fact]
