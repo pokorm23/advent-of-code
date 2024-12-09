@@ -3,10 +3,16 @@ using BenchmarkDotNet.Running;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Logging;
 using Pokorm.AdventOfCode;
 using Pokorm.AdventOfCore.Benchmarks;
 
 var services = new ServiceCollection();
+
+services.AddLogging(b =>
+{
+    b.ClearProviders();
+});
 
 services.AddSingleton<IHostEnvironment>(new HostingEnvironment()
 {

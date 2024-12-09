@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Pokorm.AdventOfCode.Tests.Logging;
@@ -70,7 +71,7 @@ public class XUnitLogger : ILogger
             return;
         }
 
-        var scope = ConsoleHelper.InColor(GetScopeInformation(), ConsoleColor.DarkGray);
+        var scope = GetScopeInformation();
 
         var (fg, bg) = logLevel switch
         {
@@ -82,13 +83,13 @@ public class XUnitLogger : ILogger
             LogLevel.Trace       => (ConsoleColor.Gray, null)
         };
 
-        var msg = ConsoleHelper.InColor(message, fg, bg, false);
-
-        var line = $"{scope}{msg}";
+        var line = $"{ConsoleHelper.InColor(scope, ConsoleColor.DarkGray)}{ConsoleHelper.InColor(message, fg, bg, false)}";
 
         try
         {
-            outputHelper.WriteLine(line);
+            //outputHelper.WriteLine(line);
+            outputHelper.WriteLine($"{scope}{message}");
+            //Trace.WriteLine($"{scope}{message}");
         }
         catch (InvalidOperationException) { }
     }

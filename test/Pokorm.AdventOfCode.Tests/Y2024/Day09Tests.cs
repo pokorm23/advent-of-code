@@ -46,26 +46,34 @@ public class Day09Tests : DayTestBase
         Assert.Equal(6346871685398, result);
     }
 
-    /* [Fact]
-     public void PartTwo_Sample()
-     {
-         var day = new Day09();
+    [Fact]
+    public void PartTwo_Sample_1()
+    {
+        var day = new Day09(this.logger);
 
-         var result = day.SolveBonus(LinesFromSample(
-                 """
-                 ...
-                 """));
+        var result = day.SolveBonus("12345");
 
-         Assert.Equal(-1, result);
-     }
+        Assert.Equal(132, result);
+    }
 
-     [Fact]
-     public void PartTwo()
-     {
-         var day = new Day09();
+    [Fact]
+    public void PartTwo_Sample_2()
+    {
+        var day = new Day09(this.logger);
 
-         var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus("2333133121414131402");
 
-         Assert.Equal(-1, result);
-     }*/
+        Assert.Equal(2858, result);
+    }
+
+    [Fact]
+    public void PartTwo()
+    {
+        var day = new Day09(this.logger);
+
+        var result = day.SolveBonus(TextForDay(day));
+
+        Assert.Equal(6346871685398, result);
+        Assert.True(result < 6373055449881);
+    }
 }
