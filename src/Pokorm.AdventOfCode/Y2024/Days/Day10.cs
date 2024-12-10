@@ -15,7 +15,7 @@ public class Day10
 
         foreach (var headPos in heads)
         {
-            result += data.GetTrailCoutFromPosition(headPos);
+            result += data.GetTrailCountFromPosition(headPos);
         }
 
         return result;
@@ -25,7 +25,14 @@ public class Day10
     {
         var data = Parse(lines);
 
+        var heads = data.GetTrailheads();
+
         var result = 0;
+
+        foreach (var headPos in heads)
+        {
+            result += data.GetPositionRating(headPos);
+        }
 
         return result;
     }
@@ -127,7 +134,7 @@ public class Day10
             return this.Points.Where(x => x.Value.Height == 0).Select(x => x.Value);
         }
 
-        public int GetTrailCoutFromPosition(Position position) // BFS
+        private (List<Position> Ends, ConcurrentDictionary<Position, List<Position>> LookbackMap) GetTrailFromPosition(Position position) // BFS
         {
             var q = new Queue<Position>();
 
@@ -142,11 +149,17 @@ public class Day10
 
             var p = new ConcurrentDictionary<Position, List<Position>>();
 
+            var t = new List<HashSet<Position>>();
+
             while (q.Count > 0)
             {
                 var v = q.Dequeue();
 
-                foreach (var w in GetNextPositions(v))
+                var next = GetNextPositions(v).ToHashSet();
+
+                t.Add(next);
+
+                foreach (var w in next)
                 {
                     if (!status.TryGetValue(w, out var _))
                     {
@@ -156,15 +169,15 @@ public class Day10
 
                         d.AddOrUpdate(w, vd + 1, (_, c) => vd + 1);
 
-                        p.AddOrUpdate(w, [ v ], (_, c) =>
-                        {
-                            c.Add(v);
-
-                            return c;
-                        });
-
                         q.Enqueue(w);
                     }
+
+                    p.AddOrUpdate(w, [ v ], (_, c) =>
+                    {
+                        c.Add(v);
+
+                        return c;
+                    });
                 }
 
                 status.AddOrUpdate(v, false, (_, _) => false);
@@ -174,17 +187,58 @@ public class Day10
                         .Select(x => x.Key)
                         .ToList();
 
-            return full.Count;
+            return (full, p);
+        }
 
-            /*foreach (var position1 in full)
+        public int GetTrailCountFromPosition(Position position) => GetTrailFromPosition(position).Ends.Count;
+
+        public int GetPositionRating(Position position)
+        {
+            var (ends, lookback) = GetTrailFromPosition(position);
+
+            var trails = new List<Trail>();
+
+            foreach (var end in ends)
             {
-                Position? pos = position1;
+                var pos = end;
 
-                while (pos != position)
+                var subTrails = GetTrails(pos, lookback);
+
+                foreach (var subTrail in subTrails)
                 {
-                    pos = p[pos];
+                    trails.Add(subTrail);
                 }
-            }*/
+            }
+
+            static IEnumerable<Trail> GetTrails(Position pos, ConcurrentDictionary<Position, List<Position>> lookback)
+            {
+                var back = lookback.TryGetValue(pos, out var s) ? s : [ ];
+
+                if (back.Count == 0)
+                {
+                    return [ new Trail([ pos ]) ];
+                }
+
+                var trails = new List<Trail>();
+
+                foreach (var end in back)
+                {
+                    var subTrails = GetTrails(end, lookback);
+
+                    var newOnes = new List<Trail>();
+
+                    foreach (var subTrail in subTrails)
+                    {
+                        newOnes.Add(new Trail([ ..subTrail.Positions, end ]));
+                    }
+
+                    trails.AddRange(newOnes);
+                }
+
+                return trails;
+            }
+
+            return trails.Count;
         }
 
         private IEnumerable<Position> GetNextPositions(Position position)

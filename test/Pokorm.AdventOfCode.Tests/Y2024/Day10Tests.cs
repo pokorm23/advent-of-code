@@ -109,26 +109,89 @@ public class Day10Tests : DayTestBase
         Assert.Equal(754, result);
     }
 
-    /* [Fact]
-     public void PartTwo_Sample()
-     {
-         var day = new Day10();
+    [Fact]
+    public void PartTwo_Sample_1()
+    {
+        var day = new Day10();
 
-         var result = day.SolveBonus(LinesFromSample(
-                 """
-                 ...
-                 """));
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            .....0.
+            ..4321.
+            ..5..2.
+            ..6543.
+            ..7..4.
+            ..8765.
+            ..9....
+            """));
 
-         Assert.Equal(-1, result);
-     }
+        Assert.Equal(3, result);
+    }
 
-     [Fact]
-     public void PartTwo()
-     {
-         var day = new Day10();
+    [Fact]
+    public void PartTwo_Sample_2()
+    {
+        var day = new Day10();
 
-         var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            ..90..9
+            ...1.98
+            ...2..7
+            6543456
+            765.987
+            876....
+            987....
+            """));
 
-         Assert.Equal(-1, result);
-     }*/
+        Assert.Equal(13, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_3()
+    {
+        var day = new Day10();
+
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            012345
+            123456
+            234567
+            345678
+            4.6789
+            56789.
+            """));
+
+        Assert.Equal(227, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_4()
+    {
+        var day = new Day10();
+
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            89010123
+            78121874
+            87430965
+            96549874
+            45678903
+            32019012
+            01329801
+            10456732
+            """));
+
+        Assert.Equal(81, result);
+    }
+
+    [Fact]
+    public void PartTwo()
+    {
+        var day = new Day10();
+
+        var result = day.SolveBonus(LinesForDay(day));
+
+        Assert.Equal(1609, result);
+    }
 }
