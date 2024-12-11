@@ -66,10 +66,52 @@ public class Day11Tests : DayTestBase
     }
 
     [Fact]
+    public void PartTwo_Speed()
+    {
+        /*int i;
+
+        for (i = 42; ; i++)
+        {
+            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+
+            try
+            {
+                var day = new Day11(this.logger);
+                day.SolveIterations("1", i, ct);
+            }
+            catch (OperationCanceledException e)
+            {
+                break;
+            }
+        }
+
+        this.logger.LogInformation(i.ToString());
+        Assert.True(i > 44);*/
+
+        var day = new Day11(this.logger);
+        //var ct = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+        day.SolveIterations("1", 60);
+
+        /*
+40:330.2299 ms
+41:460.1497 ms
+42:854.4925 ms
+43:2,055.6628 ms
+44:2,916.9291 ms
+45:2,281.3691 ms
+46:4,769.5901 ms
+47:8,700.1197 ms
+48:8,454.3051 ms
+49:37,852.7656 ms
+50:64,683.4760 ms
+         */
+    }
+
+    [Fact]
     public void PartTwo()
     {
         var day = new Day11(this.logger);
-
+        
         var result = day.SolveBonus(TextForDay(day));
 
         Assert.Equal(218079, result);

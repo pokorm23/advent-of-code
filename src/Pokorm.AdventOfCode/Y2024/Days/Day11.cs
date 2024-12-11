@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
@@ -19,24 +21,21 @@ public class Day11
 
         var data = origData;
 
-        /*using (_ = this.logger.BeginScope($"{0:00}:"))
-        {
-            this.logger.LogDebug(data.ToString());
-        }*/
-        var lookup = new Dictionary<Stone, List<Stone>>();
-
-        lookup.Add(new Stone(0), [ new Stone(1) ]);
+        var lookup = new Dictionary<long, (long, long?)>();
 
         for (var i = 0; i < iterations; i++)
         {
-            //using var _ = this.logger.BeginScope($"{i + 1:00}:");
+            lookup.Clear();
+            lookup.Add(0, (1, null));
+
+            using var _ = this.logger.BeginScope($"{i + 1:00}:");
+
+            var sw = Stopwatch.GetTimestamp();
 
             data = data.RunIteration(lookup);
 
-            //this.logger.LogDebug(data.ToString());
+            this.logger.LogDebug($"{Stopwatch.GetElapsedTime(sw).TotalMilliseconds:N4} ms");
         }
-
-        //this.logger.LogDebug("----------");
 
         return data;
     }
@@ -45,58 +44,66 @@ public class Day11
     {
         var stones = input.FullSplit(' ');
 
-        var hash = new List<Stone>();
+        var hash = new List<long>();
 
         foreach (var s in stones)
         {
-            hash.Add(new Stone(long.Parse(s)));
+            hash.Add(long.Parse(s));
         }
 
         return new DayData(hash);
     }
 
-    public record struct Stone(long Value) { }
-
-    public record DayData(List<Stone> Stones)
+    public record DayData(List<long> Stones)
     {
         public override string ToString()
         {
             return string.Join(" ", this.Stones.Select(x => x.ToString()));
         }
 
-        public DayData RunIteration(Dictionary<Stone, List<Stone>> lookup)
+        public DayData RunIteration(Dictionary<long, (long, long?)> lookup)
         {
-            var newStones = new List<Stone>();
+            var newStones = new List<long>(this.Stones.Capacity);
 
             foreach (var stone in this.Stones)
             {
                 if (lookup.TryGetValue(stone, out var look))
                 {
-                    newStones.AddRange(look);
+                    newStones.Add(look.Item1);
+
+                    if (look.Item2.HasValue)
+                    {
+                        newStones.Add(look.Item2.Value);
+                    }
 
                     continue;
                 }
 
-                var str = stone.Value.ToString();
+                var str = stone.ToString();
 
-                var newOnes = new List<Stone>();
+                long newOne;
+                long? newOne2 = null;
 
                 if (str.Length % 2 == 0)
                 {
                     var mid = str.Length / 2;
 
-                    newOnes.Add(new Stone(long.Parse(str[..mid])));
-                    newOnes.Add(new Stone(long.Parse(str[mid..])));
+                    newOne = long.Parse(str[..mid]);
+                    newOne2 = long.Parse(str[mid..]);
+
+                    newStones.Add(newOne);
+                    newStones.Add(newOne2.Value);
                 }
                 else
                 {
-                    var newStone = stone.Value * 2024;
-                    newOnes.Add(new Stone(newStone));
+                    var newStone = stone * 2024;
+                    newOne = newStone;
+                    newStones.Add(newOne);
                 }
 
-                lookup.Add(stone, newOnes);
-
-                newStones.AddRange(newOnes);
+                {
+                    lookup.Add(stone, (newOne, newOne2));
+                }
             }
 
             return new DayData(newStones);
