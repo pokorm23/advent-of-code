@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
@@ -12,7 +11,7 @@ public class Day11
 
     public long Solve(string input) => SolveIterations(input, 25).Stones.Count;
 
-    public long SolveBonus(string input) => 0;
+    public long SolveBonus(string input) => SolveIterations(input, 75).Stones.Count;
 
     public DayData SolveIterations(string input, int iterations)
     {
@@ -20,21 +19,24 @@ public class Day11
 
         var data = origData;
 
-        using (_ = this.logger.BeginScope($"{0:00}:"))
+        /*using (_ = this.logger.BeginScope($"{0:00}:"))
         {
             this.logger.LogDebug(data.ToString());
-        }
+        }*/
+        var lookup = new Dictionary<Stone, List<Stone>>();
+
+        lookup.Add(new Stone(0), [ new Stone(1) ]);
 
         for (var i = 0; i < iterations; i++)
         {
-            using var _ = this.logger.BeginScope($"{i + 1:00}:");
+            //using var _ = this.logger.BeginScope($"{i + 1:00}:");
 
-            data = data.RunIteration();
+            data = data.RunIteration(lookup);
 
-            this.logger.LogDebug(data.ToString());
+            //this.logger.LogDebug(data.ToString());
         }
 
-        this.logger.LogDebug("----------");
+        //this.logger.LogDebug("----------");
 
         return data;
     }
@@ -43,129 +45,61 @@ public class Day11
     {
         var stones = input.FullSplit(' ');
 
-        var hash = new SortedSet<Stone>();
-
-        var stoneStr = new StringBuilder();
-
-        var i = 0;
+        var hash = new List<Stone>();
 
         foreach (var s in stones)
         {
-            hash.Add(new Stone(i)
-            {
-                Length = s.Length
-            });
-
-            stoneStr.Append(s);
-
-            i += s.Length;
+            hash.Add(new Stone(long.Parse(s)));
         }
 
-        return new DayData(stoneStr.ToString(), hash);
+        return new DayData(hash);
     }
 
-    public record struct Stone(int Offset) : IComparable<Stone>, IComparable
-    {
-        public int CompareTo(Stone other) => this.Offset.CompareTo(other.Offset);
+    public record struct Stone(long Value) { }
 
-        public int CompareTo(object? obj)
-        {
-            if (obj is null)
-            {
-                return 1;
-            }
-
-            return obj is Stone other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(Stone)}");
-        }
-
-        public required int Length { get; init; }
-
-        public Range Range => new Range(new Index(this.Offset), new Index(this.Offset + this.Length));
-    }
-
-    public record DayData(string Text, SortedSet<Stone> Stones)
+    public record DayData(List<Stone> Stones)
     {
         public override string ToString()
         {
-            var result = new List<long>();
-
-            foreach (var stone in this.Stones)
-            {
-                var seg = this.Text[stone.Range];
-
-                result.Add(long.Parse(seg));
-            }
-
-            return string.Join(" ", result.Select(x => x.ToString()));
+            return string.Join(" ", this.Stones.Select(x => x.ToString()));
         }
 
-        public DayData RunIteration()
+        public DayData RunIteration(Dictionary<Stone, List<Stone>> lookup)
         {
-            var result = new StringBuilder(this.Text.Length);
-            var newStones = new SortedSet<Stone>();
-
-            var mem = this.Text.AsSpan();
-
-            var accOffset = 0;
+            var newStones = new List<Stone>();
 
             foreach (var stone in this.Stones)
             {
-                var seg = mem[stone.Range];
-
-                if (seg.Length == 1 && seg[0] == '0')
+                if (lookup.TryGetValue(stone, out var look))
                 {
-                    result.Append('1');
+                    newStones.AddRange(look);
 
-                    newStones.Add(stone with
-                    {
-                        Offset = stone.Offset + accOffset
-                    });
+                    continue;
                 }
-                else if (seg.Length % 2 == 0)
+
+                var str = stone.Value.ToString();
+
+                var newOnes = new List<Stone>();
+
+                if (str.Length % 2 == 0)
                 {
-                    var mid = stone.Length / 2;
+                    var mid = str.Length / 2;
 
-                    var secondPart = seg[mid..].TrimStart('0');
-
-                    if (secondPart.Length == 0)
-                    {
-                        secondPart = [ '0' ];
-                    }
-
-                    result.Append(seg[..mid]);
-                    result.Append(secondPart);
-
-                    newStones.Add(stone with
-                    {
-                        Offset = stone.Offset + accOffset,
-                        Length = mid
-                    });
-
-                    newStones.Add(new Stone()
-                    {
-                        Offset = stone.Offset + mid + accOffset,
-                        Length = secondPart.Length
-                    });
-
-                    accOffset += secondPart.Length - mid;
+                    newOnes.Add(new Stone(long.Parse(str[..mid])));
+                    newOnes.Add(new Stone(long.Parse(str[mid..])));
                 }
                 else
                 {
-                    var newStone = (long.Parse(seg) * 2024).ToString();
-
-                    result.Append(newStone);
-
-                    newStones.Add(stone with
-                    {
-                        Offset = stone.Offset + accOffset,
-                        Length = newStone.Length
-                    });
-
-                    accOffset += newStone.Length - seg.Length;
+                    var newStone = stone.Value * 2024;
+                    newOnes.Add(new Stone(newStone));
                 }
+
+                lookup.Add(stone, newOnes);
+
+                newStones.AddRange(newOnes);
             }
 
-            return new DayData(result.ToString(), newStones);
+            return new DayData(newStones);
         }
     }
 }

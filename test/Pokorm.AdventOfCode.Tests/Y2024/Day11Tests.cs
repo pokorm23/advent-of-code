@@ -17,7 +17,6 @@ public class Day11Tests : DayTestBase
         var result = day.SolveIterations("0 1 10 99 999", 1);
 
         Assert.Equal(7, result.Stones.Count);
-        Assert.Equal("1202410992021976", result.Text);
     }
 
     [Fact]
@@ -66,26 +65,13 @@ public class Day11Tests : DayTestBase
         Assert.Equal(218079, result);
     }
 
-    /*[Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day11();
-
-        var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
-
-        Assert.Equal(-1, result);
-    }
-
     [Fact]
     public void PartTwo()
     {
-        var day = new Day11();
+        var day = new Day11(this.logger);
 
-        var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus(TextForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal(218079, result);
+    }
 }
