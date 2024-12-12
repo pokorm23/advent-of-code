@@ -1,6 +1,6 @@
 ﻿namespace Pokorm.AdventOfCode.Helpers;
 
-internal record struct Vector(int X, int Y)
+public record struct Vector(int X, int Y)
 {
     public Vector((int, int) tuple) : this(tuple.Item1, tuple.Item2) { }
 

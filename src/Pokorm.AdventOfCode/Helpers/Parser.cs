@@ -2,9 +2,9 @@
 
 public static class Parser
 {
-    private static List<long> ParseNums(string input) => input.FullSplit(' ').Select(long.Parse).ToList();
+    public static List<long> ParseNums(string input) => input.FullSplit(' ').Select(long.Parse).ToList();
 
-    private static Grid ParseGrid(string[] lines, Action<Coord> onCoord)
+    public static Grid ParseGrid(string[] lines, Action<char, Coord> onCoord)
     {
         var width = 0;
         var height = lines.Length;
@@ -18,7 +18,7 @@ public static class Parser
             {
                 var coord = new Coord(lineWidth, y);
 
-                onCoord(coord);
+                onCoord(c, coord);
 
                 lineWidth++;
             }

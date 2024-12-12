@@ -1,6 +1,6 @@
 ﻿namespace Pokorm.AdventOfCode.Helpers;
 
-internal record Grid(int Width, int Height)
+public record Grid(int Width, int Height)
 {
     public bool IsIn(Coord source) => source.Y >= 0 && source.X >= 0 && source.Y < this.Height && source.X < this.Width;
 
