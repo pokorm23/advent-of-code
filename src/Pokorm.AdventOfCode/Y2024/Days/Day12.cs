@@ -16,9 +16,9 @@ public class Day12
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var regions = data.FindRegions();
 
-        return result;
+        return regions.Sum(x => data.CalcRegionFencePrice(x, true));
     }
 
     public static DayData Parse(string[] lines)
@@ -45,7 +45,12 @@ public class Day12
             (0, -1)
         }.Select(x => new Vector(x)).ToList();
 
-        public long CalcRegionFencePrice(Region region) => CalcRegionArea(region) * CalcRegionPerimeter(region);
+        public long CalcRegionFencePrice(Region region, bool applyDiscount = false)
+        {
+            var size = applyDiscount ? CalcRegionSides(region) : CalcRegionPerimeter(region);
+
+            return CalcRegionArea(region) * size;
+        }
 
         public long CalcRegionArea(Region r) => r.Coords.Count;
 
@@ -63,13 +68,46 @@ public class Day12
             return result;
         }
 
+        public long CalcRegionSides(Region r)
+        {
+            var result = 0L;
+
+            foreach (var d in dirs)
+            {
+                var edgeCoords = r.Coords.Where(x => this.Grid.TryGetCoordInDirection(x, d) is not { } s || this.GardenPlots[s] != r.GardenPlot)
+                                  .ToHashSet();
+
+                var seen = new HashSet<Coord>();
+
+                var edgeSides = 0L;
+
+                Vector[] otherDirs = [ d.ToRightRotated(), -d.ToRightRotated() ];
+
+                foreach (var coord in edgeCoords)
+                {
+                    if (seen.Contains(coord))
+                    {
+                        continue;
+                    }
+
+                    _ = Recurse(coord, x => GetGardenPlotSiblings(x, r.GardenPlot, otherDirs).Where(y => edgeCoords.Contains(y)), seen);
+
+                    edgeSides++;
+                }
+
+                result += edgeSides;
+            }
+
+            return result;
+        }
+
         public IEnumerable<Region> FindRegions()
         {
             var seen = new HashSet<Coord>();
 
             foreach (var (coord, c) in this.GardenPlots)
             {
-                var coords = Recurse(coord, c);
+                var coords = Recurse(coord, x => GetGardenPlotSiblings(x, c), seen);
 
                 if (coords.Count == 0)
                 {
@@ -78,33 +116,35 @@ public class Day12
 
                 yield return new (c, coords.ToHashSet());
             }
-
-            List<Coord> Recurse(Coord coord, char c)
-            {
-                if (!seen.Add(coord))
-                {
-                    return [ ];
-                }
-
-                var result = new List<Coord>()
-                {
-                    coord
-                };
-
-                foreach (var siblingCoord in GetGardenPlotSiblings(coord, c))
-                {
-                    result.AddRange(Recurse(siblingCoord, c));
-                }
-
-                return result;
-            }
         }
 
-        public IEnumerable<Coord> GetGardenPlotSiblings(Coord coord, char c)
+        private List<Coord> Recurse(Coord coord, Func<Coord, IEnumerable<Coord>> siblingFactory, HashSet<Coord> seen)
         {
-            return coord.GetSiblings(dirs, this.Grid)
-                        .Where(cr => this.GardenPlots[cr] == c)
-                        .ToList();
+            if (!seen.Add(coord))
+            {
+                return [ ];
+            }
+
+            var result = new List<Coord>()
+            {
+                coord
+            };
+
+            foreach (var siblingCoord in siblingFactory(coord))
+            {
+                result.AddRange(Recurse(siblingCoord, siblingFactory, seen));
+            }
+
+            return result;
+        }
+
+        public IEnumerable<Coord> GetGardenPlotSiblings(Coord coord, char c) => GetGardenPlotSiblings(coord, c, dirs);
+
+        public IEnumerable<Coord> GetGardenPlotSiblings(Coord coord, char c, params IEnumerable<Vector> d)
+        {
+            return this.Grid.GetSiblings(coord, d)
+                       .Where(cr => this.GardenPlots[cr] == c)
+                       .ToList();
         }
     }
 }

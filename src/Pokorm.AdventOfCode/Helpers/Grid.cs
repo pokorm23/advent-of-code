@@ -21,5 +21,11 @@ public record Grid(int Width, int Height)
         return null;
     }
 
+    public IEnumerable<Coord> GetSiblings(Coord coord, params IEnumerable<Vector> vectors)
+    {
+        return vectors.Select(v => TryGetCoordInDirection(coord, v))
+                      .OfType<Coord>();
+    }
+
     public override string ToString() => $"{this.Width}x{this.Height}";
 }
