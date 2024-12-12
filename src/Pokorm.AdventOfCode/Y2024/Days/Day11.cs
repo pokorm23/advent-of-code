@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
@@ -11,102 +10,82 @@ public class Day11
 
     public Day11(ILogger<Day11> logger) => this.logger = logger;
 
-    public long Solve(string input) => SolveIterations(input, 25).Stones.Count;
+    public long Solve(string input) => SolveIterations(input, 25);
 
-    public long SolveBonus(string input) => SolveIterations(input, 75).Stones.Count;
+    public long SolveBonus(string input) => SolveIterations(input, 75);
 
-    public DayData SolveIterations(string input, int iterations)
+    public long SolveIterations(string input, int iterations)
     {
         var origData = Parse(input);
 
-        var data = origData;
-
-        var lookup = new Dictionary<long, (long, long?)>();
+        var stones = origData.Stones;
 
         for (var i = 0; i < iterations; i++)
         {
-            lookup.Clear();
-            lookup.Add(0, (1, null));
+            //using var _ = this.logger.BeginScope($"{i + 1:00}:");
 
-            using var _ = this.logger.BeginScope($"{i + 1:00}:");
+            //var sw = Stopwatch.GetTimestamp();
 
-            var sw = Stopwatch.GetTimestamp();
+            stones = RunIteration(stones);
 
-            data = data.RunIteration(lookup);
-
-            this.logger.LogDebug($"{Stopwatch.GetElapsedTime(sw).TotalMilliseconds:N4} ms");
+            //this.logger.LogDebug($"{Stopwatch.GetElapsedTime(sw).TotalMilliseconds:N4} ms -- {stones.Count} -- {stones.Sum(x => x.Value)} -- {string.Join(", ", stones.Select(x => $"{x.Key} ({x.Value})").ToList())}");
         }
 
-        return data;
+        return stones.Sum(x => (long) x.Value);
     }
 
     private static DayData Parse(string input)
     {
         var stones = input.FullSplit(' ');
 
-        var hash = new List<long>();
+        var hash = new ConcurrentDictionary<long, long>();
 
         foreach (var s in stones)
         {
-            hash.Add(long.Parse(s));
+            hash.AddOrUpdate(long.Parse(s), _ => 1, (_, c) => c + 1);
         }
 
         return new DayData(hash);
     }
 
-    public record DayData(List<long> Stones)
+    public static ConcurrentDictionary<long, long> RunIteration(ConcurrentDictionary<long, long> initStones)
+    {
+        var stones = new ConcurrentDictionary<long, long>();
+
+        foreach (var (stone, count) in initStones)
+        {
+            var str = stone.ToString();
+
+            if (stone == 0)
+            {
+                stones.AddOrUpdate(1, _ => count, (_, c) => c + count);
+            }
+            else if (str.Length % 2 == 0)
+            {
+                var mid = str.Length / 2;
+
+                var newOne = long.Parse(str[..mid]);
+                var newOne2 = long.Parse(str[mid..]);
+
+                stones.AddOrUpdate(newOne, _ => count, (_, c) => c + count);
+                stones.AddOrUpdate(newOne2, _ => count, (_, c) => c + count);
+            }
+            else
+            {
+                var newStone = stone * 2024;
+
+                stones.AddOrUpdate(newStone, _ => count, (_, c) => c + count);
+            }
+        }
+
+        return stones;
+    }
+
+    public record DayData(ConcurrentDictionary<long, long> Stones)
     {
         public override string ToString()
         {
             return string.Join(" ", this.Stones.Select(x => x.ToString()));
-        }
-
-        public DayData RunIteration(Dictionary<long, (long, long?)> lookup)
-        {
-            var newStones = new List<long>(this.Stones.Capacity);
-
-            foreach (var stone in this.Stones)
-            {
-                if (lookup.TryGetValue(stone, out var look))
-                {
-                    newStones.Add(look.Item1);
-
-                    if (look.Item2.HasValue)
-                    {
-                        newStones.Add(look.Item2.Value);
-                    }
-
-                    continue;
-                }
-
-                var str = stone.ToString();
-
-                long newOne;
-                long? newOne2 = null;
-
-                if (str.Length % 2 == 0)
-                {
-                    var mid = str.Length / 2;
-
-                    newOne = long.Parse(str[..mid]);
-                    newOne2 = long.Parse(str[mid..]);
-
-                    newStones.Add(newOne);
-                    newStones.Add(newOne2.Value);
-                }
-                else
-                {
-                    var newStone = stone * 2024;
-                    newOne = newStone;
-                    newStones.Add(newOne);
-                }
-
-                {
-                    lookup.Add(stone, (newOne, newOne2));
-                }
-            }
-
-            return new DayData(newStones);
         }
     }
 }
