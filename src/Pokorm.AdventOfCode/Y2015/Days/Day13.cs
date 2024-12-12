@@ -37,6 +37,18 @@ public partial class Day13
 
         var result = 0;
 
+        foreach (var n in data.GetAllNames().ToList())
+        {
+            data.Settings.Add(new Setting("Me", true, 0, n));
+        }
+
+        foreach (var s in data.GetAllSetting())
+        {
+            var total = s.Sum(x => x.AppliedSettings.Sum(y => y.Amount * (y.IsGain ? 1 : -1)));
+
+            result = Math.Max(result, total);
+        }
+
         return result;
     }
 
@@ -65,11 +77,15 @@ public partial class Day13
 
     private record DayData(List<Setting> Settings)
     {
+        public IEnumerable<string> GetAllNames()
+        {
+            return this.Settings.Select(s => s.SourceName).Concat(this.Settings.Select(s => s.TargetName))
+                       .Distinct();
+        }
+
         public IEnumerable<List<Seat>> GetAllSetting()
         {
-            var allNames = this.Settings.Select(s => s.SourceName).Concat(this.Settings.Select(s => s.TargetName))
-                               .Distinct()
-                               .ToList();
+            var allNames = GetAllNames().ToList();
 
             var possibles = Get(allNames);
 

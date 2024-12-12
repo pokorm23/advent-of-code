@@ -44,25 +44,12 @@ public class Day13Tests : DayTestBase
     }
 
     [Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day13(this.logger);
-
-        var result = day.SolveBonus(LinesFromSample(
-            """
-            ...
-            """));
-
-        Assert.Equal(-1, result);
-    }
-
-    [Fact]
     public void PartTwo()
     {
         var day = new Day13(this.logger);
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(640, result);
     }
 }
