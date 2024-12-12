@@ -13,11 +13,11 @@ public partial class Day14
 
     public Day14(ILogger<Day14> logger) => this.logger = logger;
 
-    public long Solve(string[] lines) => SolveIterations(lines, 2503);
+    public long Solve(string[] lines) => SolveIterations(lines, 2503).MaxDistance;
 
-    public long SolveBonus(string[] lines) => SolveIterations(lines, 0);
+    public long SolveBonus(string[] lines) => SolveIterations(lines, 2503).MaxPoints;
 
-    public long SolveIterations(string[] lines, int iterations)
+    public (int MaxDistance, int MaxPoints) SolveIterations(string[] lines, int iterations)
     {
         var data = Parse(lines);
 
@@ -33,7 +33,7 @@ public partial class Day14
             state = data.Run(state);
         }
 
-        return state.States.Max(x => x.Value.Distance);
+        return (state.States.Max(x => x.Value.Distance), state.States.Max(x => x.Value.Points));
     }
 
     private static DayData Parse(string[] lines)
@@ -55,13 +55,13 @@ public partial class Day14
         return new DayData(settings);
     }
 
-    private record Reindeer(string Name, int Speed, int FlyTime, int RestTime);
+    public record Reindeer(string Name, int Speed, int FlyTime, int RestTime);
 
-    private record State(Dictionary<Reindeer, ReindeerState> States) { }
+    public record State(Dictionary<Reindeer, ReindeerState> States) { }
 
-    private record ReindeerState(Type Type, int Seconds, int Distance, int TotalSeconds);
+    public record ReindeerState(Type Type, int Seconds, int Distance, int Points);
 
-    private enum Type
+    public enum Type
     {
         None,
         Fly,
@@ -85,8 +85,7 @@ public partial class Day14
                         newStates.Add(r, s with
                         {
                             Type = Type.Rest,
-                            Seconds = 1,
-                            TotalSeconds = s.TotalSeconds + 1
+                            Seconds = 1
                         });
                     }
                     else
@@ -95,8 +94,7 @@ public partial class Day14
                         {
                             Type = Type.Fly,
                             Seconds = s.Seconds + 1,
-                            Distance = s.Distance + r.Speed,
-                            TotalSeconds = s.TotalSeconds + 1
+                            Distance = s.Distance + r.Speed
                         });
                     }
                 }
@@ -108,19 +106,27 @@ public partial class Day14
                         {
                             Type = Type.Fly,
                             Seconds = 1,
-                            Distance = s.Distance + r.Speed,
-                            TotalSeconds = s.TotalSeconds + 1
+                            Distance = s.Distance + r.Speed
                         });
                     }
                     else
                     {
                         newStates.Add(r, s with
                         {
-                            Seconds = s.Seconds + 1,
-                            TotalSeconds = s.TotalSeconds + 1
+                            Seconds = s.Seconds + 1
                         });
                     }
                 }
+            }
+
+            var fastestDistance = newStates.MaxBy(x => x.Value.Distance).Value.Distance;
+
+            foreach (var (r, s) in newStates.Where(x => x.Value.Distance == fastestDistance).ToDictionary())
+            {
+                newStates[r] = s with
+                {
+                    Points = s.Points + 1
+                };
             }
 
             return new State(newStates);
