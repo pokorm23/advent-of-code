@@ -16,11 +16,11 @@ public partial class Day13(ILogger<Day13> logger)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var result = 0L;
 
         foreach (var config in data.Configs)
         {
-            result += Run(config);
+            result += Run(config, 100);
         }
 
         return result;
@@ -28,24 +28,27 @@ public partial class Day13(ILogger<Day13> logger)
 
     public long SolveBonus(string[] lines)
     {
-        var data = Parse(lines);
+        var data = Parse(lines, true);
 
-        var result = 0;
+        var result = 0L;
+
+        foreach (var config in data.Configs)
+        {
+            result += Run(config, long.MaxValue);
+        }
 
         return result;
     }
 
-    private int Run(Config config)
+    private long Run(Config config, long maxLength)
     {
-        const int maxLength = 100;
-
         var coord = new Coord(0, 0);
 
-        var minCost = 0;
+        var minCost = 0L;
 
-        for (var i = 0; i < maxLength; i++)
+        for (var i = 0L; i < maxLength; i++)
         {
-            for (var j = 0; j < maxLength; j++)
+            for (var j = 0L; j < maxLength; j++)
             {
                 var aPresses = i + 1;
                 var bPresses = j + 1;
@@ -69,64 +72,31 @@ public partial class Day13(ILogger<Day13> logger)
         }
 
         return minCost;
-
-        /*var subResult = new List<int>();
-
-        subResult.AddRange(Run(0, coord, 0, config.A, config));
-
-        subResult.AddRange(Run(0, coord, 0, config.B, config));
-
-        return subResult;*/
     }
 
-    private List<int> Run(int i, Coord coord, int tokens, Button btn, Config config)
-    {
-        if (i >= 100)
-        {
-            return [ ];
-        }
-
-        logger.LogDebug($"{i:00}: {btn.Name}");
-
-        tokens += btn.TokenCost;
-        coord = coord + btn.V;
-
-        if (coord.X == config.PrizeCoord.X && coord.Y == config.PrizeCoord.Y)
-        {
-            return [ tokens ];
-        }
-
-        if (coord.X > config.PrizeCoord.X || coord.Y > config.PrizeCoord.Y)
-        {
-            return [ ];
-        }
-
-        var subResult = new List<int>();
-
-        subResult.AddRange(Run(i + 1, coord, tokens, config.A, config));
-
-        subResult.AddRange(Run(i + 1, coord, tokens, config.B, config));
-
-        return subResult;
-    }
-
-    private static DayData Parse(string[] lines)
+    private static DayData Parse(string[] lines, bool bonus = false)
     {
         var configs = new List<Config>();
 
         foreach (var line in lines.Where(x => !string.IsNullOrWhiteSpace(x)).Chunk(3))
         {
             var a = ButtonARegex.Match(line[0]);
-            var ax = int.Parse(a.Groups["x"].Value);
-            var ay = int.Parse(a.Groups["y"].Value);
+            var ax = long.Parse(a.Groups["x"].Value);
+            var ay = long.Parse(a.Groups["y"].Value);
 
             var b = ButtonBRegex.Match(line[1]);
-            var bx = int.Parse(b.Groups["x"].Value);
-            var by = int.Parse(b.Groups["y"].Value);
+            var bx = long.Parse(b.Groups["x"].Value);
+            var by = long.Parse(b.Groups["y"].Value);
 
             var p = PrizeRegex.Match(line[2]);
-            var px = int.Parse(p.Groups["x"].Value);
-            var py = int.Parse(p.Groups["y"].Value);
+            var px = long.Parse(p.Groups["x"].Value);
+            var py = long.Parse(p.Groups["y"].Value);
+
+            if (bonus)
+            {
+                px += 10000000000000L;
+                py += 10000000000000L;
+            }
 
             configs.Add(new Config(new Button('A', new Vector(ax, ay), 3), new Button('B', new Vector(bx, by), 1), new Coord(px, py)));
         }
@@ -136,7 +106,7 @@ public partial class Day13(ILogger<Day13> logger)
 
     private record Config(Button A, Button B, Coord PrizeCoord);
 
-    private record Button(char Name, Vector V, int TokenCost);
+    private record Button(char Name, Vector V, long TokenCost);
 
     private record DayData(List<Config> Configs) { }
 }

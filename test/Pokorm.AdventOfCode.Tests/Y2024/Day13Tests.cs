@@ -56,19 +56,6 @@ public class Day13Tests(ILogger<Day13> logger) : DayTestBase
         Assert.Equal(33209, result);
     }
 
-    /*[Fact]
-    public void PartTwo_Sample()
-    {
-        var day = new Day13(logger);
-
-        var result = day.SolveBonus(LinesFromSample(
-            """
-            ...
-            """));
-
-        Assert.Equal(-1, result);
-    }
-
     [Fact]
     public void PartTwo()
     {
@@ -77,5 +64,5 @@ public class Day13Tests(ILogger<Day13> logger) : DayTestBase
         var result = day.SolveBonus(LinesForDay(day));
 
         Assert.Equal(-1, result);
-    }*/
+    }
 }

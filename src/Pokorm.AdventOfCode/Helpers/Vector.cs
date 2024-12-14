@@ -1,16 +1,16 @@
 ﻿namespace Pokorm.AdventOfCode.Helpers;
 
-public record struct Vector(int X, int Y)
+public record struct Vector(long X, long Y)
 {
-    public Vector((int, int) tuple) : this(tuple.Item1, tuple.Item2) { }
+    public Vector((long, long) tuple) : this(tuple.Item1, tuple.Item2) { }
 
     public static Vector Zero = new Vector(0, 0);
 
     public static Vector operator -(Vector c) => c * -1;
 
-    public static Vector operator *(Vector c, int scale) => new Vector(c.X * scale, c.Y * scale);
+    public static Vector operator *(Vector c, long scale) => new Vector(c.X * scale, c.Y * scale);
 
-    public static Vector operator *(int scale, Vector c) => c * scale;
+    public static Vector operator *(long scale, Vector c) => c * scale;
 
     public string GetOrientationText() => (this.X, this.Y) switch
     {
