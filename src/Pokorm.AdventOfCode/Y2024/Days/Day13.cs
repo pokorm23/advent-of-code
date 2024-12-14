@@ -28,26 +28,6 @@ public partial class Day13(ILogger<Day13> logger)
         return result;
     }
 
-    public long SolvePartOneFast(string[] lines)
-    {
-        var data = Parse(lines);
-
-        var result = 0L;
-
-        var i = 0;
-        
-        foreach (var config in data.Configs)
-        {
-            using var _ = logger.BeginScope($"{i+1}/{data.Configs.Count}: ");
-            
-            logger.LogDebug($"Solving {config}");
-            result += RunFast(config);
-            i++;
-        }
-
-        return result;
-    }
-
     public long SolveBonus(string[] lines)
     {
         var data = Parse(lines, true);
@@ -55,12 +35,9 @@ public partial class Day13(ILogger<Day13> logger)
         var result = 0L;
 
         var i = 0;
-        
+
         foreach (var config in data.Configs)
         {
-            using var _ = logger.BeginScope($"{i+1}/{data.Configs.Count}: ");
-            
-            logger.LogDebug($"Solving {config}");
             result += RunFast(config);
             i++;
         }
@@ -106,109 +83,25 @@ public partial class Day13(ILogger<Day13> logger)
 
     private long RunFast(Config config)
     {
-        long[] a = { config.A.V.X, config.A.V.Y };               
-        long[] b = { config.B.V.X, config.B.V.Y };               
-        long[] c = { config.PrizeCoord.X, config.PrizeCoord.Y }; 
-        
-        var coord = new Coord(0, 0);
+        var (xa, xb, xp, ya, yb, yp) = (config.A.V.X, config.B.V.X, config.PrizeCoord.X, config.A.V.Y, config.B.V.Y, config.PrizeCoord.Y);
 
-        var minCost = 0L;
-        for (long x = 1; x <= c[0] / a[0] + 1; x++)
+        var det = xa * yb - xb * ya;
+
+        if (det == 0)
         {
-            for (long y = 1; y <= c[1] / b[1] + 1; y++)
-            {
-                if (x * a[0] + y * b[0] == c[0] && x * a[1] + y * b[1] == c[1])
-                {
-                    var aPresses = x;
-                    var bPresses = y;
-
-                    var hitCoord = coord + config.A.V * aPresses + config.B.V * bPresses;
-
-                    if (hitCoord.X > config.PrizeCoord.X || hitCoord.Y > config.PrizeCoord.Y)
-                    {
-                        continue;
-                    }
-
-                    if (hitCoord.X != config.PrizeCoord.X || hitCoord.Y != config.PrizeCoord.Y)
-                    {
-                        continue;
-                    }
-
-                    var cost = config.A.TokenCost * aPresses + config.B.TokenCost * bPresses;
-
-                    minCost = minCost == 0 ? cost : Math.Min(minCost, cost);
-                }
-            }
-        }
-        
-        var aMax = Math.Max(config.PrizeCoord.X / config.A.V.X, config.PrizeCoord.Y / config.A.V.Y);
-
-
-        /*for (var i = 0; i < aMax; i++)
-        {
-            var bMax = Math.Max((config.PrizeCoord.X - i * config.A.V.X) / config.B.V.X,
-                (config.PrizeCoord.Y - i * config.A.V.Y) / config.B.V.Y);
-
-            for (var j = 0; j < bMax; j++)
-            {
-                var aPresses = i + 1;
-                var bPresses = j + 1;
-
-                var hitCoord = coord + config.A.V * aPresses + config.B.V * bPresses;
-
-                if (hitCoord.X > config.PrizeCoord.X || hitCoord.Y > config.PrizeCoord.Y)
-                {
-                    continue;
-                }
-
-                if (hitCoord.X != config.PrizeCoord.X || hitCoord.Y != config.PrizeCoord.Y)
-                {
-                    continue;
-                }
-
-                var cost = config.A.TokenCost * aPresses + config.B.TokenCost * bPresses;
-
-                minCost = minCost == 0 ? cost : Math.Min(minCost, cost);
-            }
-        }*/
-
-        return minCost;
-
-        // X: a_x * a + b_x * b = p_x
-        // Y: a_y * a + b_y * b = p_y
-
-        // sol exists: gcd(a_x,b_x)|p_x && gcd(a_y,b_y)|p_y && 
-        /*var coord = new Coord(0, 0);
-
-        var minCost = 0L;
-
-        for (var k = 1; k < Math.Max(aMax, bMax); k++)
-        {
-            var pairs = Enumerable.Range(0, k).SelectMany(x => Enumerable.Range(0, k).Select(y => (x, y)))
-                                  .Where(t => t != (0, 0))
-                                  .ToList();
-
-            foreach (var (aPresses, bPresses) in pairs)
-            {
-                var hitCoord = coord + config.A.V * aPresses + config.B.V * bPresses;
-
-                if (hitCoord.X > config.PrizeCoord.X || hitCoord.Y > config.PrizeCoord.Y)
-                {
-                    continue;
-                }
-
-                if (hitCoord.X != config.PrizeCoord.X || hitCoord.Y != config.PrizeCoord.Y)
-                {
-                    continue;
-                }
-
-                var cost = config.A.TokenCost * aPresses + config.B.TokenCost * bPresses;
-
-                minCost = minCost == 0 ? cost : Math.Min(minCost, cost);
-            }
+            return 0;
         }
 
-        return minCost;*/
+        var a = (xp * yb - yp * xb) / det;
+        var b = (xa * yp - ya * xp) / det;
+
+        if (config.A.V.X * a + config.B.V.X * b == config.PrizeCoord.X
+            && config.A.V.Y * a + config.B.V.Y * b == config.PrizeCoord.Y)
+        {
+            return 3 * a + b;
+        }
+
+        return 0;
     }
 
     private long Gcd(long a, long b)

@@ -57,11 +57,11 @@ public class Day13Tests(ILogger<Day13> logger) : DayTestBase
     }
 
     [Fact]
-    public void PartOne_Sample_Fast()
+    public void PartTwo_Sample()
     {
         var day = new Day13(logger);
 
-        var result = day.SolvePartOneFast(LinesFromSample(
+        var result = day.SolveBonus(LinesFromSample(
             """
             Button A: X+94, Y+34
             Button B: X+22, Y+67
@@ -80,17 +80,7 @@ public class Day13Tests(ILogger<Day13> logger) : DayTestBase
             Prize: X=18641, Y=10279
             """));
 
-        Assert.Equal(480, result);
-    }
-
-    [Fact]
-    public void PartOne_Fast()
-    {
-        var day = new Day13(logger);
-
-        var result = day.SolvePartOneFast(LinesForDay(day));
-
-        Assert.Equal(33209, result);
+        Assert.Equal(875318608908, result);
     }
 
     [Fact]
@@ -100,6 +90,6 @@ public class Day13Tests(ILogger<Day13> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(83102355665474, result);
     }
 }
