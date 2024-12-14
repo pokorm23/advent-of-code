@@ -34,16 +34,41 @@ public partial class Day14(ILogger<Day14> logger)
         return rq1 * rq2 * rq3 * rq4;
     }
 
-    public long Solve(string[] lines) => SolveInGrid(lines, new Grid(101, 103), 100);
-
-    public long SolveBonus(string[] lines)
+    public long FindNumOfIterationToNoOverlap(string[] lines, Grid grid)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var state = data.Robots.ToDictionary(x => x, x => x.InitialCoord);
 
-        return result;
+        var i = 0;
+
+        for (; i < int.MaxValue; i++)
+        {
+            var seen = new HashSet<Coord>();
+
+            foreach (var r in data.Robots)
+            {
+                var c = state[r];
+
+                var nc = r.GetNextPosition(c, grid);
+
+                seen.Add(nc);
+
+                state[r] = nc;
+            }
+
+            if (seen.Count == data.Robots.Count)
+            {
+                break;
+            }
+        }
+
+        return i+1;
     }
+
+    public long Solve(string[] lines) => SolveInGrid(lines, new Grid(101, 103), 100);
+
+    public long SolveBonus(string[] lines) => FindNumOfIterationToNoOverlap(lines, new Grid(101, 103));
 
     private static DayData Parse(string[] lines)
     {
