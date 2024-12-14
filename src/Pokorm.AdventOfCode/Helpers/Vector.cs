@@ -10,6 +10,8 @@ public record struct Vector(int X, int Y)
 
     public static Vector operator *(Vector c, int scale) => new Vector(c.X * scale, c.Y * scale);
 
+    public static Vector operator *(int scale, Vector c) => c * scale;
+
     public string GetOrientationText() => (this.X, this.Y) switch
     {
         (0, 0)     => "\ud835\udfd8",

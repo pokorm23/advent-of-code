@@ -1,17 +1,8 @@
 ﻿namespace Pokorm.AdventOfCode.YYearParameter.Days;
 
 // https://adventofcode.com/YearParameter/day/DayParameter
-public class DayDayParameter
+public class DayDayParameter(ILogger<DayDayParameter> logger)
 {
-#if (NoLines)
-    static DayData Parse(string input)
-#else
-    static DayData Parse(string[] lines)
-#endif
-    {
-        return new DayData();
-    }
-
 #if (NoLines)
     public long Solve(string input)
 #else
@@ -44,6 +35,15 @@ public class DayDayParameter
         var result = 0;
 
         return result;
+    }
+
+#if (NoLines)
+    static DayData Parse(string input)
+#else
+    static DayData Parse(string[] lines)
+#endif
+    {
+        return new DayData();
     }
 
     record DayData()

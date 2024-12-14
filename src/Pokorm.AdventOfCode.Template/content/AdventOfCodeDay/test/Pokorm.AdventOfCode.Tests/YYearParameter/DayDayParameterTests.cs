@@ -2,14 +2,12 @@ using Pokorm.AdventOfCode.YYearParameter.Days;
 
 namespace Pokorm.AdventOfCode.Tests.YYearParameter;
 
-public class DayDayParameterTests : DayTestBase
+public class DayDayParameterTests(ILogger<DayDayParameter> logger) : DayTestBase
 {
-    public DayDayParameterTests(ITestOutputHelper output) : base(output) { }
-
     [Fact]
     public void PartOne_Sample()
     {
-        var day = new DayDayParameter();
+        var day = new DayDayParameter(logger);
 
 #if (NoLines)
         var result = day.Solve(
@@ -29,7 +27,7 @@ public class DayDayParameterTests : DayTestBase
     [Fact]
     public void PartOne()
     {
-        var day = new DayDayParameter();
+        var day = new DayDayParameter(logger);
 
 #if (NoLines)
         var result = day.Solve(TextForDay(day));
@@ -40,10 +38,10 @@ public class DayDayParameterTests : DayTestBase
         Assert.Equal(-1, result);
     }
 
-    [Fact]
+    /*[Fact]
     public void PartTwo_Sample()
     {
-        var day = new DayDayParameter();
+        var day = new DayDayParameter(logger);
 
 #if (NoLines)
         var result = day.SolveBonus(
@@ -63,7 +61,7 @@ public class DayDayParameterTests : DayTestBase
     [Fact]
     public void PartTwo()
     {
-        var day = new DayDayParameter();
+        var day = new DayDayParameter(logger);
 
 #if (NoLines)
         var result = day.SolveBonus(TextForDay(day));
@@ -72,5 +70,5 @@ public class DayDayParameterTests : DayTestBase
 #endif
 
         Assert.Equal(-1, result);
-    }
+    }*/
 }
