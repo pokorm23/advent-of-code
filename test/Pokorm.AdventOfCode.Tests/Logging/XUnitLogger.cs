@@ -89,7 +89,11 @@ public class XUnitLogger : ILogger
         {
             //outputHelper.WriteLine(line);
             outputHelper.WriteLine($"{scope}{message}");
-            //Trace.WriteLine($"{scope}{message}");
+
+            if (Debugger.IsAttached)
+            {
+                Trace.WriteLine($"{scope}{message}");
+            }
         }
         catch (InvalidOperationException) { }
     }
