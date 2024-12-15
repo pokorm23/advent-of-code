@@ -6,9 +6,22 @@ public static class Parser
 
     public static Grid ParseGrid(string[] lines, Action<char, Coord> onCoord)
     {
+        return ParseValuedGrid(lines, (c, coord) =>
+        {
+            onCoord(c, coord);
+
+            return c;
+        });
+    }
+
+    public static Grid<T> ParseValuedGrid<T>(string[] lines, Func<char, T> valueFactory) => ParseValuedGrid(lines, (c, _) => valueFactory(c));
+
+    public static Grid<T> ParseValuedGrid<T>(string[] lines, Func<char, Coord, T> valueFactory)
+    {
         var width = 0;
         var height = lines.Length;
         var y = 0;
+        var values = new Dictionary<Coord, T>();
 
         foreach (var line in lines)
         {
@@ -18,7 +31,9 @@ public static class Parser
             {
                 var coord = new Coord(lineWidth, y);
 
-                onCoord(c, coord);
+                var value = valueFactory(c, coord);
+
+                values.Add(coord, value);
 
                 lineWidth++;
             }
@@ -27,7 +42,7 @@ public static class Parser
             y++;
         }
 
-        var board = new Grid(width, height);
+        var board = new Grid<T>(values, width, height);
 
         return board;
     }
