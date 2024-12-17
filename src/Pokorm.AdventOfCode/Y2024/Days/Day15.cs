@@ -41,9 +41,9 @@ public class Day15(ILogger<Day15> logger)
             logger.LogDebug(" ");
         }
 
-        return g.Grid.Values.Where(x => x.Value is PositionType.Box)
+        return g.Grid.Values.Where(x => x.Value is PositionType.Box or PositionType.BigBoxLeft)
                 .Select(x => x.Key)
-                .Sum(x => 100 * (x.Y + 1) + x.X + 1);
+                .Sum(x => 100 * (x.Y) + (x.X));
     }
 
     private GridData Run(Direction dir, GridData gridData)
@@ -80,7 +80,7 @@ public class Day15(ILogger<Day15> logger)
             return SolveSimpleBox(gridData, inDir.Value, v);
         }
 
-        return SolveComplexBox(gridData, inDir.Value, v, posInDir == PositionType.BigBoxLeft);
+        return SolveComplexBox(gridData, inDir.Value, v);
     }
 
     private static GridData SolveSimpleBox(GridData gridData, Coord inDir, Vector v)
@@ -143,7 +143,197 @@ public class Day15(ILogger<Day15> logger)
         return new GridData(grid, inDir);
     }
 
-    private static GridData SolveComplexBox(GridData gridData, Coord inDir, Vector v, bool isLeftBox) => throw new NotImplementedException();
+    private static Coord[] GetBox(GridData gridData, Coord coord)
+    {
+        var atPos = gridData.Grid.Values[coord];
+
+        var l = atPos is PositionType.BigBoxLeft ? coord : coord + new Vector(-1, 0);
+        var r = atPos is not PositionType.BigBoxLeft ? coord : coord + new Vector(1, 0);
+
+        return [ l, r ];
+    }
+
+    private static (bool Result, Dictionary<int, List<Coord[]>> ToMove) CanBoxMove(GridData gridData, Vector v, List<Coord[]> boxes, int depth)
+    {
+        var nextBoxes = new List<Coord[]>();
+        var toMove = new List<Coord[]>();
+
+        foreach (var cs in boxes)
+        {
+            var isHorizontal = v == new Vector(1, 0) || v == new Vector(-1, 0);
+
+            if (isHorizontal)
+            {
+                var isRight = v == new Vector(1, 0);
+
+                var nc = isRight ? gridData.Grid.TryGetCoordInDirection(cs[1], v) : gridData.Grid.TryGetCoordInDirection(cs[0], v);
+
+                if (nc is null)
+                {
+                    return (false, [ ]);
+                }
+
+                var pos = gridData.Grid.Values[nc.Value];
+
+                if (pos is not (PositionType.Free or PositionType.BigBoxLeft or PositionType.BigBoxRight or PositionType.Box))
+                {
+                    return (false, [ ]);
+                }
+
+                if (pos is PositionType.Free)
+                {
+                    toMove.Add(cs);
+                }
+                else
+                {
+                    nextBoxes.Add(GetBox(gridData, nc.Value));
+                    toMove.Add(cs);
+                }
+
+                continue;
+            }
+
+            (Coord? Coord, PositionType Type) leftPos = default;
+            (Coord? Coord, PositionType Type) rightPos = default;
+
+            foreach (var bp in cs)
+            {
+                var nc = gridData.Grid.TryGetCoordInDirection(bp, v);
+
+                if (nc is null)
+                {
+                    return (false, [ ]);
+                }
+
+                var pos = gridData.Grid.Values[nc.Value];
+
+                if (pos is not (PositionType.Free or PositionType.BigBoxLeft or PositionType.BigBoxRight or PositionType.Box))
+                {
+                    return (false, [ ]);
+                }
+
+                if (bp == cs[0])
+                {
+                    leftPos = (nc, pos);
+                }
+                else
+                {
+                    rightPos = (nc, pos);
+                }
+            }
+
+            Debug.Assert(leftPos.Coord is not null && rightPos.Coord is not null);
+
+            // [][]
+            // .[].
+            if (leftPos.Type is PositionType.BigBoxRight && rightPos.Type is PositionType.BigBoxLeft)
+            {
+                toMove.Add(cs);
+                nextBoxes.Add(GetBox(gridData, leftPos.Coord.Value));
+                nextBoxes.Add(GetBox(gridData, rightPos.Coord.Value));
+            }
+
+            // []
+            // []
+            else if (leftPos.Type is PositionType.BigBoxLeft && rightPos.Type is PositionType.BigBoxRight)
+            {
+                toMove.Add(cs);
+                nextBoxes.Add(GetBox(gridData, leftPos.Coord.Value));
+            }
+
+            // [].
+            // .[]
+            else if (leftPos.Type is PositionType.BigBoxRight && rightPos.Type is PositionType.Free)
+            {
+                toMove.Add(cs);
+                nextBoxes.Add(GetBox(gridData, leftPos.Coord.Value));
+            }
+
+            // .[]
+            // [].
+            else if (leftPos.Type is PositionType.Free && rightPos.Type is PositionType.BigBoxLeft)
+            {
+                toMove.Add(cs);
+                nextBoxes.Add(GetBox(gridData, rightPos.Coord.Value));
+            }
+
+            // ..
+            // []
+            else if (leftPos.Type is PositionType.Free && rightPos.Type is PositionType.Free)
+            {
+                toMove.Add(cs);
+            }
+            else
+            {
+                throw new Exception();
+            }
+        }
+
+        var toMoveDir = new Dictionary<int, List<Coord[]>>
+        {
+            [depth] = toMove
+        };
+
+        if (nextBoxes.Count == 0)
+        {
+            return (true, toMoveDir);
+        }
+
+        var subCanMode = CanBoxMove(gridData, v, nextBoxes, depth + 1);
+
+        if (!subCanMode.Result)
+        {
+            return (false, [ ]);
+        }
+
+        foreach (var (k, va) in subCanMode.ToMove)
+        {
+            toMoveDir.Add(k, va);
+        }
+
+        return (true, toMoveDir);
+    }
+
+    private static GridData SolveComplexBox(GridData gridData, Coord inDir, Vector v)
+    {
+        var (grid, robotPos) = gridData;
+
+        var (canMove, boxesToMove) = CanBoxMove(gridData, v, [ GetBox(gridData, inDir) ], 0);
+
+        if (!canMove)
+        {
+            return gridData;
+        }
+
+        foreach (var (depth, allBoxesOnDepth) in boxesToMove.OrderByDescending(x => x.Key))
+        {
+            foreach (var coordse in allBoxesOnDepth)
+            {
+                grid.Values[coordse[0] + v] = PositionType.BigBoxLeft;
+                grid.Values[coordse[1] + v] = PositionType.BigBoxRight;
+
+                if (v == Vector.Bottom || v == Vector.Top)
+                {
+                    grid.Values[coordse[0]] = PositionType.Free;
+                    grid.Values[coordse[1]] = PositionType.Free;
+                }
+                else if (v == Vector.Left)
+                {
+                    grid.Values[coordse[1]] = PositionType.Free;
+                }
+                else
+                {
+                    grid.Values[coordse[0]] = PositionType.Free;
+                }
+            }
+        }
+
+        // move robot
+        grid.Values[robotPos] = PositionType.Free;
+        grid.Values[inDir] = PositionType.Robot;
+
+        return new GridData(grid, inDir);
+    }
 
     private static DayData Parse(string[] lines, bool widen)
     {
@@ -200,15 +390,6 @@ public class Day15(ILogger<Day15> logger)
             PositionType.BigBoxRight => ']',
             var _                    => throw new ArgumentOutOfRangeException(nameof(c), c, null)
         };
-
-        if (!widen)
-        {
-            grid = grid.GetSubGrid(new Coord(1, 1), grid.Width - 1, grid.Height - 1);
-        }
-        else
-        {
-            grid = grid.GetSubGrid(new Coord(2, 1), grid.Width - 2, grid.Height - 1);
-        }
 
         Debug.Assert(grid.Values.Count(x => x.Value is PositionType.Robot) == 1);
 

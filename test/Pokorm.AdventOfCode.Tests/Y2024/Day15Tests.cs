@@ -88,7 +88,7 @@ public class Day15Tests(ILogger<Day15> logger) : DayTestBase
             <vv<<^^<<^^
             """));
 
-        Assert.Equal(105, result);
+        Assert.Equal(618, result);
     }
 
     [Fact]
@@ -124,13 +124,13 @@ public class Day15Tests(ILogger<Day15> logger) : DayTestBase
         Assert.Equal(9021, result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartTwo()
     {
-        var day = new Day15(logger);
+        var day = new Day15(NullLogger<Day15>.Instance);
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal(1453087, result);
+    }
 }

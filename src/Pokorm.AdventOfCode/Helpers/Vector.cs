@@ -6,6 +6,14 @@ public record struct Vector(long X, long Y)
 
     public static Vector Zero = new Vector(0, 0);
 
+    public static Vector Top = new Vector(0, 1);
+
+    public static Vector Left = new Vector(-1, 0);
+
+    public static Vector Bottom = new Vector(0, -1);
+
+    public static Vector Right = new Vector(1, 0);
+
     public static Vector operator -(Vector c) => c * -1;
 
     public static Vector operator *(Vector c, long scale) => new Vector(c.X * scale, c.Y * scale);
