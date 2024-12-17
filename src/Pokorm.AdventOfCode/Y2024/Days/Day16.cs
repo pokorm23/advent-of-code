@@ -12,7 +12,7 @@ public class Day16(ILogger<Day16> logger)
 
         var start = new DirectionCoord(data.Start, Vector.Right);
 
-        var shortest = FindPathWithLeastPolongs(data.Grid, start, data.End);
+        var (shortest, _) = FindPathsWithLeastPolongs(data.Grid, start, data.End);
 
         Debug.Assert(shortest.HasValue);
 
@@ -23,17 +23,31 @@ public class Day16(ILogger<Day16> logger)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var start = new DirectionCoord(data.Start, Vector.Right);
 
-        return result;
+        var (_, paths) = FindPathsWithLeastPolongs(data.Grid, start, data.End);
+
+        var g = data.Grid.Transform((c, coord) =>
+        {
+            if (paths.Contains(coord))
+            {
+                return PositionType.Occupied;
+            }
+
+            return c;
+        });
+
+        logger.LogDebug(g.ToString());
+
+        return paths.Count;
     }
 
-    private static long? FindPathWithLeastPolongs(Grid<PositionType> graph, DirectionCoord source, Coord targetCoord)
+    private static (long? MinimalScore, HashSet<Coord> AllPathCoords) FindPathsWithLeastPolongs(Grid<PositionType> graph, DirectionCoord source, Coord targetCoord)
     {
         var q = new PriorityQueue<DirectionCoord, long>();
 
         var dist = new ConcurrentDictionary<DirectionCoord, long>();
-        var prev = new ConcurrentDictionary<DirectionCoord, DirectionCoord>();
+        var prev = new ConcurrentDictionary<DirectionCoord, HashSet<DirectionCoord>>();
 
         dist.TryAdd(source, 0);
 
@@ -45,7 +59,22 @@ public class Day16(ILogger<Day16> logger)
 
             if (u.Coord == targetCoord)
             {
-                return dist[u];
+                var result = new HashSet<Coord>()
+                {
+                    source.Coord,
+                    targetCoord
+                };
+
+                var cur = prev[u];
+
+                while (cur.Count > 0)
+                {
+                    result.UnionWith(cur.Select(x => x.Coord));
+
+                    cur = cur.Select(x => prev.TryGetValue(x, out var s) ? s : [ ]).SelectMany(x => x).ToHashSet();
+                }
+
+                return (dist[u], result);
             }
 
             var dir = new List<(DirectionCoord Coord, long Points)>();
@@ -54,7 +83,10 @@ public class Day16(ILogger<Day16> logger)
 
             if (directCoord.Coord.HasValue && directCoord.Value is PositionType.Free)
             {
-                dir.Add((new DirectionCoord(directCoord.Coord.Value, u.Direction), 1));
+                dir.Add((new DirectionCoord(directCoord.Coord.Value, u.Direction)
+                            {
+                                PreviousCoord = u.Coord
+                            }, 1));
             }
 
             foreach (var vector in Vector.Directional.Where(x => x != u.Direction))
@@ -66,23 +98,38 @@ public class Day16(ILogger<Day16> logger)
                     continue;
                 }
 
-                dir.Add((new DirectionCoord(u.Coord, vector), 1000));
+                dir.Add((new DirectionCoord(u.Coord, vector)
+                            {
+                                PreviousCoord = u.Coord
+                            }, 1000));
             }
 
             foreach (var (v, points) in dir)
             {
                 var alt = dist[u] + points;
 
-                if (!dist.TryGetValue(v, out var distV) || alt < distV)
+                if (dist.TryGetValue(v, out var distV) && alt > distV)
                 {
-                    prev.AddOrUpdate(v, _ => u, (_, c) => u);
-                    dist.AddOrUpdate(v, _ => alt, (_, c) => alt);
-                    q.Enqueue(v, alt);
+                    continue;
                 }
+
+                prev.AddOrUpdate(v, _ => [ u ], (_, c) =>
+                {
+                    HashSet<DirectionCoord> newOnes = [ ..c.Where(x => x != v), u ];
+
+                    var min = newOnes.Select(x => dist[x]).Min();
+
+                    return newOnes.Select(x => (x, dist[x]))
+                                  .Where(x => x.Item2 == min)
+                                  .Select(x => x.x).ToHashSet();
+                });
+
+                dist.AddOrUpdate(v, _ => alt, (_, c) => alt);
+                q.Enqueue(v, alt);
             }
         }
 
-        return null;
+        return (null, [ ]);
     }
 
     private static DayData Parse(string[] gridLines)
@@ -120,9 +167,10 @@ public class Day16(ILogger<Day16> logger)
 
         grid.ValueCharFactory = c => c switch
         {
-            PositionType.Wall => '#',
-            PositionType.Free => '.',
-            var _             => throw new ArgumentOutOfRangeException(nameof(c), c, null)
+            PositionType.Wall     => '#',
+            PositionType.Free     => '.',
+            PositionType.Occupied => 'O',
+            var _                 => throw new ArgumentOutOfRangeException(nameof(c), c, null)
         };
 
         return new (grid, start.Value, end.Value);
@@ -131,7 +179,8 @@ public class Day16(ILogger<Day16> logger)
     private enum PositionType
     {
         Free,
-        Wall
+        Wall,
+        Occupied
     }
 
     private record DayData(Grid<PositionType> Grid, Coord Start, Coord End);

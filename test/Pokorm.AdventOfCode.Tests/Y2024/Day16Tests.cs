@@ -67,20 +67,63 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(85480, result);
     }
 
-    /*[Fact]
-    public void PartTwo_Sample()
+    [Fact]
+    public void PartTwo_Sample_1()
     {
         var day = new Day16(logger);
 
         var result = day.SolveBonus(LinesFromSample(
                 """
-                ...
+                ###############
+                #.......#....E#
+                #.#.###.#.###.#
+                #.....#.#...#.#
+                #.###.#####.#.#
+                #.#.#.......#.#
+                #.#.#####.###.#
+                #...........#.#
+                ###.#.#####.#.#
+                #...#.....#.#.#
+                #.#.#.###.#.#.#
+                #.....#...#.#.#
+                #.###.#.#.#.#.#
+                #S..#.....#...#
+                ###############
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(45, result);
+    }
+
+    [Fact]
+    public void PartTwo_Sample_2()
+    {
+        var day = new Day16(logger);
+
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            #################
+            #...#...#...#..E#
+            #.#.#.#.#.#.#.#.#
+            #.#.#.#...#...#.#
+            #.#.#.#.###.#.#.#
+            #...#.#.#.....#.#
+            #.#.#.#.#.#####.#
+            #.#...#.#.#.....#
+            #.#.#####.#.###.#
+            #.#.#.......#...#
+            #.#.###.#####.###
+            #.#.#...#.....#.#
+            #.#.#.#####.###.#
+            #.#.#.........#.#
+            #.#.#.#########.#
+            #S#.............#
+            #################
+            """));
+
+        Assert.Equal(64, result);
     }
 
     [Fact]
@@ -90,6 +133,6 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal(518, result);
+    }
 }

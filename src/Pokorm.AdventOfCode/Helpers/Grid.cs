@@ -32,9 +32,27 @@ public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Gr
         };
     }
 
+    public Grid<T> Transform(Func<T, Coord, T> tranformation)
+    {
+        return new Grid<T>(this.Values.ToDictionary(x => x.Key, x => tranformation(x.Value, x.Key)), this.Width, this.Height)
+        {
+            ValueCharFactory = this.ValueCharFactory
+        };
+    }
+
+    public Grid<T> Transform(Func<T, T> tranformation)
+    {
+        return Transform((v, _) => tranformation(v));
+    }
+
+    public Grid<TTo> Transform<TTo>(Func<T, Coord, TTo> tranformation)
+    {
+        return new Grid<TTo>(this.Values.ToDictionary(x => x.Key, x => tranformation(x.Value, x.Key)), this.Width, this.Height);
+    }
+
     public Grid<TTo> Transform<TTo>(Func<T, TTo> tranformation)
     {
-        return new Grid<TTo>(this.Values.ToDictionary(x => x.Key, x => tranformation(x.Value)), this.Width, this.Height);
+        return Transform<TTo>((v, _) => tranformation(v));
     }
 
     public (Coord? Coord, T? Value) TryGetValuedCoordInDirection(Coord source, Vector vector)
