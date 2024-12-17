@@ -32,6 +32,23 @@ public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Gr
         };
     }
 
+    public Grid<TTo> Transform<TTo>(Func<T, TTo> tranformation)
+    {
+        return new Grid<TTo>(this.Values.ToDictionary(x => x.Key, x => tranformation(x.Value)), this.Width, this.Height);
+    }
+
+    public (Coord? Coord, T? Value) TryGetValuedCoordInDirection(Coord source, Vector vector)
+    {
+        var b = TryGetCoordInDirection(source, vector);
+
+        return b is null ? default : (b, this.Values[b.Value]);
+    }
+
+    public IEnumerable<(Coord Coord, T Value)> GetValuedSiblings(Coord coord, params IEnumerable<Vector> vectors)
+    {
+        return GetSiblings(coord, vectors).Select(x => (x, this.Values[x]));
+    }
+
     public IEnumerable<string> GetLines()
     {
         for (var y = 0L; y < this.Height; y++)

@@ -5,16 +5,59 @@ namespace Pokorm.AdventOfCode.Tests.Y2024;
 public class Day16Tests(ILogger<Day16> logger) : DayTestBase
 {
     [Fact]
-    public void PartOne_Sample()
+    public void PartOne_Sample_1()
     {
         var day = new Day16(logger);
 
         var result = day.Solve(LinesFromSample(
-                """
-                ...
-                """));
+            """
+            ###############
+            #.......#....E#
+            #.#.###.#.###.#
+            #.....#.#...#.#
+            #.###.#####.#.#
+            #.#.#.......#.#
+            #.#.#####.###.#
+            #...........#.#
+            ###.#.#####.#.#
+            #...#.....#.#.#
+            #.#.#.###.#.#.#
+            #.....#...#.#.#
+            #.###.#.#.#.#.#
+            #S..#.....#...#
+            ###############
+            """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(7036, result);
+    }
+
+    [Fact]
+    public void PartOne_Sample_2()
+    {
+        var day = new Day16(logger);
+
+        var result = day.Solve(LinesFromSample(
+            """
+            #################
+            #...#...#...#..E#
+            #.#.#.#.#.#.#.#.#
+            #.#.#.#...#...#.#
+            #.#.#.#.###.#.#.#
+            #...#.#.#.....#.#
+            #.#.#.#.#.#####.#
+            #.#...#.#.#.....#
+            #.#.#####.#.###.#
+            #.#.#.......#...#
+            #.#.###.#####.###
+            #.#.#...#.....#.#
+            #.#.#.#####.###.#
+            #.#.#.........#.#
+            #.#.#.#########.#
+            #S#.............#
+            #################
+            """));
+
+        Assert.Equal(11048, result);
     }
 
     [Fact]

@@ -14,6 +14,12 @@ public record struct Vector(long X, long Y)
 
     public static Vector Right = new Vector(1, 0);
 
+    public static Vector[] Horizontal = [ Left, Right ];
+
+    public static Vector[] Vertical = [ Top, Bottom ];
+
+    public static Vector[] Directional = [ ..Horizontal, ..Vertical ];
+
     public static Vector operator -(Vector c) => c * -1;
 
     public static Vector operator *(Vector c, long scale) => new Vector(c.X * scale, c.Y * scale);
