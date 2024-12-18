@@ -77,11 +77,30 @@ public partial class Day17(ILogger<Day17> logger)
         }
     }
 
-    public long What(List<int> output, ComputerProgram p)
+    public bool What(List<int> output, ComputerProgram p, Bit3 aSuspect, List<Bit3> other)
     {
-        if (output.Count == 1)
+        var expectedOutput = output[^(other.Count + 1)..];
+
+        List<Bit3> a3bitBlocks = [ ..other, aSuspect ];
+
+        long a = 0;
+
+        foreach (var (i,b) in a3bitBlocks.AsEnumerable().Reverse().Index())
         {
-            foreach (var i in RunProgramWhile(146000000, 500_000_000, p, output))
+            a += b.Value << 3*i;
+        }
+
+        var r = RunProgramWithARegistry(a, p);
+
+        var actualOutput = r.Output;
+
+        return expectedOutput.SequenceEqual(actualOutput);
+
+        /*if (output.Count == 1)
+        {
+            var r = RunProgramWithARegistry(aSuspect, p);
+
+            foreach (var i in RunProgramWhile(0, 10, p, output))
             {
                 logger.LogDebug($"A : {i}");
             }
@@ -91,7 +110,7 @@ public partial class Day17(ILogger<Day17> logger)
 
         while (true)
         {
-            var butState = What(output[..^1], p);
+            var butState = What(output[1..], p, aSuspect);
 
             var a = RunProgramWhile(0, 1_000_000, p, output).First();
 
@@ -99,53 +118,58 @@ public partial class Day17(ILogger<Day17> logger)
             {
                 return a;
             }
-        }
+        }*/
     }
 
     public long SolveBonus2(string[] lines)
     {
         var data = Parse(lines);
 
-        var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
+        var n = data.Program.Bits.Count;
+        var possibles = new List<List<Bit3>>();
 
-        var what = What(programOutput, data.Program);
-
-        long i;
-
-        for (i = 0; i < long.MaxValue; i++)
+        for (var k = 0; k < n; k++)
         {
-            var regs = data.InitialRegisters with
-            {
-                A = ComputerRegisters.CreateA((long) i)
-            };
+            var potentials = new List<Bit3>();
 
-            var state = new ComputerState(0, regs);
-
-            var computer = new Computer(Computer.AllInstructions)
+            for (var i = 0; i < 0b_1000; i++)
             {
-                OnAfterOutputChanged = (partOut, ctx) =>
+                var suspect = (Bit3) i;
+
+                List<Bit3> other = k switch
                 {
-                    if (partOut.Count > programOutput.Count)
-                    {
-                        return;
-                    }
+                    0 => [ ],
+                    _ => possibles.Select(x => x[0]).ToList()
+                };
 
-                    if (!partOut.SequenceEqual(programOutput[..partOut.Count]))
+                var last = other.Count == 0 ? suspect : other[0];
+
+                data = data with
+                {
+                    Program = data.Program with
                     {
-                        ctx.Halt();
+                        Instructions =
+                        [
+                            ..data.Program.Instructions[..^1], data.Program.Instructions[^1] with
+                            {
+                                Operand = new Operand(last) // so it halts after first iteration
+                            }
+                        ]
                     }
+                };
+
+                var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
+
+                if (What(programOutput, data.Program, suspect, other))
+                {
+                    potentials.Add(suspect);
                 }
-            };
-
-            var (finish, output, _, _) = computer.Run(data.Program, state);
-
-            if (finish || !output.SequenceEqual(programOutput))
-            {
-                break;
             }
+
+            possibles.Add(potentials);
         }
 
-        return i;
+        return 0;
     }
 
     public long SolveBonus(string[] lines)
@@ -399,7 +423,7 @@ public partial class Day17(ILogger<Day17> logger)
             var _         => throw new ArgumentOutOfRangeException()
         };
 
-        public Bit3 ComboModulo => (int)(this.Combo % 8);
+        public Bit3 ComboModulo => (int) (this.Combo % 8);
     }
 
     public abstract record ComputerInstructionContext(ComputerState CurrentState)
@@ -491,7 +515,7 @@ public partial class Day17(ILogger<Day17> logger)
             return new (bits, r);
         }
 
-        public RunInstruction this[int ip] => this.Instructions[(ip / 2)];
+        public RunInstruction this[int ip] => this.Instructions[ip / 2];
 
         public int RawLength => this.Instructions.Count * 2;
 

@@ -46,7 +46,7 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
             Program: 0,3,5,4,3,0
             """));
 
-        Assert.Equal(117440, result);
+        Assert.Equal(0b_011_100_101_011_000_000, result);
     }
 
     [Fact]
@@ -56,12 +56,15 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
 
         var parse = Day17.Parse(LinesFromSample(
             """
-            Register A: 63687530
+            Register A: 0
             Register B: 0
             Register C: 0
 
             Program: 2,4,1,3,7,5,0,3,1,5,4,1,5,5,3,0
             """));
+        
+        // N = 16
+        // A=000 ->  
 
         logger.LogInformation(string.Join(Environment.NewLine, parse.Program.GetFormatLines()));
 
