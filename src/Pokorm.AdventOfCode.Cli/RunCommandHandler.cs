@@ -9,21 +9,15 @@ public class RunCommandHandler : ICliCommandHandler<RunCliCommand>
 {
     private readonly IConsole console;
     private readonly IDayFactory dayFactory;
-    private readonly ILoggerFactory loggerFactory;
     private readonly IServiceProvider serviceProvider;
-    private readonly IInputService inputService;
 
     public RunCommandHandler(IConsole console,
         IDayFactory dayFactory,
-        ILoggerFactory loggerFactory,
-        IServiceProvider serviceProvider,
-        IInputService inputService)
+        IServiceProvider serviceProvider)
     {
         this.console = console;
         this.dayFactory = dayFactory;
-        this.loggerFactory = loggerFactory;
         this.serviceProvider = serviceProvider;
-        this.inputService = inputService;
     }
 
     public async Task HandleAsync(RunCliCommand command, CancellationToken cancellationToken)

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Text;
 
 namespace Pokorm.AdventOfCode.Y2024.Days;
 
@@ -9,51 +10,59 @@ public partial class Day17(ILogger<Day17> logger)
     {
         var data = Parse(lines);
 
-        var computer = new Computer(new ComputerState(0, data.InitialRegisters with { }), Computer.Instructions);
+        var computer = new Computer(new ComputerState(0, data.InitialRegisters with { }), Computer.AllInstructions);
 
-        var sb = new StringBuilder();
+        var output = computer.Run(data.Program, computer.InitialState) ?? [ ];
 
-        using (var s = new StringWriter(sb))
-        {
-            computer.Run(data.Program, computer.InitialState, s);
-        }
-
-        return sb.ToString();
+        return string.Join(",", output);
     }
 
     public long SolveBonus(string[] lines)
     {
         var data = Parse(lines);
 
-        var i = 0u;
-        var sb = new StringBuilder();
+        var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
 
-        for (; i < uint.MaxValue; i++)
+        var res = new ConcurrentBag<int>();
+
+        Parallel.For(0, 200_000, (i, ctx) =>
         {
+            //logger.LogDebug($"A = {i}");
+
             var regs = data.InitialRegisters with
             {
-                A = new Register('A')
+                A = ComputerRegisters.CreateA((uint) i)
+            };
+
+            var computer = new Computer(new ComputerState(0, regs), Computer.AllInstructions)
+            {
+                OnAfterOutputChanged = (partOut, ctx) =>
                 {
-                    Value = i
+                    if (partOut.Count > programOutput.Count)
+                    {
+                        return;
+                    }
+
+                    if (!partOut.SequenceEqual(programOutput[..partOut.Count]))
+                    {
+                        ctx.Halt();
+                    }
                 }
             };
 
-            var computer = new Computer(new ComputerState(0, regs), Computer.Instructions);
+            var output = computer.Run(data.Program, computer.InitialState);
 
-            using (var s = new StringWriter(sb))
+            if (output is null || !output.SequenceEqual(programOutput))
             {
-                computer.Run(data.Program, computer.InitialState, s);
+                return;
             }
 
-            if (sb.ToString() == string.Join(",", data.Program.Select(x => x.Value)))
-            {
-                break;
-            }
+            res.Add(i);
+        });
 
-            sb.Clear();
-        }
+        logger.LogDebug($"As = {string.Join(", ", res.Order())}");
 
-        return i;
+        return res.Min();
     }
 
     #region Parsing
@@ -64,7 +73,7 @@ public partial class Day17(ILogger<Day17> logger)
     [GeneratedRegex(@"Program: (?<val>[\d,]+)")]
     public static partial Regex ProgramRegex { get; }
 
-    private static ProgramDefinition Parse(string[] lines)
+    public static ProgramDefinition Parse(string[] lines)
     {
         var middle = lines.Index().FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Item)).Index;
 
@@ -82,10 +91,10 @@ public partial class Day17(ILogger<Day17> logger)
                             .Select(x => (Bit3) x)
                             .ToList();
 
-        return new ProgramDefinition(new ComputerRegisters(a, b, c), p);
+        return new ProgramDefinition(new ComputerRegisters(a, b, c), ComputerProgram.Parse(p, Computer.AllInstructions));
     }
 
-    private static Register ParseRegister(string value)
+    public static Register ParseRegister(string value)
     {
         var match = RegisterRegex.Match(value);
 
@@ -103,59 +112,70 @@ public partial class Day17(ILogger<Day17> logger)
         };
     }
 
-    private record ProgramDefinition(ComputerRegisters InitialRegisters, List<Bit3> Program) { }
+    public record ProgramDefinition(ComputerRegisters InitialRegisters, ComputerProgram Program) { }
 
     #endregion
 
     #region Instructions
 
-    private abstract record DvIns(string Name, Bit3 OpCode) : Instruction(Name, OpCode)
+    public abstract class DvIns(string name, Bit3 opCode) : Instruction(name, opCode)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
             var num = ctx.RegisterA.Value;
-            var den = (uint) Math.Pow(2, op.Combo);
+            var den = 1u << (int) op.Combo;
 
             var div = Math.DivRem(num, den).Quotient;
 
             ctx.WriteRegister(this.RegisterSelector(ctx.CurrentState.Registers), div);
         }
 
+        public override string Format(Bit3? operand)
+        {
+            var regName = this.RegisterSelector(ComputerRegisters.Empty).Id;
+
+            return $"{regName} <- A // 1 << {Operand.FormatOperand(true, operand)}";
+        }
+
         public abstract Func<ComputerRegisters, Register> RegisterSelector { get; }
     }
 
-    private record AdvIns() : DvIns("adv", 0)
+    public class AdvIns() : DvIns("adv", 0)
     {
         public override Func<ComputerRegisters, Register> RegisterSelector => r => r.A;
     }
 
-    private record BdvIns() : DvIns("bdv", 6)
+    public class BdvIns() : DvIns("bdv", 6)
     {
         public override Func<ComputerRegisters, Register> RegisterSelector => r => r.B;
     }
 
-    private record CdvIns() : DvIns("cdv", 7)
+    public class CdvIns() : DvIns("cdv", 7)
     {
         public override Func<ComputerRegisters, Register> RegisterSelector => r => r.C;
     }
 
-    private record BxlIns() : Instruction("bxl", 1)
+    public class BxlIns() : Instruction("bxl", 1)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
             ctx.WriteRegister(ctx.RegisterB, ctx.RegisterB.Value ^ op.Literal);
         }
+
+        public override string Format(Bit3? operand) => $"B <- B ^ {Operand.FormatOperand(false, operand)}";
     }
 
-    private record BstIns() : Instruction("bst", 2)
+    public class BstIns() : Instruction("bst", 2)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
             ctx.WriteRegister(ctx.RegisterB, op.ComboModulo);
         }
+
+        public override string Format(Bit3? operand) => $"B <- {Operand.FormatOperand(true, operand)} % 8";
     }
 
-    private record JnzIns() : Instruction("jnz", 3)
+    public class JnzIns() : Instruction("jnz", 3)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
@@ -166,17 +186,21 @@ public partial class Day17(ILogger<Day17> logger)
 
             ctx.SetInsPtr(op.Literal);
         }
+
+        public override string Format(Bit3? operand) => $"InsPtr <- A == 0 ? {Operand.FormatOperand(false, operand)} : InsPtr";
     }
 
-    private record BxcIns() : Instruction("bxc", 4)
+    public class BxcIns() : Instruction("bxc", 4)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
             ctx.WriteRegister(ctx.RegisterB, ctx.RegisterB.Value ^ ctx.RegisterC.Value);
         }
+
+        public override string Format(Bit3? operand) => $"B <- B ^ C";
     }
 
-    private record OutIns() : Instruction("out", 5)
+    public class OutIns() : Instruction("out", 5)
     {
         public override void Run(Operand op, ComputerInstructionContext ctx)
         {
@@ -184,16 +208,26 @@ public partial class Day17(ILogger<Day17> logger)
 
             ctx.WriteOutput(value);
         }
+
+        public override string Format(Bit3? operand) => $"Out <- {Operand.FormatOperand(true, operand)} % 8";
     }
 
     #endregion
 
-    private abstract record Instruction(string Name, Bit3 OpCode)
+    public abstract class Instruction(string name, Bit3 opCode)
     {
+        public Bit3 OpCode { get; } = opCode;
+
+        public string Name { get; } = name;
+
         public abstract void Run(Operand op, ComputerInstructionContext ctx);
+
+        public virtual string Format(Bit3? operand) => this.Name;
+
+        public override string ToString() => Format(null);
     }
 
-    private record Operand(Bit3 Value, ComputerRegisters Registers)
+    public record Operand(Bit3 Value, ComputerRegisters Registers)
     {
         public Bit3 Literal => this.Value;
 
@@ -207,10 +241,30 @@ public partial class Day17(ILogger<Day17> logger)
             var _         => throw new ArgumentOutOfRangeException()
         };
 
+        public static string GetComboFormat(Bit3 value) => value.Value switch
+        {
+            >= 0 and <= 3 => value.BinaryFormat(),
+            4             => "A",
+            5             => "B",
+            6             => "C",
+            7             => throw new Exception("7 cannot be used in combo operand"),
+            var _         => throw new ArgumentOutOfRangeException()
+        };
+
         public Bit3 ComboModulo => this.Combo % 8;
+
+        public static string FormatOperand(bool isCombo, Bit3? operand)
+        {
+            if (operand.HasValue)
+            {
+                return isCombo ? GetComboFormat(operand.Value) : operand.Value.BinaryFormat();
+            }
+
+            return isCombo ? "Op(C)" : "Op(L)";
+        }
     }
 
-    private abstract record ComputerInstructionContext(ComputerState CurrentState)
+    public abstract record ComputerInstructionContext(ComputerState CurrentState)
     {
         public Register RegisterA => this.CurrentState.Registers.A;
 
@@ -225,7 +279,7 @@ public partial class Day17(ILogger<Day17> logger)
         public abstract void WriteRegister(Register reg, uint value);
     }
 
-    private record ComputerControlContext(ComputerState CurrentState) : ComputerInstructionContext(CurrentState)
+    public record ComputerControlContext(ComputerState CurrentState) : ComputerInstructionContext(CurrentState)
     {
         public uint? OverrideInsPtr { get; private set; }
 
@@ -233,7 +287,7 @@ public partial class Day17(ILogger<Day17> logger)
 
         public bool SuppressInsPtrIncrement => this.OverrideInsPtr.HasValue;
 
-        public string? Output { get; set; }
+        public List<uint> Output { get; set; } = new List<uint>();
 
         public override void SetInsPtr(uint newValue)
         {
@@ -247,7 +301,7 @@ public partial class Day17(ILogger<Day17> logger)
 
         public override void WriteOutput(uint value)
         {
-            this.Output = value.ToString();
+            this.Output.Add(value);
         }
 
         public override void WriteRegister(Register reg, uint value)
@@ -276,9 +330,50 @@ public partial class Day17(ILogger<Day17> logger)
         public ComputerRegisters GetFinalRegisters() => new ComputerRegisters(GetFinalRegister(this.CurrentState.Registers.A), GetFinalRegister(this.CurrentState.Registers.B), GetFinalRegister(this.CurrentState.Registers.C));
     }
 
-    private record Computer(ComputerState InitialState, HashSet<Instruction> InstructionSet)
+    public record RunInstruction(Instruction Ins, Bit3 OperandValue)
     {
-        public static HashSet<Instruction> Instructions =
+        public string Format() => this.Ins.Format(this.OperandValue);
+
+        public override string ToString() => $"{this.Ins}({this.OperandValue})";
+    }
+
+    public record ComputerProgram(List<Bit3> Bits, List<RunInstruction> Instructions)
+    {
+        public static ComputerProgram Parse(List<Bit3> bits, HashSet<Instruction> instructionSet)
+        {
+            var r = new List<RunInstruction>();
+
+            foreach (var b in bits.Chunk(2))
+            {
+                var (ins, op) = (b[0], b[1]);
+
+                r.Add(new RunInstruction(instructionSet.SingleOrDefault(x => x.OpCode == ins) ?? throw new Exception($"Invalid OpCode: {ins}")
+                  , op));
+            }
+
+            return new (bits, r);
+        }
+
+        public RunInstruction this[uint ip] => this.Instructions[(int) (ip / 2)];
+
+        public int RawLength => this.Instructions.Count * 2;
+
+        public string RawFormat => string.Join(",", this.Bits);
+
+        public IEnumerable<string> GetFormatLines()
+        {
+            foreach (var i in this.Instructions)
+            {
+                yield return i.Format();
+            }
+        }
+
+        public override string ToString() => $"{string.Join(",", this.Instructions)}";
+    }
+
+    public record Computer(ComputerState InitialState, HashSet<Instruction> InstructionSet)
+    {
+        public static HashSet<Instruction> AllInstructions =
         [
             new AdvIns(),
             new BdvIns(),
@@ -290,16 +385,23 @@ public partial class Day17(ILogger<Day17> logger)
             new BxlIns()
         ];
 
-        public void Run(List<Bit3> program, ComputerState state, TextWriter stdOut)
+        public Action<List<uint>, ComputerRunContext>? OnAfterOutputChanged { get; set; }
+
+        public List<uint>? Run(ComputerProgram program, ComputerState state)
         {
-            var wasAnyStdOut = false;
-            var runContext = new ComputerRunContext(program.ToArray(), state);
+            var output = new List<uint>();
+            var runContext = new ComputerRunContext(program, state);
 
             while (!runContext.EndOfProgram)
             {
-                var ins = ReadInstruction(runContext);
+                if (runContext.HaltRequested)
+                {
+                    return null;
+                }
 
-                var operand = ReadOperand(runContext);
+                var (ins, operandValue) = program[runContext.InsPtr];
+
+                var operand = new Operand(operandValue, runContext.State.Registers);
 
                 var controlContext = new ComputerControlContext(runContext.State with { });
 
@@ -307,7 +409,7 @@ public partial class Day17(ILogger<Day17> logger)
 
                 if (!controlContext.SuppressInsPtrIncrement)
                 {
-                    runContext.InsPtr++;
+                    runContext.InsPtr += 2;
                 }
                 else if (controlContext.OverrideInsPtr is { } nip)
                 {
@@ -318,16 +420,11 @@ public partial class Day17(ILogger<Day17> logger)
                     throw new Exception($"Invalid next ins pointer state");
                 }
 
-                if (!string.IsNullOrWhiteSpace(controlContext.Output))
+                if (controlContext.Output.Count > 0)
                 {
-                    if (wasAnyStdOut)
-                    {
-                        stdOut.Write(',');
-                    }
+                    output.AddRange(controlContext.Output);
 
-                    stdOut.Write(controlContext.Output);
-
-                    wasAnyStdOut = true;
+                    this.OnAfterOutputChanged?.Invoke(output, runContext);
                 }
 
                 runContext = runContext with
@@ -335,62 +432,64 @@ public partial class Day17(ILogger<Day17> logger)
                     State = new ComputerState(runContext.InsPtr, controlContext.GetFinalRegisters())
                 };
             }
+
+            return output;
         }
 
-        private Instruction ReadInstruction(ComputerRunContext ctx)
-        {
-            var nextOpCode = ctx.Program[ctx.InsPtr];
-
-            var ins = this.InstructionSet.FirstOrDefault(x => x.OpCode == nextOpCode);
-
-            if (ins is null)
-            {
-                throw new Exception($"Invalid OpCode: {nextOpCode}");
-            }
-
-            ctx.InsPtr++;
-
-            return ins;
-        }
-
-        private Operand ReadOperand(ComputerRunContext ctx)
-        {
-            if (ctx.InsPtr >= ctx.Program.Length)
-            {
-                throw new Exception($"Cannot read opcode due to end of program");
-            }
-
-            return new Operand(ctx.Program[ctx.InsPtr], ctx.State.Registers with { });
-        }
-
-        private record ComputerRunContext(Bit3[] Program, ComputerState State)
+        public record ComputerRunContext(ComputerProgram Program, ComputerState State)
         {
             public uint InsPtr { get; set; }
 
-            public bool EndOfProgram => this.InsPtr == this.Program.Length;
+            public bool EndOfProgram => this.InsPtr == this.Program.RawLength;
 
-            public bool OutOfBound => this.InsPtr > this.Program.Length;
+            public bool OutOfBound => this.InsPtr > this.Program.RawLength;
+
+            public bool HaltRequested { get; private set; }
+
+            public void Halt()
+            {
+                this.HaltRequested = true;
+            }
         }
     }
 
-    private record ComputerState(uint InsPtr, ComputerRegisters Registers)
+    public record ComputerState(uint InsPtr, ComputerRegisters Registers)
     {
+        public static ComputerState Empty = new ComputerState(0, ComputerRegisters.Empty);
+
         public override string ToString() => $"{this.Registers}{Environment.NewLine}InsPtr{this.InsPtr}";
     }
 
-    private record Register(char Id)
+    public record Register(char Id)
     {
         public uint Value { get; init; }
 
         public override string ToString() => $"Register {this.Id}: {this.Value}";
     }
 
-    private record ComputerRegisters(Register A, Register B, Register C)
+    public record ComputerRegisters(Register A, Register B, Register C)
     {
+        public static Register CreateA(uint v = 0) => new Register('A')
+        {
+            Value = v
+        };
+
+        public static Register CreateB(uint v = 0) => new Register('B')
+        {
+            Value = v
+        };
+
+        public static Register CreateC(uint v = 0) => new Register('C')
+        {
+            Value = v
+        };
+
+        public static ComputerRegisters Empty => new ComputerRegisters(CreateA(), CreateB(), CreateC());
+
         public override string ToString() => $"{this.A}{Environment.NewLine}{this.B}{Environment.NewLine}{this.C}";
     }
 
-    private record struct Bit3(bool Most, bool Middle, bool Least)
+    public record struct Bit3(bool Most, bool Middle, bool Least)
     {
         public static implicit operator uint(Bit3 bit) => (bit.Least ? 1 : 0u) + ((bit.Middle ? 1 : 0u) << 1) + ((bit.Most ? 1 : 0u) << 2);
 
@@ -409,5 +508,18 @@ public partial class Day17(ILogger<Day17> logger)
         }
 
         public uint Value => (uint) this;
+
+        public string BinaryFormat()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append(this.Most ? '1' : '0');
+            sb.Append(this.Middle ? '1' : '0');
+            sb.Append(this.Least ? '1' : '0');
+
+            return sb.ToString();
+        }
+
+        public override string ToString() => this.Value.ToString();
     }
 }

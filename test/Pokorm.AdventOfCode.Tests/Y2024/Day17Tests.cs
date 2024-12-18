@@ -49,6 +49,25 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
     }
 
     [Fact]
+    public void PartTwo_F_1()
+    {
+        var day = new Day17(logger);
+
+        var parse = Day17.Parse(LinesFromSample(
+            """
+            Register A: 63687530
+            Register B: 0
+            Register C: 0
+
+            Program: 2,4,1,3,7,5,0,3,1,5,4,1,5,5,3,0
+            """));
+
+        logger.LogInformation(string.Join(Environment.NewLine, parse.Program.GetFormatLines()));
+
+        var computer = new Day17.Computer(Day17.ComputerState.Empty, Day17.Computer.AllInstructions);
+    }
+
+    [Fact]
     public void PartTwo_F()
     {
         var day = new Day17(logger);

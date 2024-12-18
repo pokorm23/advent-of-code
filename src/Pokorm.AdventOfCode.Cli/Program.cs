@@ -4,6 +4,8 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.CommandLine.Rendering;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Pokorm.AdventOfCode.Cli;
 
 var cliBuilder = CliBuilder.Create();
@@ -11,9 +13,16 @@ var cliBuilder = CliBuilder.Create();
 var builder = new CommandLineBuilder(cliBuilder.CreateRootCommand())
               .UseDefaults()
               .UseCancelReporting()
-              .UseTimeout(TimeSpan.FromSeconds(10))
+              //.UseTimeout(TimeSpan.FromSeconds(10))
               .UseHost(hostBuilder =>
               {
+                  hostBuilder.ConfigureLogging(builder =>
+                  {
+                      builder.ClearProviders();
+                      builder.SetMinimumLevel(LogLevel.Trace);
+                      builder.AddSimpleConsole(o => o.SingleLine = true);
+                  });
+
                   var cliContext = hostBuilder.Properties[typeof(InvocationContext)] as InvocationContext;
 
                   hostBuilder.ConfigureServices((_, services) =>
