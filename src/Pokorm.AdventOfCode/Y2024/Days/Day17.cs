@@ -19,6 +19,11 @@ public partial class Day17(ILogger<Day17> logger)
 
     public long SolveBonus(string[] lines)
     {
+        return SolveBonusAcc(lines, null);
+    }
+
+    public long SolveBonusAcc(string[] lines, HashSet<Instruction>? acc)
+    {
         var data = Parse(lines);
 
         var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
@@ -34,7 +39,7 @@ public partial class Day17(ILogger<Day17> logger)
                 A = ComputerRegisters.CreateA((uint) i)
             };
 
-            var computer = new Computer(new ComputerState(0, regs), Computer.AllInstructions)
+            var computer = new Computer(new ComputerState(0, regs), acc ?? Computer.AllInstructions)
             {
                 OnAfterOutputChanged = (partOut, ctx) =>
                 {
@@ -134,7 +139,7 @@ public partial class Day17(ILogger<Day17> logger)
         {
             var regName = this.RegisterSelector(ComputerRegisters.Empty).Id;
 
-            return $"{regName} <- A // 1 << {Operand.FormatOperand(true, operand)}";
+            return $"{regName} <- A // (1 << {Operand.FormatOperand(true, operand)})";
         }
 
         public abstract Func<ComputerRegisters, Register> RegisterSelector { get; }
@@ -187,7 +192,7 @@ public partial class Day17(ILogger<Day17> logger)
             ctx.SetInsPtr(op.Literal);
         }
 
-        public override string Format(Bit3? operand) => $"InsPtr <- A == 0 ? {Operand.FormatOperand(false, operand)} : InsPtr";
+        public override string Format(Bit3? operand) => $"InsPtr <- A == 0 ? InsPtr : {Operand.FormatOperand(false, operand)}";
     }
 
     public class BxcIns() : Instruction("bxc", 4)
@@ -211,6 +216,8 @@ public partial class Day17(ILogger<Day17> logger)
 
         public override string Format(Bit3? operand) => $"Out <- {Operand.FormatOperand(true, operand)} % 8";
     }
+
+
 
     #endregion
 
