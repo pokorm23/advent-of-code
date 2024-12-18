@@ -11,10 +11,14 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
 
         var result = day.Solve(LinesFromSample(
                 """
-                ...
+                Register A: 729
+                Register B: 0
+                Register C: 0
+
+                Program: 0,1,5,4,3,0
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal("4,6,3,5,6,3,5,2,1,0", result);
     }
 
     [Fact]
@@ -24,7 +28,7 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal("1,6,7,4,3,0,5,0,6", result);
     }
 
     /*[Fact]
