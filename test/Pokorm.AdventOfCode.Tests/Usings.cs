@@ -1,6 +1,6 @@
 global using Xunit;
 global using Xunit.Abstractions;
 global using Microsoft.Extensions.Logging;
-using Xunit.Extensions.TestDependency;
+using Pokorm.AdventOfCode.Tests;
 
-[assembly: TestCaseOrderer(DependencyOrderer.TypeName, DependencyOrderer.AssemblyName)]
+[assembly: TestCaseOrderer(AlphabeticalOrderer.TypeName, AlphabeticalOrderer.AssemblyName)]

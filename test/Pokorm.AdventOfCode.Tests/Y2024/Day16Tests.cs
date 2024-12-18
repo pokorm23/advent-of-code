@@ -1,12 +1,11 @@
 using Pokorm.AdventOfCode.Y2024.Days;
-using Xunit.Extensions.TestDependency;
 
 namespace Pokorm.AdventOfCode.Tests.Y2024;
 
 public class Day16Tests(ILogger<Day16> logger) : DayTestBase
 {
     [Fact]
-    public void PartOne_Sample_1()
+    public void PartOne_1()
     {
         var day = new Day16(logger);
 
@@ -33,7 +32,7 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
     }
 
     [Fact]
-    public void PartOne_Sample_2()
+    public void PartOne_2()
     {
         var day = new Day16(logger);
 
@@ -62,8 +61,7 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
     }
 
     [Fact]
-    [TestDependency(nameof(PartOne_Sample_1), nameof(PartOne_Sample_2))]
-    public void PartOne()
+    public void PartOne_F()
     {
         var day = new Day16(logger);
 
@@ -73,8 +71,7 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
     }
 
     [Fact]
-    [TestDependency(nameof(PartOne))]
-    public void PartTwo_Sample_1()
+    public void PartTwo_1()
     {
         var day = new Day16(logger);
 
@@ -101,8 +98,7 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
     }
 
     [Fact]
-    [TestDependency(nameof(PartTwo_Sample_2))]
-    public void PartTwo_Sample_2()
+    public void PartTwo_2()
     {
         var day = new Day16(logger);
 
@@ -131,8 +127,7 @@ public class Day16Tests(ILogger<Day16> logger) : DayTestBase
     }
 
     [Fact]
-    [TestDependency(nameof(PartTwo_Sample_1), nameof(PartTwo_Sample_2))]
-    public void PartTwo()
+    public void PartTwo_F()
     {
         var day = new Day16(logger);
 
