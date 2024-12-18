@@ -10,13 +10,13 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         var day = new Day17(logger);
 
         var result = day.Solve(LinesFromSample(
-                """
-                Register A: 729
-                Register B: 0
-                Register C: 0
+            """
+            Register A: 729
+            Register B: 0
+            Register C: 0
 
-                Program: 0,1,5,4,3,0
-                """));
+            Program: 0,1,5,4,3,0
+            """));
 
         Assert.Equal("4,6,3,5,6,3,5,2,1,0", result);
     }
@@ -31,17 +31,21 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         Assert.Equal("1,6,7,4,3,0,5,0,6", result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartTwo_1()
     {
         var day = new Day17(logger);
 
         var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+            """
+            Register A: 2024
+            Register B: 0
+            Register C: 0
 
-        Assert.Equal(-1, result);
+            Program: 0,3,5,4,3,0
+            """));
+
+        Assert.Equal(117440, result);
     }
 
     [Fact]
@@ -52,5 +56,5 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         var result = day.SolveBonus(LinesForDay(day));
 
         Assert.Equal(-1, result);
-    }*/
+    }
 }

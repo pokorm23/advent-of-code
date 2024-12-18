@@ -9,19 +9,7 @@ public partial class Day17(ILogger<Day17> logger)
     {
         var data = Parse(lines);
 
-        HashSet<Instruction> ins =
-        [
-            new AdvIns(),
-            new BdvIns(),
-            new BstIns(),
-            new BxcIns(),
-            new CdvIns(),
-            new JnzIns(),
-            new OutIns(),
-            new BxlIns()
-        ];
-
-        var computer = new Computer(new ComputerState(0, data.InitialRegisters with { }), ins);
+        var computer = new Computer(new ComputerState(0, data.InitialRegisters with { }), Computer.Instructions);
 
         var sb = new StringBuilder();
 
@@ -37,9 +25,35 @@ public partial class Day17(ILogger<Day17> logger)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var i = 0u;
+        var sb = new StringBuilder();
 
-        return result;
+        for (; i < uint.MaxValue; i++)
+        {
+            var regs = data.InitialRegisters with
+            {
+                A = new Register('A')
+                {
+                    Value = i
+                }
+            };
+
+            var computer = new Computer(new ComputerState(0, regs), Computer.Instructions);
+
+            using (var s = new StringWriter(sb))
+            {
+                computer.Run(data.Program, computer.InitialState, s);
+            }
+
+            if (sb.ToString() == string.Join(",", data.Program.Select(x => x.Value)))
+            {
+                break;
+            }
+
+            sb.Clear();
+        }
+
+        return i;
     }
 
     #region Parsing
@@ -264,7 +278,19 @@ public partial class Day17(ILogger<Day17> logger)
 
     private record Computer(ComputerState InitialState, HashSet<Instruction> InstructionSet)
     {
-        public void Run(List<Bit3> program, ComputerState state, StringWriter stdOut)
+        public static HashSet<Instruction> Instructions =
+        [
+            new AdvIns(),
+            new BdvIns(),
+            new BstIns(),
+            new BxcIns(),
+            new CdvIns(),
+            new JnzIns(),
+            new OutIns(),
+            new BxlIns()
+        ];
+
+        public void Run(List<Bit3> program, ComputerState state, TextWriter stdOut)
         {
             var wasAnyStdOut = false;
             var runContext = new ComputerRunContext(program.ToArray(), state);
@@ -381,5 +407,7 @@ public partial class Day17(ILogger<Day17> logger)
 
             return new Bit3(most, middle, least);
         }
+
+        public uint Value => (uint) this;
     }
 }
