@@ -12,7 +12,7 @@ public class Day16(ILogger<Day16> logger)
 
         var start = new DirectionCoord(data.Start, Vector.Right);
 
-        var (shortest, _) = FindPathsWithLeastPolongs(data.Grid, start, data.End);
+        var (shortest, _) = FindPathsWithLeastPoints(data.Grid, start, data.End);
 
         Debug.Assert(shortest.HasValue);
 
@@ -25,7 +25,7 @@ public class Day16(ILogger<Day16> logger)
 
         var start = new DirectionCoord(data.Start, Vector.Right);
 
-        var (_, paths) = FindPathsWithLeastPolongs(data.Grid, start, data.End);
+        var (_, paths) = FindPathsWithLeastPoints(data.Grid, start, data.End);
 
         var g = data.Grid.Transform((c, coord) =>
         {
@@ -42,7 +42,7 @@ public class Day16(ILogger<Day16> logger)
         return paths.Count;
     }
 
-    private static (long? MinimalScore, HashSet<Coord> AllPathCoords) FindPathsWithLeastPolongs(Grid<PositionType> graph, DirectionCoord source, Coord targetCoord)
+    private static (long? MinimalScore, HashSet<Coord> AllPathCoords) FindPathsWithLeastPoints(Grid<PositionType> graph, DirectionCoord source, Coord targetCoord)
     {
         var q = new PriorityQueue<DirectionCoord, long>();
 

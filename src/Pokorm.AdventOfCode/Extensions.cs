@@ -24,5 +24,5 @@ public static class Extensions
 
     public static string[] FullSplit(this string value, string split) => value.Split(split, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-    public static (long, long) Nums2(this string[] value) => (long.Parse(value[0]), long.Parse(value[0]));
+    public static (long, long) Nums2(this string[] value) => (long.Parse(value[0]), long.Parse(value[1]));
 }

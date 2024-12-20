@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Reflection;
+using System.Text;
 
 namespace Pokorm.AdventOfCode.Helpers;
 
-public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Grid(Width, Height)
+public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Grid(Width, Height), IToStringLines
 {
-    public Func<T, char> ValueCharFactory { get; set; }
+    public Func<T, char>? ValueCharFactory { get; set; }
 
     public override Grid<T> GetSubGrid(Coord coord, long gridWidth, long gridHeight)
     {
@@ -93,6 +95,21 @@ public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Gr
 
                 var valueStr = this.Values[new Coord(x, y)]?.ToString() ?? "";
 
+                if (val is Enum && val.ToString() is { } name)
+                {
+                    var enumDesc = val.GetType()
+                                      .GetMember(name)
+                                      .FirstOrDefault()?
+                                      .GetCustomAttributes<DescriptionAttribute>()?
+                                      .FirstOrDefault()?
+                                      .Description;
+
+                    if (!string.IsNullOrWhiteSpace(enumDesc))
+                    {
+                        valueStr = enumDesc;
+                    }
+                }
+
                 var c = valueStr.Length switch
                 {
                     0     => '?',
@@ -106,7 +123,17 @@ public record Grid<T>(Dictionary<Coord, T> Values, long Width, long Height) : Gr
         }
     }
 
-    public override string ToString() => $"Grid {this.Width}x{this.Height}{Environment.NewLine}{Environment.NewLine}{string.Join(Environment.NewLine, GetLines())}";
+    public IEnumerable<string> GetToStringLines()
+    {
+        yield return $"Grid {this.Width}x{this.Height}";
+
+        foreach (var line in GetLines())
+        {
+            yield return line;
+        }
+    }
+
+    public override string ToString() => string.Join(Environment.NewLine, GetToStringLines());
 
     public Grid<T> Copy(Func<T, T>? copy = null)
     {

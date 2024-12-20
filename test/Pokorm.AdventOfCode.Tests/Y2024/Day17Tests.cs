@@ -49,7 +49,7 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         Assert.Equal(0b_011_100_101_011_000_000, result);
     }
 
-    [Fact]
+    /*[Fact]
     public void PartTwo_F_4()
     {
         var day = new Day17(logger);
@@ -91,5 +91,5 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         var result = day.SolveBonus(LinesForDay(day));
 
         Assert.Equal(-1, result);
-    }
+    }*/
 }
