@@ -116,7 +116,11 @@ public sealed class XUnitLogger : ILogger
 
         while (current != null)
         {
-            stack.Push(current);
+            if (current.State is not XUnitFormattingState)
+            {
+                stack.Push(current);
+            }
+
             current = current.Parent;
         }
 

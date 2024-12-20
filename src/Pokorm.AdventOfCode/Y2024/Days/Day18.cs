@@ -15,16 +15,30 @@ public class Day18(ILogger<Day18> logger)
         return FindShortestPath(graph, Coord.Zero, new Coord(size - 1, size - 1)) ?? throw new Exception("no path");
     }
 
-    public int Solve(string[] lines) => SolvePartOne(lines, 1024, 71);
-
-    public int SolveBonus(string[] lines)
+    public string SolvePartTwo(string[] lines, int size)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        for (var i = 0; i < data.IncomingBytePositions.Count; i++)
+        {
+            var graph = CreateGrid(data, i + 1, size);
 
-        return result;
+            var shortest = FindShortestPath(graph, Coord.Zero, new Coord(size - 1, size - 1));
+
+            if (shortest is null)
+            {
+                var byteThatBlock = data.IncomingBytePositions[i];
+
+                return $"{byteThatBlock.X},{byteThatBlock.Y}";
+            }
+        }
+
+        throw new Exception("not found");
     }
+
+    public int Solve(string[] lines) => SolvePartOne(lines, 1024, 71);
+
+    public string SolveBonus(string[] lines) => SolvePartTwo(lines, 71);
 
     public int? FindShortestPath(Grid<PositionType> graph, Coord source, Coord targetCoord)
     {
