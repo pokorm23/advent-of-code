@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Pokorm.AdventOfCode.Tests.Logging;
+using Xunit.DependencyInjection;
 
 namespace Pokorm.AdventOfCode.Tests;
 
@@ -15,12 +16,7 @@ public class Startup
         hostBuilder.ConfigureLogging(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Trace);
-
-            builder.Services.TryAddSingleton<TestOutputHelperAccessorWrapper>();
-
-            builder.Services.AddSingleton<ILoggerProvider>(provider => new XUnitLoggerProvider(
-                provider.GetRequiredService<TestOutputHelperAccessorWrapper>(),
-                provider.GetRequiredService<IOptions<XUnitLoggerOptions>>().Value));
+            builder.AddXUnitLogging();
         });
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Xunit.DependencyInjection;
 
 namespace Pokorm.AdventOfCode.Tests.Logging;
 
 [ProviderAlias("XUnit")]
-public class XUnitLoggerProvider : ILoggerProvider
+public sealed class XUnitLoggerProvider : ILoggerProvider
 {
     private readonly ConcurrentDictionary<string, XUnitLogger> loggers = [ ];
 
@@ -12,19 +13,16 @@ public class XUnitLoggerProvider : ILoggerProvider
 
     private readonly ITestOutputHelperAccessor outputHelperAccessor;
 
-    public XUnitLoggerProvider(ITestOutputHelper outputHelper, XUnitLoggerOptions options)
-        : this(new TestOutputHelperAccessor(outputHelper), options) { }
-
     public XUnitLoggerProvider(ITestOutputHelperAccessor accessor, XUnitLoggerOptions options)
     {
         this.outputHelperAccessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
         this.options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
-    public virtual ILogger CreateLogger(string categoryName)
+    public ILogger CreateLogger(string categoryName)
     {
-        return this.loggers.GetOrAdd(categoryName, (name) => new (name, this.outputHelperAccessor, this.options));
+        return this.loggers.GetOrAdd(categoryName, static (name, s) => new (name, s.outputHelperAccessor, s.options), (this.outputHelperAccessor, this.options));
     }
 
-    public void Dispose() { }
+    public void Dispose() {}
 }

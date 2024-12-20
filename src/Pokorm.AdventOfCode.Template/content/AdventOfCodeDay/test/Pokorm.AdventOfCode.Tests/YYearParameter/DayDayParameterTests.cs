@@ -24,6 +24,8 @@ public class DayDayParameterTests(ILogger<DayDayParameter> logger) : DayTestBase
     [Fact]
     public void PartOne_F()
     {
+        using var _ = logger.BeginScope(XUnitFormattingState.NoColor);
+
         var day = new DayDayParameter(logger);
 
 #if (NoLines)
@@ -55,6 +57,8 @@ public class DayDayParameterTests(ILogger<DayDayParameter> logger) : DayTestBase
     [Fact]
     public void PartTwo_F()
     {
+        using var _ = logger.BeginScope(XUnitFormattingState.NoColor);
+
         var day = new DayDayParameter(logger);
 
 #if (NoLines)

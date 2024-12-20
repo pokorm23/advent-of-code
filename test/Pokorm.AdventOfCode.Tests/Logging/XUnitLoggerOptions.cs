@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace Pokorm.AdventOfCode.Tests.Logging;
+﻿namespace Pokorm.AdventOfCode.Tests.Logging;
 
 public class XUnitLoggerOptions
 {

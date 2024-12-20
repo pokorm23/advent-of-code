@@ -1,6 +1,6 @@
 ﻿namespace Pokorm.AdventOfCode.Tests.Logging;
 
-public interface ITestOutputHelperAccessor
+public interface ITestOutputHelperAccessorsss
 {
     ITestOutputHelper? OutputHelper { get; set; }
 }

@@ -1,17 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Microsoft.Extensions.Logging;
+using Xunit.DependencyInjection;
 
 namespace Pokorm.AdventOfCode.Tests.Logging;
 
-public class XUnitLogger : ILogger
+public sealed class XUnitLogger : ILogger
 {
     private Func<string?, LogLevel, bool> filter;
 
     private readonly ITestOutputHelperAccessor outputHelperAccessor;
-
-    public XUnitLogger(string name, ITestOutputHelper outputHelper, XUnitLoggerOptions? options)
-        : this(name, new TestOutputHelperAccessor(outputHelper), options) { }
 
     public XUnitLogger(string name, ITestOutputHelperAccessor accessor, XUnitLoggerOptions? options)
     {
@@ -62,9 +59,9 @@ public class XUnitLogger : ILogger
         }
     }
 
-    public virtual void WriteMessage(LogLevel logLevel, int eventId, string? message, Exception? exception)
+    public void WriteMessage(LogLevel logLevel, int eventId, string? message, Exception? exception)
     {
-        var outputHelper = this.outputHelperAccessor?.OutputHelper;
+        var outputHelper = this.outputHelperAccessor?.Output;
 
         if (outputHelper is null)
         {
@@ -73,25 +70,36 @@ public class XUnitLogger : ILogger
 
         var scope = GetScopeInformation();
 
-        var (fg, bg) = logLevel switch
-        {
-            LogLevel.Critical    => (ConsoleColor.White, (ConsoleColor?) ConsoleColor.DarkRed),
-            LogLevel.Error       => (ConsoleColor.Red, null),
-            LogLevel.Warning     => (ConsoleColor.Yellow, null),
-            LogLevel.Information => (ConsoleColor.Blue, null),
-            LogLevel.Debug       => (ConsoleColor.White, null),
-            LogLevel.Trace       => (ConsoleColor.Gray, null)
-        };
+        var suppressColor = (XUnitLogScope.Current?.State as XUnitFormattingState)?.SuppressColor ?? false;
 
-        var line = $"{ConsoleHelper.InColor(scope, ConsoleColor.DarkGray)}{ConsoleHelper.InColor(message, fg, bg, false)}";
+        string line;
+
+        if (!suppressColor)
+        {
+            var (fg, bg) = logLevel switch
+            {
+                LogLevel.Critical    => (ConsoleColor.White, (ConsoleColor?) ConsoleColor.DarkRed),
+                LogLevel.Error       => (ConsoleColor.Red, null),
+                LogLevel.Warning     => (ConsoleColor.Yellow, null),
+                LogLevel.Information => (ConsoleColor.Blue, null),
+                LogLevel.Debug       => (ConsoleColor.White, null),
+                var _                => (ConsoleColor.Gray, null)
+            };
+
+            line = $"{ConsoleHelper.InColor(scope, ConsoleColor.DarkGray)}{ConsoleHelper.InColor(message, fg, bg, false)}";
+        }
+        else
+        {
+            line = $"{scope}{message}";
+        }
 
         try
         {
-            //outputHelper.WriteLine(line);
-            outputHelper.WriteLine($"{scope}{message}");
+            outputHelper.WriteLine(line);
 
             if (Debugger.IsAttached)
             {
+                Console.WriteLine($"{scope}{message}");
                 Trace.WriteLine($"{scope}{message}");
             }
         }
