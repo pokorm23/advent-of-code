@@ -36,17 +36,26 @@ public class Day19Tests(ILogger<Day19> logger) : DayTestBase
         Assert.Equal(358, result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartTwo_1()
     {
         var day = new Day19(logger);
 
         var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+            """
+            r, wr, b, g, bwu, rb, gb, br
 
-        Assert.Equal(-1, result);
+            brwrr
+            bggr
+            gbbr
+            rrbgbr
+            ubwu
+            bwurrg
+            brgr
+            bbrgwb
+            """));
+
+        Assert.True(16 == result);
     }
 
     [Fact]
@@ -56,6 +65,6 @@ public class Day19Tests(ILogger<Day19> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal(600639829400603, result);
+    }
 }
