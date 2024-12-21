@@ -10,11 +10,20 @@ public class Day19Tests(ILogger<Day19> logger) : DayTestBase
         var day = new Day19(logger);
 
         var result = day.Solve(LinesFromSample(
-                """
-                ...
-                """));
+            """
+            r, wr, b, g, bwu, rb, gb, br
 
-        Assert.Equal(-1, result);
+            brwrr
+            bggr
+            gbbr
+            rrbgbr
+            ubwu
+            bwurrg
+            brgr
+            bbrgwb
+            """));
+
+        Assert.Equal(6, result);
     }
 
     [Fact]
@@ -24,7 +33,7 @@ public class Day19Tests(ILogger<Day19> logger) : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(358, result);
     }
 
     /*[Fact]
