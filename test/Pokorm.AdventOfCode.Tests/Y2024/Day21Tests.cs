@@ -11,10 +11,14 @@ public class Day21Tests(ILogger<Day21> logger) : DayTestBase
 
         var result = day.Solve(LinesFromSample(
                 """
-                ...
+                029A
+                980A
+                179A
+                456A
+                379A
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(126384, result);
     }
 
     [Fact]
