@@ -32,6 +32,7 @@ public partial class Day17(ILogger<Day17> logger)
         return c.Run(p, initState);
     }
 
+    /*
     public IEnumerable<long> RunProgramWhile(long from, long max, ComputerProgram p, List<int> output)
     {
         long i;
@@ -76,8 +77,9 @@ public partial class Day17(ILogger<Day17> logger)
             }
         }
     }
+    */
 
-    public bool What(List<int> output, ComputerProgram p, Bit3 aSuspect, List<Bit3> other)
+    public bool What(string output, ComputerProgram p, Bit3 aSuspect, List<Bit3> other)
     {
         var expectedOutput = output[^(other.Count + 1)..];
 
@@ -85,16 +87,16 @@ public partial class Day17(ILogger<Day17> logger)
 
         long a = 0;
 
-        foreach (var (i,b) in a3bitBlocks.AsEnumerable().Reverse().Index())
+        foreach (var (i, b) in a3bitBlocks.AsEnumerable().Reverse().Index())
         {
-            a += b.Value << 3*i;
+            a += b.Value << (3 * i);
         }
 
         var r = RunProgramWithARegistry(a, p);
 
         var actualOutput = r.Output;
 
-        return expectedOutput.SequenceEqual(actualOutput);
+        return expectedOutput==(actualOutput);
 
         /*if (output.Count == 1)
         {
@@ -136,10 +138,10 @@ public partial class Day17(ILogger<Day17> logger)
             {
                 var suspect = (Bit3) i;
 
-                List<Bit3> other = k switch
+                var other = k switch
                 {
-                    0 => [ ],
-                    _ => possibles.Select(x => x[0]).ToList()
+                    0     => [ ],
+                    var _ => possibles.Select(x => x[0]).ToList()
                 };
 
                 var last = other.Count == 0 ? suspect : other[0];
@@ -158,7 +160,7 @@ public partial class Day17(ILogger<Day17> logger)
                     }
                 };
 
-                var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
+                var programOutput = string.Join("", data.Program.Bits.Select(x => x.Value).ToList());
 
                 if (What(programOutput, data.Program, suspect, other))
                 {
@@ -175,15 +177,32 @@ public partial class Day17(ILogger<Day17> logger)
     public long SolveBonus(string[] lines)
     {
         var data = Parse(lines);
+        
+        logger.LogDebug(string.Join("\n", data.Program.GetFormatLines()));
 
-        var programOutput = data.Program.Bits.Select(x => x.Value).ToList();
+        return -1;
 
-        long i;
+        var programOutput = string.Join("", data.Program.Bits.Select(x => x.Value).ToList());
 
-        //  Parallel.For(0, long.MaxValue, (i, ctx) =>
-        for (i = 0; i < long.MaxValue; i++)
+        var result = long.MaxValue;
+
+        var ss = Environment.ProcessorCount;
+
+        IEnumerable<long> Get()
         {
-            //logger.LogDebug($"A = {i}");
+            for (int k = 0; k < ss; k++)
+            {
+                for (var i = k; i < long.Parse(new string('9', 15)); i+=ss)
+                {
+                    yield return i;
+                }
+            }
+        }
+
+          Parallel.ForEach(Get().AsParallel().AsOrdered() /*0L, long.Parse(new string('9', 15))*/ ,  new ParallelOptions() { MaxDegreeOfParallelism = ss} ,(i, parallelState) =>
+        //for (var i = 0L; i < long.MaxValue; i++)
+        {
+           // logger.LogDebug($"A = {i}");
 
             var regs = data.InitialRegisters with
             {
@@ -196,12 +215,12 @@ public partial class Day17(ILogger<Day17> logger)
             {
                 OnAfterOutputChanged = (partOut, ctx) =>
                 {
-                    if (partOut.Count > programOutput.Count)
+                    if (partOut.Length > programOutput.Length)
                     {
                         return;
                     }
 
-                    if (!partOut.SequenceEqual(programOutput[..partOut.Count]))
+                    if (partOut != (programOutput[..partOut.Length]))
                     {
                         ctx.Halt();
                     }
@@ -210,15 +229,20 @@ public partial class Day17(ILogger<Day17> logger)
 
             var (finish, output, _, _) = computer.Run(data.Program, state);
 
-            if (finish && output.SequenceEqual(programOutput))
+            if (finish && output ==(programOutput))
             {
-                break;
+                logger.LogDebug($"Potencial result {i}");
+
+                if (i < result)
+                result = i;
+
+                parallelState.Break();
             }
-        }
+        //}
 
-        //});
+        });
 
-        return i;
+        return result;
     }
 
     #region Parsing
@@ -449,7 +473,7 @@ public partial class Day17(ILogger<Day17> logger)
 
         public bool SuppressInsPtrIncrement => this.OverrideInsPtr.HasValue;
 
-        public List<int> Output { get; set; } = new List<int>();
+        public List<int> Output { get; set; } = new ();
 
         public override void SetInsPtr(int newValue)
         {
@@ -489,7 +513,7 @@ public partial class Day17(ILogger<Day17> logger)
             return reg;
         }
 
-        public ComputerRegisters GetFinalRegisters() => new ComputerRegisters(GetFinalRegister(this.CurrentState.Registers.A), GetFinalRegister(this.CurrentState.Registers.B), GetFinalRegister(this.CurrentState.Registers.C));
+        public ComputerRegisters GetFinalRegisters() => new (GetFinalRegister(this.CurrentState.Registers.A), GetFinalRegister(this.CurrentState.Registers.B), GetFinalRegister(this.CurrentState.Registers.C));
     }
 
     public record RunInstruction(Instruction Ins, Operand Operand)
@@ -532,7 +556,7 @@ public partial class Day17(ILogger<Day17> logger)
         public override string ToString() => $"{string.Join(",", this.Instructions)}";
     }
 
-    public record ComputerProgramRunResult(bool Finished, List<int> Output, ComputerState State, List<string> Log)
+    public record ComputerProgramRunResult(bool Finished, string Output, ComputerState State, List<string> Log)
     {
         public IEnumerable<string> GetToStringLines()
         {
@@ -579,11 +603,11 @@ public partial class Day17(ILogger<Day17> logger)
             new BxlIns()
         ];
 
-        public Action<List<int>, ComputerRunContext>? OnAfterOutputChanged { get; set; }
+        public Action<string, ComputerRunContext>? OnAfterOutputChanged { get; set; }
 
         public ComputerProgramRunResult Run(ComputerProgram program, ComputerState state)
         {
-            var output = new List<int>();
+            var output = new StringBuilder();
             var runContext = new ComputerRunContext(program, state);
             var log = this.Log ? null : new List<string>();
             var i = 0;
@@ -594,7 +618,7 @@ public partial class Day17(ILogger<Day17> logger)
                 {
                     log?.Add($" - Computer halt request");
 
-                    return new ComputerProgramRunResult(false, output, runContext.State, log);
+                    return new ComputerProgramRunResult(false, output.ToString(), runContext.State, log);
                 }
 
                 var (ins, operandValue) = program[runContext.InsPtr];
@@ -625,14 +649,17 @@ public partial class Day17(ILogger<Day17> logger)
                 {
                     log?.Add($" - Output set: {string.Join(",", controlContext.Output)}");
 
-                    output.AddRange(controlContext.Output);
+                    output.Append(string.Join("", controlContext.Output));
 
-                    this.OnAfterOutputChanged?.Invoke(output, runContext);
+                    this.OnAfterOutputChanged?.Invoke(output.ToString(), runContext);
                 }
 
-                foreach (var (r, v) in controlContext.RegisterWrites.OrderBy(x => x.Key.Id))
+                if (log is not null)
                 {
-                    log?.Add($" - {r.Id}: {v}");
+                    foreach (var (r, v) in controlContext.RegisterWrites.OrderBy(x => x.Key.Id))
+                    {
+                        log?.Add($" - {r.Id}: {v}");
+                    }
                 }
 
                 runContext = runContext with
@@ -643,7 +670,7 @@ public partial class Day17(ILogger<Day17> logger)
                 i++;
             }
 
-            return new ComputerProgramRunResult(true, output, runContext.State, log);
+            return new ComputerProgramRunResult(true, output.ToString(), runContext.State, log ?? [ ]);
         }
 
         public record ComputerRunContext(ComputerProgram Program, ComputerState State)
@@ -665,7 +692,7 @@ public partial class Day17(ILogger<Day17> logger)
 
     public record ComputerState(long InsPtr, ComputerRegisters Registers)
     {
-        public static ComputerState Empty = new ComputerState(0, ComputerRegisters.Empty);
+        public static ComputerState Empty = new (0, ComputerRegisters.Empty);
 
         public IEnumerable<string> GetToStringLines()
         {
@@ -689,22 +716,22 @@ public partial class Day17(ILogger<Day17> logger)
 
     public record ComputerRegisters(Register A, Register B, Register C)
     {
-        public static Register CreateA(long v = 0) => new Register('A')
+        public static Register CreateA(long v = 0) => new ('A')
         {
             Value = v
         };
 
-        public static Register CreateB(long v = 0) => new Register('B')
+        public static Register CreateB(long v = 0) => new ('B')
         {
             Value = v
         };
 
-        public static Register CreateC(long v = 0) => new Register('C')
+        public static Register CreateC(long v = 0) => new ('C')
         {
             Value = v
         };
 
-        public static ComputerRegisters Empty => new ComputerRegisters(CreateA(), CreateB(), CreateC());
+        public static ComputerRegisters Empty => new (CreateA(), CreateB(), CreateC());
 
         public IEnumerable<string> GetToStringLines()
         {
