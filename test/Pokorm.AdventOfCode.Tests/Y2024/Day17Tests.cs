@@ -33,11 +33,11 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
     }
 
     [Fact]
-    public void PartTwo_1()
+    public void PartTwo_1_Naive()
     {
         var day = new Day17(logger);
 
-        var result = day.SolveBonus(LinesFromSample(
+        var result = day.SolveBonus_Naive(LinesFromSample(
             """
             Register A: 2024
             Register B: 0
@@ -49,47 +49,30 @@ public class Day17Tests(ILogger<Day17> logger) : DayTestBase
         Assert.Equal(0b_011_100_101_011_000_000, result);
     }
 
-    /*[Fact]
-    public void PartTwo_F_4()
+    [Fact]
+    public void PartTwo_1_Recursive()
     {
         var day = new Day17(logger);
 
-        var parse = Day17.Parse(LinesFromSample(
+        var result = day.SolveBonus_Recursive(LinesFromSample(
             """
-            Register A: 0
+            Register A: 2024
             Register B: 0
             Register C: 0
 
-            Program: 2,4,1,3,7,5,0,3,1,5,4,1,5,5,3,0
+            Program: 0,3,5,4,3,0
             """));
-        
-        // N = 16
-        // A=000 ->  
 
-        logger.LogInformation(string.Join(Environment.NewLine, parse.Program.GetFormatLines()));
-
-        var c = RunProgramWithARegistry(4, parse.Program);
-        
-        logger.LogInformation(c.ToString());
+        Assert.Equal(0b_011_100_101_011_000_000, result);
     }
-
-    [Fact]
-    public void PartTwo_F_FindA()
-    {
-        var day = new Day17(logger);
-
-        var result = day.SolveBonus2(LinesForDay(day));
-
-        Assert.Equal(-1, result);
-    }*/
 
     [Fact]
     public void PartTwo_F()
     {
         var day = new Day17(logger);
 
-        var result = day.SolveBonus(LinesForDay(day));
+        var result = day.SolveBonus_Recursive(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(216148338630253, result);
     }
 }
