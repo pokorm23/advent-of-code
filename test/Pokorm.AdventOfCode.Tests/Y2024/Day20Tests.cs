@@ -30,8 +30,8 @@ public class Day20Tests(ILogger<Day20> logger) : DayTestBase
 
           Assert.Equal(14, result[2]);
           Assert.Equal(14, result[4]);
-          Assert.Equal(2, result[5]);
-          Assert.Equal(4, result[6]);
+          Assert.Equal(2, result[6]);
+          Assert.Equal(4, result[8]);
           Assert.Equal(2, result[10]);
           Assert.Equal(3, result[12]);
           Assert.Equal(1, result[20]);
@@ -48,7 +48,7 @@ public class Day20Tests(ILogger<Day20> logger) : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(1497, result);
     }
 
     /*[Fact]
