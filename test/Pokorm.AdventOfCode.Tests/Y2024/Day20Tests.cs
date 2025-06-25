@@ -26,7 +26,7 @@ public class Day20Tests(ILogger<Day20> logger) : DayTestBase
                 #.#.#.#.#.#.###
                 #...#...#...###
                 ###############
-                """));
+                """), 2);
 
           Assert.Equal(14, result[2]);
           Assert.Equal(14, result[4]);
