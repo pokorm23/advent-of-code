@@ -139,7 +139,7 @@ public partial class Day07
 
     private record NotOp(Value A) : Value
     {
-        protected override ushort EvaluateCore() => (ushort) ~this.A.Evaluate();
+        protected override ushort EvaluateCore() => unchecked ((ushort) ~this.A.Evaluate());
     }
 
     private record AndOp(Value A, Value B) : Value

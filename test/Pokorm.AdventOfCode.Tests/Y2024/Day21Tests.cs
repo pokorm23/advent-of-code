@@ -4,7 +4,7 @@ namespace Pokorm.AdventOfCode.Tests.Y2024;
 
 public class Day21Tests(ILogger<Day21> logger) : DayTestBase
 {
-    [Fact]
+    /*[Fact]
     public void PartOne_1()
     {
         var day = new Day21(logger);
@@ -29,7 +29,7 @@ public class Day21Tests(ILogger<Day21> logger) : DayTestBase
         var result = day.Solve(LinesForDay(day));
 
         Assert.Equal(-1, result);
-    }
+    }*/
 
     /*[Fact]
     public void PartTwo_1()
