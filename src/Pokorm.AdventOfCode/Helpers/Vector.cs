@@ -39,6 +39,19 @@ public record struct Vector(long X, long Y)
         (< 0, < 0) => "\u2196"
     };
 
+    public Direction? ToDirection() => (this.X, this.Y) switch
+    {
+        (0, 0)     => null,
+        (> 0, 0)   => Direction.Right,
+        (< 0, 0)   => Direction.Left,
+        (0, > 0)   => Direction.Bottom,
+        (0, < 0)   => Direction.Top,
+        (> 0, > 0) => Direction.Right | Direction.Bottom,
+        (> 0, < 0) => Direction.Right | Direction.Top,
+        (< 0, > 0) => Direction.Left | Direction.Bottom,
+        (< 0, < 0) => Direction.Left | Direction.Top
+    };
+
     public override string ToString() => $"({this.X},{this.Y}) {GetOrientationText()}";
 
     public Vector ToRightRotated() => new Vector(this.Y, this.X);
