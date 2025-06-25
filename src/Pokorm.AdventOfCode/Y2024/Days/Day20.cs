@@ -46,7 +46,7 @@ public class Day20(ILogger<Day20> logger)
                     continue;
                 }
 
-                // 2. in direction from start to end is a wall
+                /*// 2. in direction from start to end is a wall
                 var anyWallOnStart = GetDirectionalUnitVectors(diff)
                     .Any(x => data.Grid.TryGetValuedCoordInDirection(pc, x).Value.Position is PositionType.Wall);
 
@@ -62,7 +62,7 @@ public class Day20(ILogger<Day20> logger)
                 if (!anyWallOnEnd)
                 {
                     continue;
-                }
+                }*/
 
                 // 4. already seen cheat
                 if (!seenCheats.Add((c, pc)))
