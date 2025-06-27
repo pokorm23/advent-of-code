@@ -1,4 +1,6 @@
-﻿namespace Pokorm.AdventOfCode.Y2024.Days;
+﻿using System.Collections.Frozen;
+
+namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/22
 public class Day22(ILogger<Day22> logger)
@@ -28,7 +30,7 @@ public class Day22(ILogger<Day22> logger)
         foreach (var secret in data.Secrets.Select(x => new SecretRow(x, GetLastDigit(x), 0)))
         {
             var rows = new List<SecretRow>(); // without the first
-            var changes = new List<SecretRowSequence>();
+            var changes = new HashSet<SecretRowSequence>();
             var cursorSecret = secret;
 
             for (var i = 0; i < 2000; i++)
@@ -39,12 +41,7 @@ public class Day22(ILogger<Day22> logger)
 
                 if (rows.Count > 4)
                 {
-                    var newChange = new SecretRowSequence(rows[^4], rows[^3], rows[^2], rows[^1]);
-
-                    if (!changes.Contains(newChange))
-                    {
-                        changes.Add(newChange);
-                    }
+                    changes.Add(new SecretRowSequence(rows[^4], rows[^3], rows[^2], rows[^1]));
                 }
 
                 cursorSecret = nextSecretRow;
@@ -68,7 +65,7 @@ public class Day22(ILogger<Day22> logger)
                                .SelectMany(x => x.Sequence.Select(y => (x.Index, x.Price, Sequence: y)))
                                .GroupBy(x => (x.Index, x.Sequence))
                                .Select(x => (x.Key.Index, x.Key.Sequence, x.First().Price))
-                               .ToDictionary(x => (x.Index, x.Sequence), x => x.Item3);
+                               .ToFrozenDictionary(x => (x.Index, x.Sequence), x => x.Item3);
 
         var max = 0L;
         SecretRowSequence? seq = null;
