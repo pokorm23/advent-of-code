@@ -7,7 +7,14 @@ public class Day22(ILogger<Day22> logger)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var result = 0L;
+
+        foreach (var secret in data.Secrets)
+        {
+            var lastSecret = GetNextSecret(secret, 2000);
+
+            result += lastSecret;
+        }
 
         return result;
     }
@@ -21,13 +28,35 @@ public class Day22(ILogger<Day22> logger)
         return result;
     }
 
-    static DayData Parse(string[] lines)
+    public static long GetNextSecret(long secret, int iterations)
     {
-        return new DayData();
+        for (var i = 0; i < iterations; i++)
+        {
+            secret = GetNextSecret(secret);
+        }
+
+        return secret;
     }
 
-    record DayData()
+    public static long GetNextSecret(long secret)
     {
+        secret = Prune(Mix(secret * 64, secret));
+        secret = Prune(Mix(secret / 32, secret));
+        secret = Prune(Mix(secret * 2048, secret));
 
+        return secret;
     }
+
+    private static long Mix(long value, long secret) => value ^ secret;
+
+    private static long Prune(long secret) => secret % 16777216;
+
+    private static DayData Parse(string[] lines)
+    {
+        var secrets = lines.Select(x => long.Parse(x));
+
+        return new DayData(secrets.ToList());
+    }
+
+    private record DayData(List<long> Secrets) { }
 }

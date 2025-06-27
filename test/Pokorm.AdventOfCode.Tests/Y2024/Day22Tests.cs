@@ -11,10 +11,13 @@ public class Day22Tests(ILogger<Day22> logger) : DayTestBase
 
         var result = day.Solve(LinesFromSample(
                 """
-                ...
+                1
+                10
+                100
+                2024
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(37327623, result);
     }
 
     [Fact]
@@ -24,7 +27,7 @@ public class Day22Tests(ILogger<Day22> logger) : DayTestBase
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(12759339434, result);
     }
 
     /*[Fact]
