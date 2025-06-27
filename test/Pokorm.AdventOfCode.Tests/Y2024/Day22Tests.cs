@@ -10,12 +10,12 @@ public class Day22Tests(ILogger<Day22> logger) : DayTestBase
         var day = new Day22(logger);
 
         var result = day.Solve(LinesFromSample(
-                """
-                1
-                10
-                100
-                2024
-                """));
+            """
+            1
+            10
+            100
+            2024
+            """));
 
         Assert.Equal(37327623, result);
     }
@@ -30,17 +30,20 @@ public class Day22Tests(ILogger<Day22> logger) : DayTestBase
         Assert.Equal(12759339434, result);
     }
 
-    /*[Fact]
+    [Fact]
     public void PartTwo_1()
     {
         var day = new Day22(logger);
 
         var result = day.SolveBonus(LinesFromSample(
-                """
-                ...
-                """));
+            """
+            1
+            2
+            3
+            2024
+            """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal(23, result);
     }
 
     [Fact]
@@ -50,6 +53,7 @@ public class Day22Tests(ILogger<Day22> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.InRange(result, 0, 1426 - 1);
+        Assert.Equal(1405, result);
+    }
 }
