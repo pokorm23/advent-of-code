@@ -2,41 +2,35 @@ using Pokorm.AdventOfCode.Y2024.Days;
 
 namespace Pokorm.AdventOfCode.Tests.Y2024;
 
-public class Day21Tests(ILogger<Day21> logger) : DayTestBase
+public class Day22Tests(ILogger<Day22> logger) : DayTestBase
 {
-    /*[Fact]
+    [Fact]
     public void PartOne_1()
     {
-        var day = new Day21(logger);
+        var day = new Day22(logger);
 
         var result = day.Solve(LinesFromSample(
                 """
-                029A
-                980A
-                179A
-                456A
-                379A
+                ...
                 """));
 
-        Assert.Equal(126384, result);
+        Assert.Equal(-1, result);
     }
 
     [Fact]
     public void PartOne_F()
     {
-        var day = new Day21(logger);
+        var day = new Day22(logger);
 
         var result = day.Solve(LinesForDay(day));
 
-        Assert.InRange(result, 0, 224288-1);
-        Assert.InRange(result, 0, 213384-1);
         Assert.Equal(-1, result);
-    }*/
+    }
 
     /*[Fact]
     public void PartTwo_1()
     {
-        var day = new Day21(logger);
+        var day = new Day22(logger);
 
         var result = day.SolveBonus(LinesFromSample(
                 """
@@ -49,7 +43,7 @@ public class Day21Tests(ILogger<Day21> logger) : DayTestBase
     [Fact]
     public void PartTwo_F()
     {
-        var day = new Day21(logger);
+        var day = new Day22(logger);
 
         var result = day.SolveBonus(LinesForDay(day));
 
