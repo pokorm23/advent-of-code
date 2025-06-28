@@ -49,13 +49,109 @@ public class Day23(ILogger<Day23> logger)
         return result;
     }
 
-    public long SolveBonus(string[] lines)
+    public string SolveBonus(string[] lines)
     {
         var data = Parse(lines);
 
-        var result = 0;
+        var vertices = data.Connections.SelectMany(x => new List<string>()
+        {
+            x.A,
+            x.B
+        }).Distinct().ToList();
 
-        return result;
+        var allEdges = GetAllEdges(vertices).ToHashSet();
+
+        var complEdges = allEdges.ToHashSet();
+
+        complEdges.ExceptWith(data.Connections);
+
+        var edgeStack = new Stack<Pair>(complEdges);
+
+        var ctx = new SearchContext();
+
+        FindMaxFullGraph(vertices.ToHashSet(), edgeStack, ctx);
+
+        return string.Join(",", ctx.CurrentMaxFullGraph.Order());
+    }
+
+    private void FindMaxFullGraph(HashSet<string> vertices, Stack<Pair> complEdges, SearchContext ctx)
+    {
+        // trivial case
+        if (vertices.Count <= 3)
+        {
+            return;
+        }
+
+        // ex. bigger full graph already
+        if (vertices.Count <= ctx.CurrentMaxFullGraph.Count)
+        {
+            return;
+        }
+
+        // found bigger
+        if (complEdges.Count == 0)
+        {
+            ctx.TryToSet(vertices);
+
+            return;
+        }
+
+        // division by removing compl edge and then
+        // recursively run on each sub-graph without one of the vertices from the removed edge
+        var edge = complEdges.Pop();
+
+        if (IsFullGraph(vertices, complEdges.ToHashSet()))
+        {
+            ctx.TryToSet(vertices);
+
+            return;
+        }
+
+        FindMaxFullGraph(vertices.Where(x => x != edge.A).ToHashSet(), new Stack<Pair>(complEdges), ctx);
+        FindMaxFullGraph(vertices.Where(x => x != edge.B).ToHashSet(), new Stack<Pair>(complEdges), ctx);
+    }
+
+    private static bool IsFullGraph(HashSet<string> vertices, HashSet<Pair> edges)
+    {
+        var veEd = edges.SelectMany(x => new List<string>()
+                        {
+                            x.A,
+                            x.B
+                        })
+                        .ToHashSet();
+
+        return veEd.SequenceEqual(vertices);
+    }
+
+    private record SearchContext()
+    {
+        public HashSet<string> CurrentMaxFullGraph { get; set; } = [ ];
+
+        public void TryToSet(HashSet<string> vertices)
+        {
+            if (vertices.Count > this.CurrentMaxFullGraph.Count)
+            {
+                this.CurrentMaxFullGraph = vertices.ToHashSet();
+            }
+        }
+    }
+
+    private static IEnumerable<Pair> GetAllEdges(IReadOnlyCollection<string> vertices)
+    {
+        var n = vertices.ToList();
+
+        for (var i = 0; i < n.Count; i++)
+        {
+            for (var j = i + 1; j < n.Count; j++)
+            {
+                var a = n[i];
+                var b = n[j];
+
+                var d = new Pair(a, b);
+
+                yield return d;
+            }
+        }
     }
 
     private static DayData Parse(string[] lines)

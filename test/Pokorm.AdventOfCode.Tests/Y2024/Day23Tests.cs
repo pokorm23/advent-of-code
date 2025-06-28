@@ -57,18 +57,68 @@ public class Day23Tests(ILogger<Day23> logger) : DayTestBase
 
         Assert.Equal(1337, result);
     }
+    
+    [Fact]
+    public void PartTwo_0()
+    {
+        var day = new Day23(logger);
 
-    /*[Fact]
+        var result = day.SolveBonus(LinesFromSample(
+            """
+            a-b
+            b-e
+            a-c
+            a-d
+            c-d
+            b-d
+            b-c
+            """));
+
+        Assert.Equal("a,b,c,d", result);
+    }
+
+    [Fact]
     public void PartTwo_1()
     {
         var day = new Day23(logger);
 
         var result = day.SolveBonus(LinesFromSample(
                 """
-                ...
+                kh-tc
+                qp-kh
+                de-cg
+                ka-co
+                yn-aq
+                qp-ub
+                cg-tb
+                vc-aq
+                tb-ka
+                wh-tc
+                yn-cg
+                kh-ub
+                ta-co
+                de-co
+                tc-td
+                tb-wq
+                wh-td
+                ta-ka
+                td-qp
+                aq-cg
+                wq-ub
+                ub-vc
+                de-ta
+                wq-aq
+                wq-vc
+                wh-yn
+                ka-de
+                kh-ta
+                co-tc
+                wh-qp
+                tb-vc
+                td-yn
                 """));
 
-        Assert.Equal(-1, result);
+        Assert.Equal("co,de,ka,ta", result);
     }
 
     [Fact]
@@ -78,6 +128,6 @@ public class Day23Tests(ILogger<Day23> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal(-1, result);
-    }*/
+        Assert.Equal("-", result);
+    }
 }
