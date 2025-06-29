@@ -59,74 +59,94 @@ public class Day23(ILogger<Day23> logger)
             x.B
         }).Distinct().ToList();
 
-        var allEdges = GetAllEdges(vertices).ToList();
+        var r = FindMaxFullGraph_Iterative(new Vertices(vertices.ToHashSet()), data.Connections);
 
-        var complEdges = allEdges.Except(data.Connections).ToList();
-
-        var edgeStack = new Stack<Pair>(complEdges);
-
-        var ctx = new SearchContext();
-
-        FindMaxFullGraph(new Vertices(vertices.ToHashSet()), edgeStack, ctx);
-
-        return string.Join(",", ctx.CurrentMaxFullGraph.V.Select(x => x.Value).Order());
+        return string.Join(",", r.V.Select(x => x.Value).Order());
     }
 
-    private void FindMaxFullGraph(Vertices verticesA, Stack<Pair> complEdgesA, SearchContext ctx)
+    private Vertices FindMaxFullGraph_Iterative(Vertices v, HashSet<Pair> edges)
     {
-        var state = new Stack<(Vertices vertices, Stack<Pair> complEdges)>();
+        var q = new Queue<Vertices>();
+        var seen = new Dictionary<int, HashSet<string>>();
+        var maxFull = default(Vertices);
 
-        state.Push((verticesA, complEdgesA));
-
-        while (state.Count > 0)
+        foreach (var key in v.V)
         {
-            var (vertices, complEdges) = state.Pop();
-
-            // trivial case
-            if (vertices.V.Count <= 3)
-            {
-                ctx.Visited.Add(vertices.HashKey);
-                continue;
-            }
-
-            // ex. bigger full graph already
-            if (vertices.V.Count <= ctx.CurrentMaxFullGraph.V.Count)
-            {
-                ctx.Visited.Add(vertices.HashKey);
-                continue;
-            }
-
-            // found bigger
-            if (complEdges.Count == 0)
-            {
-                ctx.TryToSet(vertices);
-
-                ctx.Visited.Add(vertices.HashKey);
-                continue;
-            }
-
-            if (ctx.Visited.Contains(vertices.HashKey))
-            {
-                continue;
-            }
-
-            // division by removing compl edge and then
-            // recursively run on each sub-graph without one of the vertices from the removed edge
-            var edge = complEdges.Pop();
-
-            var a = vertices.V.ToHashSet();
-            a.Remove(edge.A);
-
-            state.Push((new Vertices(a), new Stack<Pair>(complEdges)));
-
-            vertices = new Vertices(a);
-            complEdges = new Stack<Pair>(complEdges);
-
-            a = vertices.V.ToHashSet();
-            a.Remove(edge.B);
-
-            state.Push((new Vertices(a), new Stack<Pair>(complEdges)));
+            q.Enqueue(new Vertices([ key ]));
         }
+
+        while (q.Count > 0)
+        {
+            var vs = q.Dequeue();
+            var d = vs.V.Count;
+
+            foreach (var nv in v.V)
+            {
+                // already in vertices
+                if (vs.V.Contains(nv))
+                {
+                    continue;
+                }
+
+                if (seen.Count < d)
+                {
+                    if (seen.TryAdd(d, [ ]))
+                    {
+                        logger.LogInformation($"Depth: {d}");
+
+                        if (d > 1 && seen[d - 1].Count == 1)
+                        {
+                            logger.LogInformation($" - Last count: {seen[d-1].Count}");
+                            break;
+                        }
+                    }
+
+                    if (d > 1)
+                    {
+                        seen.Remove(d - 1);
+                    }
+                }
+
+                var cache = seen[d];
+
+                var newVs = new Vertices([ ..vs.V, nv ]);
+
+                // already processed
+                if (cache.Contains(newVs.HashKey))
+                {
+                    continue;
+                }
+
+                var isFull = true;
+
+                // vs is full graph, verify if adding nv also is full graph
+                foreach (var k in vs.V)
+                {
+                    if (edges.Contains(new Pair(nv, k)))
+                    {
+                        continue;
+                    }
+
+                    isFull = false;
+
+                    break;
+                }
+
+                if (isFull)
+                {
+                    q.Enqueue(newVs);
+
+                    if (maxFull is null || newVs.V.Count > maxFull.V.Count)
+                    {
+                        maxFull = newVs;
+                    }
+                }
+
+                cache.Add(newVs.HashKey);
+            }
+        }
+
+        return maxFull ?? throw new Exception("max not found");
     }
 
     private record Vertices
@@ -143,10 +163,10 @@ public class Day23(ILogger<Day23> logger)
                 return true;
             }
 
-            return this.V.SetEquals(other.V);
+            return this.HashKey == this.HashKey;
         }
 
-        public override int GetHashCode() => this.V.GetHashCode();
+        public override int GetHashCode() => this.HashKey.GetHashCode();
 
         public HashSet<Key> V { get; }
 
@@ -156,39 +176,6 @@ public class Day23(ILogger<Day23> logger)
         {
             this.V = V;
             this.HashKey = string.Join("", V.Select(x => x.Value).Order());
-        }
-    }
-
-    private record SearchContext()
-    {
-        public Vertices CurrentMaxFullGraph { get; set; } = new ([ ]);
-
-        public HashSet<string> Visited { get; set; } = [ ];
-
-        public void TryToSet(Vertices vertices)
-        {
-            if (vertices.V.Count > this.CurrentMaxFullGraph.V.Count)
-            {
-                this.CurrentMaxFullGraph = vertices;
-            }
-        }
-    }
-
-    private static IEnumerable<Pair> GetAllEdges(IReadOnlyCollection<Key> vertices)
-    {
-        var n = vertices.ToList();
-
-        for (var i = 0; i < n.Count; i++)
-        {
-            for (var j = i + 1; j < n.Count; j++)
-            {
-                var a = n[i];
-                var b = n[j];
-
-                var d = new Pair(a, b);
-
-                yield return d;
-            }
         }
     }
 
