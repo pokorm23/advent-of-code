@@ -1,4 +1,6 @@
-﻿namespace Pokorm.AdventOfCode.Y2024.Days;
+﻿using System.Numerics;
+
+namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/23
 public class Day23(ILogger<Day23> logger)
@@ -9,7 +11,7 @@ public class Day23(ILogger<Day23> logger)
 
         var threeLoops = new HashSet<ThreePair>();
 
-        var vertices = data.Connections.SelectMany(x => new List<string>()
+        var vertices = data.Connections.SelectMany(x => new List<Key>()
         {
             x.A,
             x.B
@@ -39,9 +41,9 @@ public class Day23(ILogger<Day23> logger)
             }
         }
 
-        var possibles = threeLoops.Where(x => x.A.StartsWith('t')
-                                              || x.B.StartsWith('t')
-                                              || x.C.StartsWith('t'))
+        var possibles = threeLoops.Where(x => x.A.Value.StartsWith('t')
+                                              || x.B.Value.StartsWith('t')
+                                              || x.C.Value.StartsWith('t'))
                                   .ToHashSet();
 
         var result = possibles.Count;
@@ -53,37 +55,35 @@ public class Day23(ILogger<Day23> logger)
     {
         var data = Parse(lines);
 
-        var vertices = data.Connections.SelectMany(x => new List<string>()
+        var vertices = data.Connections.SelectMany(x => new List<Key>()
         {
             x.A,
             x.B
         }).Distinct().ToList();
 
-        var allEdges = GetAllEdges(vertices).ToHashSet();
+        var allEdges = GetAllEdges(vertices).ToList();
 
-        var complEdges = allEdges.ToHashSet();
-
-        complEdges.ExceptWith(data.Connections);
+        var complEdges = allEdges.Except(data.Connections).ToList();
 
         var edgeStack = new Stack<Pair>(complEdges);
 
         var ctx = new SearchContext();
 
-        FindMaxFullGraph(vertices.ToHashSet(), edgeStack, ctx);
+        FindMaxFullGraph(new Vertices(vertices.ToHashSet()), edgeStack, ctx);
 
-        return string.Join(",", ctx.CurrentMaxFullGraph.Order());
+        return string.Join(",", ctx.CurrentMaxFullGraph.V.Select(x => x.Value).Order());
     }
 
-    private void FindMaxFullGraph(HashSet<string> vertices, Stack<Pair> complEdges, SearchContext ctx)
+    private void FindMaxFullGraph(Vertices vertices, Stack<Pair> complEdges, SearchContext ctx)
     {
         // trivial case
-        if (vertices.Count <= 3)
+        if (vertices.V.Count <= 3)
         {
             return;
         }
 
         // ex. bigger full graph already
-        if (vertices.Count <= ctx.CurrentMaxFullGraph.Count)
+        if (vertices.V.Count <= ctx.CurrentMaxFullGraph.V.Count)
         {
             return;
         }
@@ -96,47 +96,74 @@ public class Day23(ILogger<Day23> logger)
             return;
         }
 
+        if (ctx.Visited.Contains(vertices.HashKey))
+        {
+            return;
+        }
+
         // division by removing compl edge and then
         // recursively run on each sub-graph without one of the vertices from the removed edge
         var edge = complEdges.Pop();
 
-        if (IsFullGraph(vertices, complEdges.ToHashSet()))
-        {
-            ctx.TryToSet(vertices);
+        var a = vertices.V.ToHashSet();
+        a.Remove(edge.A);
 
-            return;
-        }
+        FindMaxFullGraph(new Vertices(a), new Stack<Pair>(complEdges), ctx);
 
-        FindMaxFullGraph(vertices.Where(x => x != edge.A).ToHashSet(), new Stack<Pair>(complEdges), ctx);
-        FindMaxFullGraph(vertices.Where(x => x != edge.B).ToHashSet(), new Stack<Pair>(complEdges), ctx);
+        a = vertices.V.ToHashSet();
+        a.Remove(edge.B);
+
+        FindMaxFullGraph(new Vertices(a), new Stack<Pair>(complEdges), ctx);
+
+        ctx.Visited.Add(vertices.HashKey);
     }
 
-    private static bool IsFullGraph(HashSet<string> vertices, HashSet<Pair> edges)
+    private record Vertices
     {
-        var veEd = edges.SelectMany(x => new List<string>()
-                        {
-                            x.A,
-                            x.B
-                        })
-                        .ToHashSet();
+        public virtual bool Equals(Vertices? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
 
-        return veEd.SequenceEqual(vertices);
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return this.V.SetEquals(other.V);
+        }
+
+        public override int GetHashCode() => this.V.GetHashCode();
+
+        public HashSet<Key> V { get; }
+
+        public string HashKey { get; }
+
+        public Vertices(HashSet<Key> V)
+        {
+            this.V = V;
+            this.HashKey = string.Join("", V.Select(x => x.Value).Order());
+        }
     }
 
     private record SearchContext()
     {
-        public HashSet<string> CurrentMaxFullGraph { get; set; } = [ ];
+        public Vertices CurrentMaxFullGraph { get; set; } = new ([ ]);
 
-        public void TryToSet(HashSet<string> vertices)
+        public HashSet<string> Visited { get; set; } = [ ];
+
+        public void TryToSet(Vertices vertices)
         {
-            if (vertices.Count > this.CurrentMaxFullGraph.Count)
+            if (vertices.V.Count > this.CurrentMaxFullGraph.V.Count)
             {
-                this.CurrentMaxFullGraph = vertices.ToHashSet();
+                this.CurrentMaxFullGraph = vertices;
             }
         }
     }
 
-    private static IEnumerable<Pair> GetAllEdges(IReadOnlyCollection<string> vertices)
+    private static IEnumerable<Pair> GetAllEdges(IReadOnlyCollection<Key> vertices)
     {
         var n = vertices.ToList();
 
@@ -161,7 +188,10 @@ public class Day23(ILogger<Day23> logger)
         foreach (var line in lines)
         {
             var split = line.FullSplit('-');
-            c.Add(new (split[0], split[1]));
+
+            var keys = split.Select(x => new Key(x)).ToList();
+
+            c.Add(new (keys[0], keys[1]));
         }
 
         return new DayData(c);
@@ -169,8 +199,21 @@ public class Day23(ILogger<Day23> logger)
 
     private record DayData(HashSet<Pair> Connections) { }
 
-    private record Pair(string A, string B)
+    private record Pair
     {
+        public Key A { get; }
+
+        public Key B { get; }
+
+        public int Num { get; }
+
+        public Pair(Key A, Key B)
+        {
+            this.A = A >= B ? A : B;
+            this.B = A >= B ? B : A;
+            this.Num = 1000 * this.A.Num + this.B.Num;
+        }
+
         public virtual bool Equals(Pair? other)
         {
             if (other is null)
@@ -183,14 +226,52 @@ public class Day23(ILogger<Day23> logger)
                 return true;
             }
 
-            return (this.A, this.B) == (other.A, other.B)
-                   || (this.B, this.A) == (other.A, other.B);
+            return this.Num == other.Num;
         }
 
-        public override int GetHashCode() => 0;
+        public override int GetHashCode() => this.Num.GetHashCode();
     }
 
-    private record ThreePair(string A, string B, string C)
+    private record struct Key : IComparable<Key>, IComparable
+    {
+        public int CompareTo(Key other) => this.Num.CompareTo(other.Num);
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is null)
+            {
+                return 1;
+            }
+
+            return obj is Key other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(Key)}");
+        }
+
+        public static bool operator <(Key left, Key right) => left.CompareTo(right) < 0;
+
+        public static bool operator >(Key left, Key right) => left.CompareTo(right) > 0;
+
+        public static bool operator <=(Key left, Key right) => left.CompareTo(right) <= 0;
+
+        public static bool operator >=(Key left, Key right) => left.CompareTo(right) >= 0;
+
+        public readonly bool Equals(Key other) => this.Num == other.Num;
+
+        public readonly override int GetHashCode() => this.Num.GetHashCode();
+
+        public string Value { get; }
+
+        public int Num { get; }
+
+        public Key(string value)
+        {
+            this.Value = value;
+            var b = 26;
+            var (c1, c2) = value.Length == 1 ? (value[0], 'z') : (value[0], value[1]);
+            this.Num = (int) (c2 - 'a') + b * (c1 - 'a');
+        }
+    }
+
+    private record ThreePair(Key A, Key B, Key C)
     {
         public virtual bool Equals(ThreePair? other)
         {
