@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Pokorm.AdventOfCode.Y2024.Days;
+﻿namespace Pokorm.AdventOfCode.Y2024.Days;
 
 // https://adventofcode.com/2024/day/23
 public class Day23(ILogger<Day23> logger)
@@ -74,48 +72,61 @@ public class Day23(ILogger<Day23> logger)
         return string.Join(",", ctx.CurrentMaxFullGraph.V.Select(x => x.Value).Order());
     }
 
-    private void FindMaxFullGraph(Vertices vertices, Stack<Pair> complEdges, SearchContext ctx)
+    private void FindMaxFullGraph(Vertices verticesA, Stack<Pair> complEdgesA, SearchContext ctx)
     {
-        // trivial case
-        if (vertices.V.Count <= 3)
+        var state = new Stack<(Vertices vertices, Stack<Pair> complEdges)>();
+
+        state.Push((verticesA, complEdgesA));
+
+        while (state.Count > 0)
         {
-            return;
+            var (vertices, complEdges) = state.Pop();
+
+            // trivial case
+            if (vertices.V.Count <= 3)
+            {
+                ctx.Visited.Add(vertices.HashKey);
+                continue;
+            }
+
+            // ex. bigger full graph already
+            if (vertices.V.Count <= ctx.CurrentMaxFullGraph.V.Count)
+            {
+                ctx.Visited.Add(vertices.HashKey);
+                continue;
+            }
+
+            // found bigger
+            if (complEdges.Count == 0)
+            {
+                ctx.TryToSet(vertices);
+
+                ctx.Visited.Add(vertices.HashKey);
+                continue;
+            }
+
+            if (ctx.Visited.Contains(vertices.HashKey))
+            {
+                continue;
+            }
+
+            // division by removing compl edge and then
+            // recursively run on each sub-graph without one of the vertices from the removed edge
+            var edge = complEdges.Pop();
+
+            var a = vertices.V.ToHashSet();
+            a.Remove(edge.A);
+
+            state.Push((new Vertices(a), new Stack<Pair>(complEdges)));
+
+            vertices = new Vertices(a);
+            complEdges = new Stack<Pair>(complEdges);
+
+            a = vertices.V.ToHashSet();
+            a.Remove(edge.B);
+
+            state.Push((new Vertices(a), new Stack<Pair>(complEdges)));
         }
-
-        // ex. bigger full graph already
-        if (vertices.V.Count <= ctx.CurrentMaxFullGraph.V.Count)
-        {
-            return;
-        }
-
-        // found bigger
-        if (complEdges.Count == 0)
-        {
-            ctx.TryToSet(vertices);
-
-            return;
-        }
-
-        if (ctx.Visited.Contains(vertices.HashKey))
-        {
-            return;
-        }
-
-        // division by removing compl edge and then
-        // recursively run on each sub-graph without one of the vertices from the removed edge
-        var edge = complEdges.Pop();
-
-        var a = vertices.V.ToHashSet();
-        a.Remove(edge.A);
-
-        FindMaxFullGraph(new Vertices(a), new Stack<Pair>(complEdges), ctx);
-
-        a = vertices.V.ToHashSet();
-        a.Remove(edge.B);
-
-        FindMaxFullGraph(new Vertices(a), new Stack<Pair>(complEdges), ctx);
-
-        ctx.Visited.Add(vertices.HashKey);
     }
 
     private record Vertices
