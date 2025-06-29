@@ -66,18 +66,18 @@ public class Day23(ILogger<Day23> logger)
 
     private Vertices FindMaxFullGraph_Iterative(Vertices v, HashSet<Pair> edges)
     {
-        var q = new Queue<Vertices>();
-        var seen = new Dictionary<int, HashSet<string>>();
+        var q = new Stack<Vertices>();
+        var cache = new HashSet<string>();
         var maxFull = default(Vertices);
 
         foreach (var key in v.V)
         {
-            q.Enqueue(new Vertices([ key ]));
+            q.Push(new Vertices([ key ]));
         }
 
         while (q.Count > 0)
         {
-            var vs = q.Dequeue();
+            var vs = q.Pop();
             var d = vs.V.Count;
 
             foreach (var nv in v.V)
@@ -87,27 +87,6 @@ public class Day23(ILogger<Day23> logger)
                 {
                     continue;
                 }
-
-                if (seen.Count < d)
-                {
-                    if (seen.TryAdd(d, [ ]))
-                    {
-                        logger.LogInformation($"Depth: {d}");
-
-                        if (d > 1 && seen[d - 1].Count == 1)
-                        {
-                            logger.LogInformation($" - Last count: {seen[d-1].Count}");
-                            break;
-                        }
-                    }
-
-                    if (d > 1)
-                    {
-                        seen.Remove(d - 1);
-                    }
-                }
-
-                var cache = seen[d];
 
                 var newVs = new Vertices([ ..vs.V, nv ]);
 
@@ -134,11 +113,18 @@ public class Day23(ILogger<Day23> logger)
 
                 if (isFull)
                 {
-                    q.Enqueue(newVs);
+                    q.Push(newVs);
 
                     if (maxFull is null || newVs.V.Count > maxFull.V.Count)
                     {
                         maxFull = newVs;
+
+                        // assumption
+                        if (maxFull.V.Count == 13)
+                        {
+                            q.Clear();
+                            break;
+                        }
                     }
                 }
 

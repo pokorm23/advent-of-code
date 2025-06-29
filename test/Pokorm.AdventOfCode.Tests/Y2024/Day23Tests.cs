@@ -128,6 +128,6 @@ public class Day23Tests(ILogger<Day23> logger) : DayTestBase
 
         var result = day.SolveBonus(LinesForDay(day));
 
-        Assert.Equal("-", result);
+        Assert.Equal("aw,fk,gv,hi,hp,ip,jy,kc,lk,og,pj,re,sr", result);
     }
 }
