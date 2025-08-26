@@ -3,84 +3,49 @@
 // https://adventofcode.com/2015/day/18
 public class Day18(ILogger<Day18> logger)
 {
-    
-    public long Solve(string[] lines, int steps)
+    public long Solve(string[] lines) => Solve(lines, 100, false);
+
+    public long SolveBonus(string[] lines) => Solve(lines, 100, true);
+
+    public long Solve(string[] lines, int steps, bool lockCorners)
     {
-        var data = Parse(lines);
+        var data = Parse(lines, lockCorners);
 
         for (var s = 0; s < steps; s++)
         {
-            var d = data.Data.Select(x => x.ToList()).ToList();
+            var gridCursor = data.Data.Copy();
 
-            foreach (var (i, row) in d.Index())
+            foreach (var (c, (l, canChange)) in gridCursor.Values)
             {
-                foreach (var (j, l) in row.Index())
+                if (!canChange)
                 {
-                    var neib = new List<bool>();
-
-                    //logger.LogInformation($"[{s}]: [{i}][{j}]");
-
-                    for (var a = int.Max(0, i - 1); a <= int.Min(i + 1, data.Data.Count - 1); a++)
-                    {
-                        for (var b = int.Max(0, j - 1); b <= int.Min(j + 1, row.Count - 1); b++)
-                        {
-                            if (a == i && b == j)
-                            {
-                                continue;
-                            }
-
-                            //logger.LogInformation($" - [{a}][{b}] {data.Data[a][b]}");
-
-                            neib.Add(d[a][b]);
-                        }
-                    }
-
-                    var nextState = l ? neib.Count(x => x) is 2 or 3 : neib.Count(x => x) is 3;
-
-                    //logger.LogInformation($" -> {nextState}");
-
-                    data.Data[i][j] = nextState;
+                    continue;
                 }
+
+                var neib = gridCursor.GetValuedSiblings(c, Vector.All).Count(x => x.Value.Item1);
+
+                var nextState = l ? neib is 2 or 3 : neib is 3;
+
+                data.Data.Values[c] = (nextState, true);
             }
         }
 
-        var result = data.Data.SelectMany(x => x).Count(x => x);
+        var result = data.Data.Values.Values.Count(x => x.Item1);
 
         return result;
     }
 
-    public long SolveBonus(string[] lines)
+    private static DayData Parse(string[] lines, bool lockCorners)
     {
-        var data = Parse(lines);
+        var grid = Parser.ParseValuedGrid(lines, (c, coord) => (c == '#', true));
 
-        var result = 0;
-
-        return result;
-    }
-
-    private static DayData Parse(string[] lines)
-    {
-        List<List<bool>> data = [];
-
-        foreach (var line in lines)
+        if (lockCorners)
         {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-
-            List<bool> lineData = [];
-
-            foreach (var c in line)
-            {
-                lineData.Add(c == '#');
-            }
-
-            data.Add(lineData);
+            grid = grid.Transform((tuple, coord) => grid.GetSiblings(coord, Vector.All).Count() == 3 ? (true, false) : (tuple.Item1, true));
         }
 
-        return new DayData(data);
+        return new DayData(grid);
     }
 
-    private record DayData(List<List<bool>> Data) { }
+    private record DayData(Grid<(bool, bool)> Data) { }
 }

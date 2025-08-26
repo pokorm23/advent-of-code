@@ -8,9 +8,17 @@ public record struct Vector(long X, long Y)
 
     public static Vector Top = new Vector(0, 1);
 
+    public static Vector TopRight = new Vector(1, 1);
+
+    public static Vector TopLeft = new Vector(-1, 1);
+
     public static Vector Left = new Vector(-1, 0);
 
     public static Vector Bottom = new Vector(0, -1);
+
+    public static Vector BottomLeft = new Vector(-1, -1);
+
+    public static Vector BottomRigth = new Vector(1, -1);
 
     public static Vector Right = new Vector(1, 0);
 
@@ -18,7 +26,11 @@ public record struct Vector(long X, long Y)
 
     public static Vector[] Vertical = [ Top, Bottom ];
 
+    public static Vector[] Diagonal = [ TopRight, TopLeft, BottomRigth, BottomLeft ];
+
     public static Vector[] Directional = [ ..Horizontal, ..Vertical ];
+
+    public static Vector[] All = [ ..Directional, ..Diagonal ];
 
     public static Vector operator -(Vector c) => c * -1;
 
